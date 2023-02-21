@@ -1,4 +1,4 @@
-## Cloud Foundations Script
+## Cloud Foundations scripts
 
 1. Automations to help you set up your cloud foundation
     - Delete Default VPC
