@@ -1,6 +1,42 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Config centralized logging S3 bucket for the log archive account.
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "S3 Bucket Details"
+        Parameters:
+          - pS3BucketName
+      - Label:
+          default: "Encryption"
+        Parameters:
+          - pSSEAlgorithm
+          - pKMSMasterKeyID
+      - Label:
+          default: "Log Retention"
+        Parameters:
+          - pRetentionDays
+          - pRetentionDaysForAccessLogs
+      - Label:
+          default: "Glacier Configuration (Optional)"
+        Parameters:
+          - pTransitionToGlacier
+          - pTransitionDays
+    ParameterLabels:
+      pS3BucketName:
+        default: "S3 Bucket name"
+      pSSEAlgorithm:
+        default: "SSE algorithm"
+      pKMSMasterKeyID:
+        default: "KMS master key ID (Optional)"
+      pRetentionDays:
+        default: "Retention in days"
+      pRetentionDaysForAccessLogs:
+        default: "Retention days for access logs"
+      pTransitionToGlacier:
+        default: "Transition to Glacier"
+
 Parameters:
   pS3BucketName:
     Type: 'String'
@@ -148,7 +184,6 @@ Resources:
               ExpirationInDays: !Ref pRetentionDays
               NoncurrentVersionExpirationInDays: !Ref pRetentionDays
 
-  # Create Bucket Policy for S3 Audit bucket for existing customers
   rS3ConfigBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
