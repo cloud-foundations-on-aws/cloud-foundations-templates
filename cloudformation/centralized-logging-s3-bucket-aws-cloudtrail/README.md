@@ -15,3 +15,4 @@ The centralized config logging bucket is configured so that AWS CloudTrail can w
 | `Retention days for access logs` | String | 365 | Number of Days to retain the access logs, after which it will be permanently deleted. |
 | `Transition to Glacier` | String | No | Yes or No option to to specify to transition the logs to Glacier before permanently deleting. |
 | `Transition to Glacier days` | String | 364 | The number of days to transition the data from S3 to Glacier if Glacier is being used. |
+| `AWS Organization ID` | String | | The ID of your AWS Organization |

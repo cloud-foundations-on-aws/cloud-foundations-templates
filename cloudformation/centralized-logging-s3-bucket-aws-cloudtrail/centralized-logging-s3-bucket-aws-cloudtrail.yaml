@@ -1,0 +1,249 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudTrail centralized logging S3 bucket for the log archive account.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "S3 Bucket Details"
+        Parameters:
+          - pS3BucketName
+      - Label:
+          default: "Encryption"
+        Parameters:
+          - pSSEAlgorithm
+          - pKMSMasterKeyID
+      - Label:
+          default: "Log Retention"
+        Parameters:
+          - pRetentionDays
+          - pRetentionDaysForAccessLogs
+      - Label:
+          default: "Glacier Configuration (Optional)"
+        Parameters:
+          - pTransitionToGlacier
+          - pTransitionDays
+    ParameterLabels:
+      pS3BucketName:
+        default: "S3 Bucket name"
+      pSSEAlgorithm:
+        default: "SSE algorithm"
+      pKMSMasterKeyID:
+        default: "KMS key ID (Optional)"
+      pRetentionDays:
+        default: "Retention in days"
+      pRetentionDaysForAccessLogs:
+        default: "Retention days for access logs"
+      pTransitionToGlacier:
+        default: "Transition to Glacier"
+      pTransitionDays:
+        default: "Transition to Glacier days"
+      pOrganizationId:
+        default: "AWS Organization ID"
+
+Parameters:
+  pS3BucketName:
+    Type: 'String'
+    Description: 'Name for the S3 Bucket to hold AWS CloudTrail logging'
+    Default: "config-logs"
+  pSSEAlgorithm:
+    Type: 'String'
+    Default: 'AES256'
+    Description: S3 bucket SSE Algorithm.
+    AllowedValues:
+      - 'AES256'
+      - 'aws:kms'
+  pKMSMasterKeyID:
+    Type: 'String'
+    Description: 'KMS key ID required if SSE algorithm is aws:kms.'
+  pRetentionDays:
+    Type: String
+    Description: 'Number of Days to retain the logs, after which it will be permanently deleted'
+    Default: "365"
+  pRetentionDaysForAccessLogs:
+    Type: String
+    Description: 'Number of Days to retain the access logs, after which it will be permanently deleted'
+    Default: "365"
+  pTransitionToGlacier:
+    Type: String
+    Description: 'Do you wish to transition the logs to Glacier before permanently deleting?'
+    Default: 'No'
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+  pTransitionDays:
+    Type: String
+    Description: 'Number of days to transition the data from S3 to Glacier if Glacier is being used.'
+    Default: "364"
+
+  pOrganizationId:
+    Type: 'String'
+    Description: Organization Id for the management account.
+
+Conditions:
+  cUseKMS: !Equals
+    - !Ref pSSEAlgorithm
+    - 'aws:kms'
+  cMoveToGlacier: !Equals
+    - !Ref pTransitionToGlacier
+    - 'Yes'
+
+Resources:
+
+  rS3AccessLoggingBucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    # false positive due to if statement
+    # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Properties:
+      BucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
+      AccessControl: LogDeliveryWrite
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - !If
+            - cUseKMS
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: !Ref pSSEAlgorithm
+                KMSMasterKeyID: !Ref pKMSMasterKeyID
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: !Ref pSSEAlgorithm
+      LifecycleConfiguration:
+        Rules:
+          - !If
+            - cMoveToGlacier
+            - Id: RetentionRule
+              Status: Enabled
+              ExpirationInDays: !Ref pRetentionDaysForAccessLogs
+              NoncurrentVersionExpirationInDays: !Ref pRetentionDaysForAccessLogs
+              Transitions:
+                - TransitionInDays: !Ref pTransitionDays
+                  StorageClass: Glacier
+              NoncurrentVersionTransitions:
+                - TransitionInDays: !Ref pTransitionDays
+                  StorageClass: Glacier
+            - Id: RetentionRule
+              Status: Enabled
+              ExpirationInDays: !Ref pRetentionDaysForAccessLogs
+              NoncurrentVersionExpirationInDays: !Ref pRetentionDaysForAccessLogs
+
+  rS3AccessLoggingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref rS3AccessLoggingBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}"
+              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  rS3CloudTrailBucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    # false positive due to if statement
+    # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Properties:
+      BucketName: !Sub ${pS3BucketName}-${AWS::AccountId}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Ref rS3AccessLoggingBucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - !If
+            - cUseKMS
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: !Ref pSSEAlgorithm
+                KMSMasterKeyID: !Ref pKMSMasterKeyID
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: !Ref pSSEAlgorithm
+      LifecycleConfiguration:
+        Rules:
+          - !If
+            - cMoveToGlacier
+            - Id: RetentionRule
+              Status: Enabled
+              ExpirationInDays: !Ref pRetentionDays
+              NoncurrentVersionExpirationInDays: !Ref pRetentionDays
+              Transitions:
+                - TransitionInDays: !Ref pTransitionDays
+                  StorageClass: Glacier
+              NoncurrentVersionTransitions:
+                - TransitionInDays: !Ref pTransitionDays
+                  StorageClass: Glacier
+            - Id: RetentionRule
+              Status: Enabled
+              ExpirationInDays: !Ref pRetentionDays
+              NoncurrentVersionExpirationInDays: !Ref pRetentionDays
+
+  rS3CloudTrailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref rS3CloudTrailBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+          - Sid: AWSBucketPermissionsCheck
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource:
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
+          - Sid: AWSBucketExistenceCheck
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:ListBucket
+            Resource:
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
+          - Sid: AWSBucketDeliveryForOrganizationTrail
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource:
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/${AWSLogsS3KeyPrefix}/AWSLogs/${pOrganizationId}/*"
+              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/${AWSLogsS3KeyPrefix}/AWSLogs/*/*"
+
+Outputs:
+  BucketName:
+    Description: CloudTrail centralized logging S3 Bucket name
+    Value: !Ref rS3CloudTrailBucket
+  LoggingBucketName:
+    Description: S3 Access Logging Bucket name for CloudTrail centralized logging
+    Value: !Ref rS3AccessLoggingBucket
