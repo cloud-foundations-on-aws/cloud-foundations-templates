@@ -19,9 +19,11 @@ Parameters:
   pRetentionDays:
     Type: String
     Description: 'No of Days to retain the logs, after which it will be permanently deleted'
+    Default: "365"
   pRetentionDaysForAccessLogs:
     Type: String
     Description: 'No of Days to retain the access logs, after which it will be permanently deleted'
+    Default: "365"
   pTransitionToGlacier:
     Type: String
     Description: 'Do you wish to transition the logs to Glacier before permanently deleting?'
@@ -31,7 +33,7 @@ Parameters:
       - 'No'
   pTransitionDays:
     Type: String
-    Description: 'No of Days to transition the data from S3 to Glacier'
+    Description: 'Number of days to transition the data from S3 to Glacier if Glacier is being used.'
 
 Conditions:
   cUseKMS: !Equals
@@ -52,7 +54,7 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
       LoggingConfiguration:
-        DestinationBucketName: !Sub ${pS3BucketName}-AccessLogs-${AWS::AccountId}
+        DestinationBucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
