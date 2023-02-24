@@ -49,7 +49,7 @@ Resources:
     DeletionPolicy: Retain
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${pS3BucketName}-AccessLogs-${AWS::AccountId}
+      BucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
       AccessControl: LogDeliveryWrite
       VersioningConfiguration:
         Status: Enabled
