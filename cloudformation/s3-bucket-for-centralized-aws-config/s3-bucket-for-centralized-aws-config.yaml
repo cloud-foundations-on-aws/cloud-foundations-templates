@@ -5,7 +5,7 @@ Parameters:
   pS3BucketName:
     Type: 'String'
     Description: 'Name for the S3 Bucket to hold AWS Config logging'
-    Default: "Config-Logs"
+    Default: "config-logs"
   pSSEAlgorithm:
     Type: 'String'
     Default: 'AES256'
@@ -16,9 +16,6 @@ Parameters:
   pKMSMasterKeyID:
     Type: 'String'
     Description: 'KMS key ID required if SSE algorithm is aws:kms.'
-  pManagedResourcePrefix:
-    Type: 'String'
-    Description: 'Prefix for the managed resources'
   pRetentionDays:
     Type: String
     Description: 'No of Days to retain the logs, after which it will be permanently deleted'
@@ -43,12 +40,6 @@ Conditions:
   cMoveToGlacier: !Equals
     - !Ref pTransitionToGlacier
     - 'Yes'
-  cCompletedAccountTrailDeletionStatus: !Equals
-    - !Ref pAccountTrailDeletionStatus
-    - 'COMPLETED'
-  cNotRequiredAccountTrailDeletionStatus: !Equals
-    - !Ref pAccountTrailDeletionStatus
-    - 'NOT_REQUIRED'
 
 Resources:
 
@@ -95,7 +86,6 @@ Resources:
               ExpirationInDays: !Ref pRetentionDaysForAccessLogs
               NoncurrentVersionExpirationInDays: !Ref pRetentionDaysForAccessLogs
 
-  # Create Bucket Policy for S3 Access Logging bucket
   rS3AccessLoggingBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -108,13 +98,12 @@ Resources:
             Principal: '*'
             Action: s3:*
             Resource:
-              - !Sub "arn:aws:s3:::${S3LoggingBucket}"
-              - !Sub "arn:aws:s3:::${S3LoggingBucket}/*"
+              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}"
+              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}/*"
             Condition:
               Bool:
                 aws:SecureTransport: false
 
-  # Create S3 Audit bucket
   rS3ConfigBucket:
     DeletionPolicy: Retain
     Type: AWS::S3::Bucket
