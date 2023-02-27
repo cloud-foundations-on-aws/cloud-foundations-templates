@@ -1,0 +1,41 @@
+name: sast
+
+on:
+  push:
+
+jobs:
+
+  cfn-nag:
+    name: Run cfn-nag scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run cfn-nag
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: cloudformation
+
+  checkov:
+    name: checkov
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: grolston/cfn-security@v2
+      with:
+        cloudformation_directory: './cloudformation/'
+        scanner: "checkov"
+
+  cfn-lint:
+    name: cfn-lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Cloud Formation Linter with Latest Version
+      uses: scottbrenner/cfn-lint-action@v2
+
+    - name: Print the Cloud Formation Linter Version & run Linter.
+      run: |
+        cfn-lint --version
+        cfn-lint cloudformation/**/*.yaml

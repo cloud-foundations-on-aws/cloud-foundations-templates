@@ -1,0 +1,39 @@
+name: General Issue
+description: Create a new issue
+title: "(module name): short issue description"
+labels: [needs-triage, guidance]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If your issue does not fall in any of the other categories create an issue with this template.
+
+  - type: input
+    id: issue
+    attributes:
+      label: General Issue
+      description: |
+        Important Information - Please look at the following sections before creating an issue to see if your question was already answered:
+        * [Open issues](https://github.com/cloud-foundations-on-aws/cloud-foundations-docs/issues)
+        * All our [PRs](https://github.com/cloud-foundations-on-aws/cloud-foundations-docs/pulls), both open and closed
+        * Our [documentation](https://github.com/cloud-foundations-on-aws/cloud-foundations-docs/README.md)
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: The Question
+      description: |
+        Ask your question here. Include any details relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Other information
+      description: |
+        e.g. detailed explanation, screenshots, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. associated pull-request, stackoverflow, slack, etc
+    validations:
+      required: false
