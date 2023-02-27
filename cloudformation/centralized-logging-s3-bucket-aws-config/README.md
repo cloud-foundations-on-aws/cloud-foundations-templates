@@ -10,7 +10,7 @@ The centralized config logging bucket is configured so that AWS Config can write
 | --------- | ---- | ------------- | ----------- |
 | `S3 Bucket name` | String | `config-logs` | defines the name of the s3 bucket to store logs from Config. The name will be suffixed with the account ID to help create a globally unique name. |
 | `SSE algorithm` | String |  `AES256` | Accepts values of `AES256` or `aws:kms` to set the server side encryption of the S3 Bucket. If you specify `aws:kms` you will need to include  `KMS Key ID` parameter in the template. |
-| `KMS key ID` | String |  | The KMS key ID that you use to encrypt data at rest in the S3 Bucket. Leave this blank if using `AES256` for the `SSE algorithm` parameter. |
+| `KMS key ID` | String |  | The KMS key ID that you use to encrypt data at rest in the S3 Bucket. Leave this blank if using `AES256` for the `SSE algorithm` parameter. If using KMS Key, ensure it is in same region as the S3 Bucket. |
 | `Retention in days` | String | 365  | Number of Days to retain the Config logs, after which it will be permanently deleted. |
 | `Retention days for access logs` | String | 365 | Number of Days to retain the access logs, after which it will be permanently deleted. |
 | `Transition to Glacier` | String | No | Yes or No option to to specify to transition the logs to Glacier before permanently deleting. |
