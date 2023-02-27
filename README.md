@@ -1,4 +1,4 @@
-## Cloud Foundations
+# Template Solutions - Cloud Foundations on AWS
 
 To support cloud adoption, AWS recommends that you have a foundational set of capabilities that enable you to deploy, operate, and govern your workloads. A capability includes a definition, scenarios, guidance, and supporting solutions to establish and operate a specific part of a cloud environment. Capabilities are designed to integrate into your overall technology environment.
 
@@ -19,4 +19,3 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
-

@@ -16,6 +16,7 @@ jobs:
           input_path: cloudformation
 
   checkov:
+    name: checkov
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,3 +24,16 @@ jobs:
       with:
         cloudformation_directory: './cloudformation/'
         scanner: "checkov"
+
+  cfn-lint:
+    name: cfn-lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: cfn-nag
+      shell: bash
+      run: |
+        pip install cfn-lint
+        setopt -s globstar
+        cfn-lint cloudformation/**/*.yaml
