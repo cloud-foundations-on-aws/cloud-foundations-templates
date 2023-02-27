@@ -5,6 +5,12 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: "CloudTrail Config"
+        Parameters:
+          - pTrailAccountId
+          - pTrailName
+          - pOrganizationId
+      - Label:
           default: "S3 Bucket Details"
         Parameters:
           - pS3BucketName
@@ -29,7 +35,7 @@ Metadata:
       pSSEAlgorithm:
         default: "SSE algorithm"
       pKMSMasterKeyID:
-        default: "KMS key ID (Optional)"
+        default: "KMS key Id (Optional)"
       pRetentionDays:
         default: "Retention in days"
       pRetentionDaysForAccessLogs:
@@ -39,7 +45,11 @@ Metadata:
       pTransitionDays:
         default: "Transition to Glacier days"
       pOrganizationId:
-        default: "AWS Organization ID"
+        default: "AWS Organization Id"
+      pTrailAccountId:
+        default: "CloudTrail AWS Account Id"
+      pTrailName:
+        default: "CloudTrail Trail Name"
 
 Parameters:
   pS3BucketName:
@@ -79,6 +89,14 @@ Parameters:
   pOrganizationId:
     Type: 'String'
     Description: Organization Id for the management account.
+
+  pTrailAccountId:
+    Type: 'String'
+    Description: "The AWS account Id which the CloudTrail Organization Trail exists in."
+
+  pTrailName:
+    Type: 'String'
+    Description: "The name of the Organization Trail for CloudTrail"
 
 Conditions:
   cUseKMS: !Equals
@@ -197,6 +215,8 @@ Resources:
               ExpirationInDays: !Ref pRetentionDays
               NoncurrentVersionExpirationInDays: !Ref pRetentionDays
 
+  ## Bucket Policy details can be found at:
+  ## https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-s3-bucket-policy-for-cloudtrail.html#org-trail-bucket-policy
   rS3CloudTrailBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -204,6 +224,34 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Sid: "AWSCloudTrailAclCheck"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - cloudtrail.amazonaws.com
+            Action: "s3:GetBucketAcl"
+            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
+            Condition:
+              StringEquals:
+                "aws:SourceArn": !Sub "arn:aws:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
+          - Sid: "AWSCloudTrailWrite"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource: "arn:aws:s3:::${pBucketName}/AWSLogs/${AWS:AccountId}/*"
+            Condition:
+              StringEquals:
+                "s3:x-amz-acl": "bucket-owner-full-control"
+                "aws:SourceArn": !Sub "arn:aws:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
+          - Sid: AWSCloudTrailOrganizationWrite
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "cloudtrail.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/AWSLogs/${pOrganizationId}/*"
           - Sid: AllowSSLRequestsOnly
             Effect: Deny
             Principal: '*'
@@ -214,31 +262,6 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: false
-          - Sid: AWSBucketPermissionsCheck
-            Effect: Allow
-            Principal:
-              Service:
-                - cloudtrail.amazonaws.com
-            Action: s3:GetBucketAcl
-            Resource:
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
-          - Sid: AWSBucketExistenceCheck
-            Effect: Allow
-            Principal:
-              Service:
-                - cloudtrail.amazonaws.com
-            Action: s3:ListBucket
-            Resource:
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
-          - Sid: AWSBucketDeliveryForOrganizationTrail
-            Effect: Allow
-            Principal:
-              Service:
-                - cloudtrail.amazonaws.com
-            Action: s3:PutObject
-            Resource:
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/${AWSLogsS3KeyPrefix}/AWSLogs/${pOrganizationId}/*"
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/${AWSLogsS3KeyPrefix}/AWSLogs/*/*"
 
 Outputs:
   BucketName:
