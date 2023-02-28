@@ -65,7 +65,7 @@ Resources:
   rMAAdminPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
-      InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+      InstanceArn: !Sub 'arn:${AWS::Partition}:sso:::instance/${pInstanceId}'
       Name: 'PermissionSet'
       Description: 'MA-Administrator access permission set'
       SessionDuration: !Ref pMAAdminSessionDuration
@@ -79,7 +79,7 @@ Resources:
   rMAReadOnlyPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
-      InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+      InstanceArn: !Sub 'arn:${AWS::Partition}:sso:::instance/${pInstanceId}'
       Name: 'PermissionSet'
       Description: 'MA-ReadOnly access permission set'
       SessionDuration: !Ref pMAReadOnlySessionDuration
