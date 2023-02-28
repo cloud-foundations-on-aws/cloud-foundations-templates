@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloud Foundations on AWS - Management Account Identity Center Permission Sets.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Identity Center"
+        Parameters:
+          - pInstanceId
+      - Label:
+          default: "Session Duration"
+        Parameters:
+          - pMAAdminSessionDuration
+          - pMAReadOnlySessionDuration
+    ParameterLabels:
+      pInstanceId:
+        default: "Identity Center Id"
+      pMAAdminSessionDuration:
+        default: "MA-Administrator Session Duration"
+      pMAReadOnlySessionDuration:
+        default: "MA-ReadOnly Session Duration"
+
+Parameters:
+  pInstanceId:
+    Type: 'String'
+    Description: 'The Id of the AWS Identity Center instance in your environment'
+  pMAAdminSessionDuration:
+    Type: 'String'
+    Default: 'PT1H'
+    Description: The length of time that the MA-Administrator user sessions are valid for in the ISO-8601 standard.
+    AllowedValues:
+      - 'PT1H'
+      - 'PT2H'
+      - 'PT3H'
+      - 'PT4H'
+      - 'PT5H'
+      - 'PT6H'
+      - 'PT7H'
+      - 'PT8H'
+      - 'PT9H'
+      - 'PT10H'
+      - 'PT11H'
+      - 'PT12H'
+  pMAReadOnlySessionDuration:
+    Type: 'String'
+    Default: 'PT1H'
+    Description: The length of time that the MA-ReadOnly user sessions are valid for in the ISO-8601 standard.
+    AllowedValues:
+      - 'PT1H'
+      - 'PT2H'
+      - 'PT3H'
+      - 'PT4H'
+      - 'PT5H'
+      - 'PT6H'
+      - 'PT7H'
+      - 'PT8H'
+      - 'PT9H'
+      - 'PT10H'
+      - 'PT11H'
+      - 'PT12H'
+
+Resources:
+
+rMAAdminPermissionSet:
+  Type: AWS::SSO::PermissionSet
+    Properties:
+    InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+    Name: 'PermissionSet'
+    Description: 'MA-Administrator access permission set'
+    SessionDuration: !Ref pMAAdminSessionDuration
+    ManagedPolicies:
+      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+    ## Add necessary tags for your implementation
+    # Tags:
+    #   - Key: tagKey
+    #     Value: tagValue
+
+rMAReadOnlyPermissionSet:
+  Type: AWS::SSO::PermissionSet
+    Properties:
+    InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+    Name: 'PermissionSet'
+    Description: 'MA-ReadOnly access permission set'
+    SessionDuration: !Ref pMAReadOnlySessionDuration
+    ManagedPolicies:
+      - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
+    ## Add necessary tags for your implementation
+    # Tags:
+    #   - Key: tagKey
+    #     Value: tagValue
