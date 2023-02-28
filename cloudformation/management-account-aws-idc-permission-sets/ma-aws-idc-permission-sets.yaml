@@ -62,30 +62,30 @@ Parameters:
 
 Resources:
 
-rMAAdminPermissionSet:
-  Type: AWS::SSO::PermissionSet
-    Properties:
-    InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
-    Name: 'PermissionSet'
-    Description: 'MA-Administrator access permission set'
-    SessionDuration: !Ref pMAAdminSessionDuration
-    ManagedPolicies:
-      - 'arn:aws:iam::aws:policy/AdministratorAccess'
-    ## Add necessary tags for your implementation
-    # Tags:
-    #   - Key: tagKey
-    #     Value: tagValue
+  rMAAdminPermissionSet:
+    Type: AWS::SSO::PermissionSet
+      Properties:
+      InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+      Name: 'PermissionSet'
+      Description: 'MA-Administrator access permission set'
+      SessionDuration: !Ref pMAAdminSessionDuration
+      ManagedPolicies:
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      ## Add necessary tags for your implementation
+      # Tags:
+      #   - Key: tagKey
+      #     Value: tagValue
 
-rMAReadOnlyPermissionSet:
-  Type: AWS::SSO::PermissionSet
-    Properties:
-    InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
-    Name: 'PermissionSet'
-    Description: 'MA-ReadOnly access permission set'
-    SessionDuration: !Ref pMAReadOnlySessionDuration
-    ManagedPolicies:
-      - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
-    ## Add necessary tags for your implementation
-    # Tags:
-    #   - Key: tagKey
-    #     Value: tagValue
+  rMAReadOnlyPermissionSet:
+    Type: AWS::SSO::PermissionSet
+      Properties:
+      InstanceArn: !Sub 'arn:aws:sso:::instance/${pInstanceId}'
+      Name: 'PermissionSet'
+      Description: 'MA-ReadOnly access permission set'
+      SessionDuration: !Ref pMAReadOnlySessionDuration
+      ManagedPolicies:
+        - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
+      ## Add necessary tags for your implementation
+      # Tags:
+      #   - Key: tagKey
+      #     Value: tagValue
