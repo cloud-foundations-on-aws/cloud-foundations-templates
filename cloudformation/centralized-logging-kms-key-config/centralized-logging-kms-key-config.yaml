@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description:
+  Config centralized KMS key for Config.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: KMS Key Properties
+        Parameters:
+          - pLogArchiveAccountId
+          - pManagementAccountId
+          - pConfigKeyAlias
+    ParameterLabels:
+      pManagementAccountId:
+        default: Management Account ID
+      pLogArchiveAccountId:
+        default: Log Archive Account ID
+      pConfigKeyAlias:
+        default: Organization Config KMS Key Alias
+
+Parameters:
+  pManagementAccountId:
+    AllowedPattern: '^\d{12}$'
+    ConstraintDescription: Must be 12 digits
+    Description: Management Account ID
+    Type: String
+  pLogArchiveAccountId:
+    AllowedPattern: '^\d{12}$'
+    ConstraintDescription: Must be 12 digits
+    Description: Log archive account ID
+    Type: String
+  pConfigKeyAlias:
+    Default: config-org-key
+    Description: Config KMS Key Alias
+    Type: String
+
+Resources:
+  rConfigKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: AWS Config KMS Key
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Sub ${pConfigKeyAlias}
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow Config to use KMS for encryption
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:${AWS::Partition}:iam::${pManagementAccountId}:root
+            Action: 
+                - kms:Decrypt
+                - kms:GenerateDataKey
+            Resource: '*'
+          - Sid: Allow alias creation during setup
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:root
+            Action: kms:CreateAlias
+            Resource: '*'
+            Condition:
+              StringEquals:
+                kms:CallerAccount: !Sub ${AWS::AccountId}
+                kms:ViaService: !Sub cloudformation.${AWS::Region}.amazonaws.com
+          - Sid: Allow Log Archive and Management account access
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:${AWS::Partition}:iam::${pLogArchiveAccountId}:root
+                - !Sub arn:${AWS::Partition}:iam::${pManagementAccountId}:root
+            Action: kms:Decrypt
+            Resource: '*'
+
+  rConfigKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/${pConfigKeyAlias}
+      TargetKeyId: !Ref rConfigKey
+
+Outputs:
+  oConfigKeyArn:
+    Description: Config KMS Key ARN
+    Value: !GetAtt rConfigKey.Arn
