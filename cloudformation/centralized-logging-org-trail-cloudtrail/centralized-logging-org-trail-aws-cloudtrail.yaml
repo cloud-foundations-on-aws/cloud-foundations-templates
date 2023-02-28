@@ -1,0 +1,68 @@
+########################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+########################################################################
+AWSTemplateFormatVersion: 2010-09-09
+Description:
+  This template enables and configures an AWS CloudTrail Organization trail in the Control Tower Management account. - 'cloudtrail_org' solution in
+  the repo, https://github.com/aws-samples/aws-security-reference-architecture-examples (sra-1ssgnse0i)
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CloudTrail parameters
+        Parameters:
+          - pCloudTrailName
+          - pCloudTrailS3BucketName
+          - pOrganizationCloudTrailKMSKeyId
+
+    ParameterLabels:
+      pCloudTrailName:
+        default: CloudTrail Name
+      pCloudTrailS3BucketName:
+        default: CloudTrail S3 Bucket Name
+      pOrganizationCloudTrailKMSKeyId:
+        default: Organization CloudTrail KMS Key
+
+Parameters:
+  pCloudTrailName:
+    AllowedPattern: ^[A-Za-z0-9][a-zA-Z0-9-\-_.]{2,127}$
+    ConstraintDescription:
+      Contain only ASCII letters (a-z, A-Z), numbers (0-9), periods (.), underscores (_), or dashes (-) Start with a letter or number, and end with a
+      letter or number Be between 3 and 128 characters Have no adjacent periods, underscores or dashes. Names like my-_namespace and my--namespace are
+      invalid. Not be in IP address format (for example, 192.168.5.4)
+    Default: aws-cloudtrail-org
+    Description: CloudTrail name
+    Type: String
+  pCloudTrailS3BucketName:
+    AllowedPattern: ^$|^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription:
+      S3 bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: CloudTrail S3 Bucket Name
+    Type: String
+  pOrganizationCloudTrailKMSKeyId:
+    AllowedPattern: '^$|^arn:(aws[a-zA-Z-]*){1}:kms:[a-z0-9-]+:\d{12}:key\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+    ConstraintDescription: 'Key ARN example:  arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab'
+    Description: KMS Key ARN to use for encrypting the CloudTrail logs
+    Type: String
+
+Resources:
+  rOrgCloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Properties:
+      S3BucketName: !Ref pCloudTrailS3BucketName
+      IsLogging: true
+      TrailName: !Ref pCloudTrailName
+      EnableLogFileValidation: true
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      IsOrganizationTrail: true
+      KMSKeyId: !Ref pOrganizationCloudTrailKMSKeyId
+      EventSelectors:
+        - IncludeManagementEvents: true
+          ReadWriteType: All
+Outputs:
+  ARN:
+    Description: The trail ARN
+    Value: !GetAtt rOrgCloudTrail.Arn
