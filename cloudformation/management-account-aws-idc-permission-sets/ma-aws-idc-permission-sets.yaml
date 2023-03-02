@@ -7,24 +7,24 @@ Metadata:
       - Label:
           default: "Identity Center"
         Parameters:
-          - pInstanceId
+          - pIdentityCenterArn
       - Label:
           default: "Session Duration"
         Parameters:
           - pMAAdminSessionDuration
           - pMAReadOnlySessionDuration
     ParameterLabels:
-      pInstanceId:
-        default: "Identity Center Id"
+      pIdentityCenterArn:
+        default: "Identity Center ARN"
       pMAAdminSessionDuration:
         default: "MA-Administrator Session Duration"
       pMAReadOnlySessionDuration:
         default: "MA-ReadOnly Session Duration"
 
 Parameters:
-  pInstanceId:
+  pIdentityCenterArn:
     Type: 'String'
-    Description: 'The Id of the AWS Identity Center instance in your environment'
+    Description: 'The ARN of the AWS Identity Center instance in your environment'
   pMAAdminSessionDuration:
     Type: 'String'
     Default: 'PT1H'
@@ -65,8 +65,8 @@ Resources:
   rMAAdminPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
-      InstanceArn: !Sub 'arn:${AWS::Partition}:sso:::instance/${pInstanceId}'
-      Name: 'PermissionSet'
+      InstanceArn: !Ref pIdentityCenterArn
+      Name: 'MA-Administrator'
       Description: 'MA-Administrator access permission set'
       SessionDuration: !Ref pMAAdminSessionDuration
       ManagedPolicies:
@@ -79,8 +79,8 @@ Resources:
   rMAReadOnlyPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
-      InstanceArn: !Sub 'arn:${AWS::Partition}:sso:::instance/${pInstanceId}'
-      Name: 'PermissionSet'
+      InstanceArn: !Ref pIdentityCenterArn
+      Name: 'MA-ReadOnly'
       Description: 'MA-ReadOnly access permission set'
       SessionDuration: !Ref pMAReadOnlySessionDuration
       ManagedPolicies:

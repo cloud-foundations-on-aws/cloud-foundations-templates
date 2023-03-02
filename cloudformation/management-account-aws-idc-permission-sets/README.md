@@ -28,6 +28,6 @@ Template creates an S3 Bucket to be deployed in your log archive account for cen
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
-| `Identity Center Id` | String |  | The ARN of the IAM Identity Center instance under which the operation will be executed. |
-| `MA-Administrator Session Duration` | String |  `PT1H` | The length of time that the MA-Administrator user sessions are valid for in the ISO-8601 standard |
-| `MA-ReadOnly Session Duration` | String | `PT1H` | The length of time that the MA-ReadOnly user sessions are valid for in the ISO-8601 standard. |
+| `pIdentityCenterArn` | String |  | The ARN of the IAM Identity Center instance under which the operation will be executed. |
+| `pMAAdminSessionDuration` | String |  `PT1H` | The length of time that the MA-Administrator user sessions are valid for in the ISO-8601 standard |
+| `pMAReadOnlySessionDuration` | String | `PT1H` | The length of time that the MA-ReadOnly user sessions are valid for in the ISO-8601 standard. |
