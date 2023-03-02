@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloud Foundations on AWS - Management Account Identity Center Assignments.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Identity Center Details"
+        Parameters:
+          - pIdCInstanceId
+          - pManagementAccountId
+      - Label:
+          default: "Management Account Admin User Assignment"
+        Parameters:
+          - pMAAdministratorUserId
+          - pMAAdministratorPermissionSetId
+      - Label:
+          default: "Management Account ReadOnly User Assignment"
+        Parameters:
+          - pMAReadOnlyUserId
+          - pMAReadOnlyPermissionSetId
+    ParameterLabels:
+      pIdCInstanceId:
+        default: "AWS Identity Center Instance Id"
+      pManagementAccountId:
+        default: "Management Account Id"
+      pMAAdministratorUserId:
+        default: "MA Administrator User Id"
+      pMAAdministratorPermissionSetId:
+        default: "MA Administrator Permission Set Id"
+      pMAReadOnlyUserId:
+        default: "MA Read Only User Id"
+      pMAReadOnlyPermissionSetId:
+        default: "MA ReadOnly Permission Set Id"
+
+Parameters:
+  pIdCInstanceId:
+    Type: String
+    Description: 'The Identity Center instance Id (example: ssoins-xxxxxxxxxxxxxxxx)'
+  pMAAdministratorUserId:
+    Type: String
+    Description: 'The MA-Administrator Identity Center User Id (example: 92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793)'
+  pMAAdministratorPermissionSetId:
+    Type: String
+    Description: 'The name of the permission set to assign the user (example: ps-xxxxxxxxxxxxxxxx)'
+  pManagementAccountId:
+    Type: String
+    Description: The AWS Management Account Id to deploy the assignment to.
+  pMAReadOnlyUserId:
+    Type: String
+    Description: 'The MA-ReadOnly Identity Center User Id (example: 92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793)'
+  pMAReadOnlyPermissionSetId:
+    Type: String
+    Description: 'The name of the permission set to assign the user (example: ps-xxxxxxxxxxxxxxxx)'
+
+Resources:
+
+  rMAAdministratorUserAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Sub arn:${AWS::Partition}:sso:::instance/${pIdCInstanceId}
+      PermissionSetArn: !Sub arn:${AWS::Partition}:sso:::permissionSet/${pIdCInstanceId}/${pMAAdministratorPermissionSetId}
+      TargetId: !Ref pManagementAccountId
+      TargetType: "AWS_ACCOUNT"
+      PrincipalType: "USER"
+      PrincipalId: !Ref pMAAdministratorUserId
+
+  rMAReadOnlyUserAssignment:
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Sub arn:${AWS::Partition}:sso:::instance/${pIdCInstanceId}
+      PermissionSetArn: !Sub arn:${AWS::Partition}:sso:::permissionSet/${pIdCInstanceId}/${pMAReadOnlyPermissionSetId}
+      TargetId: !Ref pManagementAccountId
+      TargetType: "AWS_ACCOUNT"
+      PrincipalType: "USER"
+      PrincipalId: !Ref pMAReadOnlyUserId
