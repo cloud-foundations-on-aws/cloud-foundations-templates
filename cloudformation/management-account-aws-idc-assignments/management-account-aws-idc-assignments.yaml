@@ -7,7 +7,7 @@ Metadata:
       - Label:
           default: "Identity Center Details"
         Parameters:
-          - pIdCInstanceId
+          - pIdentityCenterArn
           - pManagementAccountId
       - Label:
           default: "Management Account Admin User Assignment"
@@ -20,8 +20,8 @@ Metadata:
           - pMAReadOnlyUserId
           - pMAReadOnlyPermissionSetId
     ParameterLabels:
-      pIdCInstanceId:
-        default: "AWS Identity Center Instance Id"
+      pIdentityCenterArn:
+        default: "AWS Identity Center Instance ARN"
       pManagementAccountId:
         default: "Management Account Id"
       pMAAdministratorUserId:
@@ -34,9 +34,9 @@ Metadata:
         default: "MA ReadOnly Permission Set Id"
 
 Parameters:
-  pIdCInstanceId:
+  pIdentityCenterArn:
     Type: String
-    Description: 'The Identity Center instance Id (example: ssoins-xxxxxxxxxxxxxxxx)'
+    Description: 'The Identity Center instance ARN'
   pMAAdministratorUserId:
     Type: String
     Description: 'The MA-Administrator Identity Center User Id (example: 92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793)'
@@ -58,8 +58,8 @@ Resources:
   rMAAdministratorUserAssignment:
     Type: AWS::SSO::Assignment
     Properties:
-      InstanceArn: !Sub arn:${AWS::Partition}:sso:::instance/${pIdCInstanceId}
-      PermissionSetArn: !Sub arn:${AWS::Partition}:sso:::permissionSet/${pIdCInstanceId}/${pMAAdministratorPermissionSetId}
+      InstanceArn: !Ref pIdentityCenterArn
+      PermissionSetArn: !Sub ${pIdentityCenterArn}/${pMAAdministratorPermissionSetId}
       TargetId: !Ref pManagementAccountId
       TargetType: "AWS_ACCOUNT"
       PrincipalType: "USER"
@@ -68,8 +68,8 @@ Resources:
   rMAReadOnlyUserAssignment:
     Type: AWS::SSO::Assignment
     Properties:
-      InstanceArn: !Sub arn:${AWS::Partition}:sso:::instance/${pIdCInstanceId}
-      PermissionSetArn: !Sub arn:${AWS::Partition}:sso:::permissionSet/${pIdCInstanceId}/${pMAReadOnlyPermissionSetId}
+      InstanceArn: !Ref pIdentityCenterArn
+      PermissionSetArn: !Sub ${pIdentityCenterArn}/${pMAReadOnlyPermissionSetId}
       TargetId: !Ref pManagementAccountId
       TargetType: "AWS_ACCOUNT"
       PrincipalType: "USER"
