@@ -8,30 +8,27 @@ Metadata:
           default: "Identity Center Details"
         Parameters:
           - pIdentityCenterArn
-          - pManagementAccountId
       - Label:
           default: "Management Account Admin User Assignment"
         Parameters:
           - pMAAdministratorUserId
-          - pMAAdministratorPermissionSetId
+          - pMAAdministratorPermissionSetArn
       - Label:
           default: "Management Account ReadOnly User Assignment"
         Parameters:
           - pMAReadOnlyUserId
-          - pMAReadOnlyPermissionSetId
+          - pMAReadOnlyPermissionSetArn
     ParameterLabels:
       pIdentityCenterArn:
         default: "AWS Identity Center Instance ARN"
-      pManagementAccountId:
-        default: "Management Account Id"
       pMAAdministratorUserId:
         default: "MA Administrator User Id"
-      pMAAdministratorPermissionSetId:
-        default: "MA Administrator Permission Set Id"
+      pMAAdministratorPermissionSetArn:
+        default: "MA Administrator Permission Set ARN"
       pMAReadOnlyUserId:
         default: "MA Read Only User Id"
-      pMAReadOnlyPermissionSetId:
-        default: "MA ReadOnly Permission Set Id"
+      pMAReadOnlyPermissionSetArn:
+        default: "MA ReadOnly Permission Set ARN"
 
 Parameters:
   pIdentityCenterArn:
@@ -40,27 +37,23 @@ Parameters:
   pMAAdministratorUserId:
     Type: String
     Description: 'The MA-Administrator Identity Center User Id (example: 92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793)'
-  pMAAdministratorPermissionSetId:
+  pMAAdministratorPermissionSetArn:
     Type: String
-    Description: 'The name of the permission set to assign the user (example: ps-xxxxxxxxxxxxxxxx)'
-  pManagementAccountId:
+    Description: 'The ARN of the Administrator permission set to assign the user'
+  pMAReadOnlyPermissionSetArn:
     Type: String
-    Description: The AWS Management Account Id to deploy the assignment to.
+    Description: 'The ARN of the Read Only permission set to assign the user'
   pMAReadOnlyUserId:
     Type: String
     Description: 'The MA-ReadOnly Identity Center User Id (example: 92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793)'
-  pMAReadOnlyPermissionSetId:
-    Type: String
-    Description: 'The name of the permission set to assign the user (example: ps-xxxxxxxxxxxxxxxx)'
 
 Resources:
-
   rMAAdministratorUserAssignment:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref pIdentityCenterArn
-      PermissionSetArn: !Sub ${pIdentityCenterArn}/${pMAAdministratorPermissionSetId}
-      TargetId: !Ref pManagementAccountId
+      PermissionSetArn: !Ref pMAAdministratorPermissionSetArn
+      TargetId: !Ref "AWS::AccountId"
       TargetType: "AWS_ACCOUNT"
       PrincipalType: "USER"
       PrincipalId: !Ref pMAAdministratorUserId
@@ -69,8 +62,8 @@ Resources:
     Type: AWS::SSO::Assignment
     Properties:
       InstanceArn: !Ref pIdentityCenterArn
-      PermissionSetArn: !Sub ${pIdentityCenterArn}/${pMAReadOnlyPermissionSetId}
-      TargetId: !Ref pManagementAccountId
+      PermissionSetArn: !Ref pMAReadOnlyPermissionSetArn
+      TargetId: !Ref "AWS::AccountId"
       TargetType: "AWS_ACCOUNT"
       PrincipalType: "USER"
       PrincipalId: !Ref pMAReadOnlyUserId
