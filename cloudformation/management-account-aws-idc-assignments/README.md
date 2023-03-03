@@ -19,11 +19,9 @@ The CloudFormation template creates two assignments for AWS Identity Users. Depl
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
-| `pIdCInstanceId` | String |  | Then Identity Center instance Id. Example: `ssoins-xxxxxxxxxxxxxxxx` |
-| `pManagementAccountId` | String |  | The AWS Management Account Id to deploy the assignment to |
-| `pMAAdministratorUserId` | String |   | The MA-Administrator Identity Center User Id. Example: Example: `92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793`
-) |
-| `pMAAdministratorPermissionSetId` | String |  | The name of the permission set to assign the user Example: `ps-xxxxxxxxxxxxxxxx` |
-| `pMAAdministratorPermissionSetId` | String |  | The ARN of the IAM Identity Center instance under which the operation will be executed |
+| `pIdentityCenterArn` | String |  | Then Identity Center instance ARN.` |
+| `pMAAdministratorUserId` | String |   | The MA-Administrator Identity Center User Id. Example: Example: `92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793` |
+| `pMAAdministratorPermissionSetArn` | String |  | The ARN of the MA Administrator permission set to assign the user` |
 | `pMAReadOnlyUserId` | String |   | The MA-ReadOnly Identity Center User Id. Example: `92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793` |
-| `pMAReadOnlyPermissionSetId` | String |  | The name of the permission set to assign the user. Example: `ps-xxxxxxxxxxxxxxxx` |
+| `pMAReadOnlyPermissionSetArn` | String |  | The ARN of the Read Only permission set to assign the user |
+
