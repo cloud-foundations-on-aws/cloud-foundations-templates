@@ -1,0 +1,47 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowSSLRequestsOnly",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::[BUCKET_NAME]",
+                "arn:aws:s3:::[BUCKET_NAME]/*"
+            ],
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "false"
+                }
+            }
+        },
+        {
+            "Sid": "AWSBucketPermissionsCheck",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "config.amazonaws.com"
+            },
+            "Action": "s3:GetBucketAcl",
+            "Resource": "arn:aws:s3:::[BUCKET_NAME]"
+        },
+        {
+            "Sid": "AWSConfigBucketExistenceCheck",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "config.amazonaws.com"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::[BUCKET_NAME]"
+        },
+        {
+            "Sid": "AWSBucketDeliveryForConfig",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "config.amazonaws.com"
+            },
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::[BUCKET_NAME]/AWSLogs/*/*"
+        }
+    ]
+}
