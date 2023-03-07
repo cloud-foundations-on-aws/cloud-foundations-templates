@@ -4,7 +4,7 @@ The [foundational-organizational-unit-structure.yml](./foundational-organization
 
 > **Note:** Deploy the template from your [AWS management account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html).
 
-The following diagram
+The following diagram illustrates the resources deployed by the template foundational-organizational-unit-structure.yml](./foundational-organizational-unit-structure.yml).
 
 ![Reference Architecture](./ref-arch-diagram.drawio.png)
 
