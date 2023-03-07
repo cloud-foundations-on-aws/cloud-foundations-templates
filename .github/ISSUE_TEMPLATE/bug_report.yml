@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report a bug
-title: "(module name): short issue description"
-labels: [bug, needs-triage]
+title: "(name): short issue description"
+labels: [type:bug, status:needs-triage]
 body:
   - type: textarea
     id: problem
@@ -15,9 +15,9 @@ body:
     attributes:
       label: Reproduction Steps
       description: |
-        1. Example rules and template that results in the error
-        1. The commands you used to invoke the tool
-        1. The output of a `-v` log level or the `cfn-guard test -d` output
+        1. Example template that results in the error
+        2. The commands you used to invoke the tool
+        3. The output received
     validations:
       required: true
 
@@ -48,32 +48,16 @@ body:
     id: version
     attributes:
       label: version of IaC or CLI being used
-      description: Output of cli version
+      description: Output
     validations:
       required: true
-
-  - type: input
-    id: operating-system
-    attributes:
-      label: OS
-      description: E.g. MacOS | Windows | Ubuntu
-    validations:
-      required: true
-
-  - type: input
-    id: os-version
-    attributes:
-      label: OS Version
-      description: E.g. Catalina | 10 | 18.04
-    validations:
-      required: false
 
   - type: textarea
     id: other
     attributes:
       label: Other information
       description: |
-        e.g. detailed explanation, scrennshots, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. associated pull-request, stackoverflow, slack, etc
+        e.g. detailed explanation, screenshots, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. associated pull-request, stackoverflow, slack, etc
     validations:
       required: false
 

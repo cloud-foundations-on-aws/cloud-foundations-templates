@@ -1,7 +1,7 @@
 name: Documentation Issue
 description: Issue in the reference documentation or developer guide
-title: "(module name): short issue description"
-labels: [feature-request, documentation, needs-triage]
+title: "(name): short issue description"
+labels: [type:documentation, status:needs-triage]
 body:
   - type: input
     id: doc-link
