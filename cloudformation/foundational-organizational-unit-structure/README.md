@@ -1,10 +1,12 @@
 # Foundational Organizational Unit Structure and Accounts
 
-The [foundational-organizational-unit-structure.yml](./foundational-organizational-unit-structure.yml) template deploys a basic AWS Organizational Unit structure with AWS accounts for log centralization and security tooling. By starting with a subset of the [AWS Multi-Account Strategy Recommended OUs](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/recommended-ous-and-accounts.html), you will have an organizational structure that allows you to start building out your environment and workloads and allow you to create additional recommended OUs as they are needed.
+The [foundational-organizational-unit-structure.yaml](./foundational-organizational-unit-structure.yaml) template
+ deploys a basic AWS Organizational Unit structure with AWS accounts for log centralization and security tooling. By starting with a subset of the [AWS Multi-Account Strategy Recommended OUs](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/recommended-ous-and-accounts.html), you will have an organizational structure that allows you to start building out your environment and workloads and allow you to create additional recommended OUs as they are needed.
 
 > **Note:** Deploy the template from your [AWS management account](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html).
 
-The following diagram illustrates the resources deployed by the template foundational-organizational-unit-structure.yml](./foundational-organizational-unit-structure.yml).
+The following diagram illustrates the resources deployed by the template [foundational-organizational-unit-structure
+.yaml](./foundational-organizational-unit-structure.yaml).
 
 ![Reference Architecture](./ref-arch-diagram.drawio.png)
 
