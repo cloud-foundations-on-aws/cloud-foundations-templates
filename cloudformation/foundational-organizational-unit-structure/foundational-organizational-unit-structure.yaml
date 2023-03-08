@@ -1,0 +1,102 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Cloud Foundations on AWS - Foundational Organizational Unit structure and AWS accounts.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Organization Configs"
+        Parameters:
+          - pRootOrgId
+      - Label:
+          default: "AWS Accounts"
+        Parameters:
+          - pLogArchiveAccountName
+          - pLogArchiveAccountEmail
+          - pSecurityToolingAccountName
+          - pSecurityToolingAccountEmail
+    ParameterLabels:
+      pRootOrgId:
+        default: "Root Org Id (r-xxxx)"
+      pLogArchiveAccountName:
+        default: "Production Log Archive Account Name"
+      pLogArchiveAccountEmail:
+        default: "Production Log Archive Account Email"
+      pSecurityToolingAccountName:
+        default: "Production Security Tooling Account Name"
+      pSecurityToolingAccountEmail:
+        default: "Production Security Tooling Account Email"
+
+Parameters:
+  pRootOrgId:
+    Type: String
+    Description: Organization root Id (r-xxxx)
+  pLogArchiveAccountName:
+    Type: String
+    Description: alias (AWS account name) for the production log archive account
+    Default: "Log Archive"
+  pLogArchiveAccountEmail:
+    Type: String
+    Description: 'root user email address for the production log archive account. Example: aws-log-archive-[org-identifier]@example.com'
+  pSecurityToolingAccountName:
+    Type: String
+    Description: alias (AWS account name) for the production security account
+    Default: "Security Tooling"
+  pSecurityToolingAccountEmail:
+    Type: String
+    Description: 'root user email address for the production security tooling account. Example: aws-security-tooling-[org-identifier]@example.com'
+
+Resources:
+
+  rExceptionsOu:
+    Type: AWS::Organizations::OrganizationalUnit
+    Properties:
+      Name: Exceptions
+      ParentId: !Ref pRootOrgId
+
+  rInfrastructureOu:
+    Type: AWS::Organizations::OrganizationalUnit
+    Properties:
+      Name: Infrastructure
+      ParentId: !Ref pRootOrgId
+
+  rSecurityOu:
+    Type: AWS::Organizations::OrganizationalUnit
+    Properties:
+      Name: Security
+      ParentId: !Ref pRootOrgId
+
+  rSandboxOu:
+    Type: AWS::Organizations::OrganizationalUnit
+    Properties:
+      Name: Sandbox
+      ParentId: !Ref pRootOrgId
+
+  rWorkloadsOu:
+    Type: AWS::Organizations::OrganizationalUnit
+    Properties:
+      Name: Workloads
+      ParentId: !Ref pRootOrgId
+
+  rLogArchiveProdAccount:
+    Type: AWS::Organizations::Account
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      AccountName: !Ref pLogArchiveAccountName
+      Email: !Ref pLogArchiveAccountEmail
+      ParentIds:
+        - !Ref rSecurityOu
+
+  rSecurityToolingProdAccount:
+    Type: AWS::Organizations::Account
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    DependsOn:
+      - rLogArchiveProdAccount
+    Properties:
+      AccountName: !Ref pSecurityToolingAccountName
+      Email: !Ref pSecurityToolingAccountEmail
+      ParentIds:
+        - !Ref rSecurityOu
