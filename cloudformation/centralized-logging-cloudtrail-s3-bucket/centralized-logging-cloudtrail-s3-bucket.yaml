@@ -55,7 +55,7 @@ Parameters:
   pS3BucketName:
     Type: 'String'
     Description: 'Name for the S3 Bucket to hold AWS CloudTrail logging'
-    Default: "config-logs"
+    Default: "cloudtrail-logs"
   pSSEAlgorithm:
     Type: 'String'
     Default: 'AES256'
@@ -97,6 +97,7 @@ Parameters:
   pTrailName:
     Type: 'String'
     Description: "The name of the Organization Trail for CloudTrail"
+    Default: 'aws-cloudtrail-org'
 
 Conditions:
   cUseKMS: !Equals
