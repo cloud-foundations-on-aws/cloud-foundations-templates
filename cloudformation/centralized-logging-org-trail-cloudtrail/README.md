@@ -1,7 +1,6 @@
 # Organization CloudTrail Trail
 
-Template creates an Organization CloudTrail trail for management events and records them in a previously created
- centralized S3 bucket in the Log Archive account.
+Template creates an Organization CloudTrail trail for management events and records them in a previously created centralized S3 bucket in the Log Archive account.
 
 Deploy this CloudTrail trail to the home region of your management account.
 

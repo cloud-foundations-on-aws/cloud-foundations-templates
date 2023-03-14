@@ -22,7 +22,7 @@ Associated Policies: Custom Permission set: AWS managed policy ReadOnlyAccess
 
 ## CloudFormation Template
 
-Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of CloudTrail. Template will deploy two S3 buckets: one for centralized config logging and another for access logging.
+The CloudFormation template creates two permissions set for AWS Identity Users accessing the management account. Deploy the template in your AWS Management account under the region your Identity Center is deployed in.
 
 ## Parameters
 

@@ -1,7 +1,6 @@
 # KMS Key for Centralized AWS Config logging
 
-Template creates a KMS Key to be deployed in your Security Tooling account for encrypting AWS Config Snapshots and
- History in the Log Archive account.
+Template creates a KMS Key to be deployed in your Security Tooling account for encrypting AWS Config Snapshots and History in the Log Archive account.
 
 The centralized Config KMS Key policy allows the Log Archive and Management account to decrypt.
 
@@ -19,7 +18,7 @@ Deploy this KMS Key Template to your Security Tooling account.
 
 The CloudFormation template sets the below recommended KMS key attributes.
 
-| Parameter | Recommendation | Description | 
+| Parameter | Recommendation | Description |
 | ----------| -------------- | ----------- |
 | `Key Type` | Symmetric | AWS KMS supports several types of KMS keys: symmetric encryption keys, symmetric HMAC keys, asymmetric encryption keys, and asymmetric signing keys.
 | `Key Usage` | Encrypt and Decrypt |The key usage of a KMS key determines whether the KMS key is used for encryption and decryption, or signing and verifying signatures, or generating and verifying HMAC tags. |
