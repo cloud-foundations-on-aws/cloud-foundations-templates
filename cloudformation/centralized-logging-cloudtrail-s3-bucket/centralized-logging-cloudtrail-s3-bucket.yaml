@@ -24,11 +24,6 @@ Metadata:
         Parameters:
           - pRetentionDays
           - pRetentionDaysForAccessLogs
-      - Label:
-          default: "Glacier Configuration (Optional)"
-        Parameters:
-          - pTransitionToGlacier
-          - pTransitionDays
     ParameterLabels:
       pS3BucketName:
         default: "S3 Bucket name"
@@ -40,10 +35,6 @@ Metadata:
         default: "Retention in days"
       pRetentionDaysForAccessLogs:
         default: "Retention days for access logs"
-      pTransitionToGlacier:
-        default: "Transition to Glacier"
-      pTransitionDays:
-        default: "Transition to Glacier days"
       pOrganizationId:
         default: "AWS Organization Id"
       pTrailAccountId:
@@ -55,7 +46,7 @@ Parameters:
   pS3BucketName:
     Type: 'String'
     Description: 'Name for the S3 Bucket to hold AWS CloudTrail logging'
-    Default: "config-logs"
+    Default: "cloudtrail-logs"
   pSSEAlgorithm:
     Type: 'String'
     Default: 'AES256'
@@ -74,37 +65,21 @@ Parameters:
     Type: String
     Description: 'Number of Days to retain the access logs, after which it will be permanently deleted'
     Default: "365"
-  pTransitionToGlacier:
-    Type: String
-    Description: 'Do you wish to transition the logs to Glacier before permanently deleting?'
-    Default: 'No'
-    AllowedValues:
-      - 'Yes'
-      - 'No'
-  pTransitionDays:
-    Type: String
-    Description: 'Number of days to transition the data from S3 to Glacier if Glacier is being used.'
-    Default: "364"
-
   pOrganizationId:
     Type: 'String'
     Description: Organization Id for the management account.
-
   pTrailAccountId:
     Type: 'String'
     Description: "The AWS account Id which the CloudTrail Organization Trail exists in."
-
   pTrailName:
     Type: 'String'
     Description: "The name of the Organization Trail for CloudTrail"
+    Default: 'aws-cloudtrail-org'
 
 Conditions:
   cUseKMS: !Equals
     - !Ref pSSEAlgorithm
     - 'aws:kms'
-  cMoveToGlacier: !Equals
-    - !Ref pTransitionToGlacier
-    - 'Yes'
 
 Resources:
 
@@ -137,18 +112,6 @@ Resources:
                 SSEAlgorithm: !Ref pSSEAlgorithm
       LifecycleConfiguration:
         Rules:
-          - !If
-            - cMoveToGlacier
-            - Id: RetentionRule
-              Status: Enabled
-              ExpirationInDays: !Ref pRetentionDaysForAccessLogs
-              NoncurrentVersionExpirationInDays: !Ref pRetentionDaysForAccessLogs
-              Transitions:
-                - TransitionInDays: !Ref pTransitionDays
-                  StorageClass: Glacier
-              NoncurrentVersionTransitions:
-                - TransitionInDays: !Ref pTransitionDays
-                  StorageClass: Glacier
             - Id: RetentionRule
               Status: Enabled
               ExpirationInDays: !Ref pRetentionDaysForAccessLogs
@@ -200,18 +163,6 @@ Resources:
                 SSEAlgorithm: !Ref pSSEAlgorithm
       LifecycleConfiguration:
         Rules:
-          - !If
-            - cMoveToGlacier
-            - Id: RetentionRule
-              Status: Enabled
-              ExpirationInDays: !Ref pRetentionDays
-              NoncurrentVersionExpirationInDays: !Ref pRetentionDays
-              Transitions:
-                - TransitionInDays: !Ref pTransitionDays
-                  StorageClass: Glacier
-              NoncurrentVersionTransitions:
-                - TransitionInDays: !Ref pTransitionDays
-                  StorageClass: Glacier
             - Id: RetentionRule
               Status: Enabled
               ExpirationInDays: !Ref pRetentionDays
@@ -242,7 +193,7 @@ Resources:
               Service:
                 - "cloudtrail.amazonaws.com"
             Action: "s3:PutObject"
-            Resource: "arn:aws:s3:::${pBucketName}/AWSLogs/${AWS:AccountId}/*"
+            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/AWSLogs/*"
             Condition:
               StringEquals:
                 "s3:x-amz-acl": "bucket-owner-full-control"
