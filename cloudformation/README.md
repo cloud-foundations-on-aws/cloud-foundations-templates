@@ -1,15 +1,3 @@
-## Cloud Foundations Cloud Formation templates
+# Cloud Foundations CloudFormation templates
 
-1. Deploy Config
-2. Deploy Dashboard for RIM
-3. Other POCs?
-
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
-## License
-
-This library is licensed under the MIT-0 License. See the LICENSE file.
-
+Inside the directory, you can find a collection of sample templates in CloudFormation that can assist you in deploying different components of your AWS cloud foundation. The templates are grouped into solution directories, each of which includes documentation for implementing the corresponding solution. With these resources at your disposal, you can quickly and effectively deploy the necessary AWS resources to build and maintain a robust cloud infrastructure.
