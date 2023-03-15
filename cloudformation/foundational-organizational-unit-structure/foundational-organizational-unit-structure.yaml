@@ -1,3 +1,7 @@
+########################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+########################################################################
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Cloud Foundations on AWS - Foundational Organizational Unit structure and AWS accounts.

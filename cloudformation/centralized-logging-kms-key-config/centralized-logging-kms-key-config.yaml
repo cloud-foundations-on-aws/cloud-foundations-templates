@@ -1,3 +1,8 @@
+########################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+########################################################################
+---
 AWSTemplateFormatVersion: 2010-09-09
 Description:
   Config centralized KMS key for Config.
@@ -57,7 +62,7 @@ Resources:
             Principal:
               AWS:
                 - !Sub arn:${AWS::Partition}:iam::${pManagementAccountId}:root
-            Action: 
+            Action:
                 - kms:Decrypt
                 - kms:GenerateDataKey
             Resource: '*'
