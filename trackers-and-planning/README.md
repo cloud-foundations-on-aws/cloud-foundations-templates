@@ -1,11 +1,7 @@
-## Trackers and planning templates
+# Trackers and planning templates
 
-Here you can find resources to plan and document your Cloud Foundation, these templates include:
+The [trackers and planning](./trackers-and-planning/README.md) directory contains project management templates and cloud documentation planning resources to assist in setting up your cloud foundation environment.
 
-1. Cloud Foundations tracker
-2. Governance Documents
-3. Tagging dictionary template
-4. Stakeholder team for your Cloud Business Office or your CCoE
-5. Backup documents templates
-6. Disaster Recovery templates
-7. Operational Readiness Reviews templates
+| Template | Description |
+| -------- | ----------- |
+| [account email naming convention](./account-email-naming-convention/) | A template to start an emailing naming convention for your AWS accounts. |
