@@ -23,6 +23,21 @@
           "ram:AllowsExternalPrincipals": "true"
         }
       }
+    },
+    {
+      "Sid": "PreventRootUserFromPerformingAnyActions",
+      "Effect": "Deny",
+      "Action": [
+            "*"
+        ],
+      "Resource": [
+            "*"
+        ],
+      "Condition": {
+            "ArnLike": {
+                "aws:PrincipalArn": "arn:aws:iam::*:root"
+            }
+        }
     }
   ]
 }
