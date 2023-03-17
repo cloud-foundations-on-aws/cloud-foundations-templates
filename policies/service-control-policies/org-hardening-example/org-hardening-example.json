@@ -1,0 +1,43 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PreventMemberLeaveOrg",
+      "Effect": "Deny",
+      "Action": [
+        "organizations:LeaveOrganization"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PreventResourceSharingOutsideOrg",
+      "Effect": "Deny",
+      "Action": [
+        "*"
+      ],
+      "Resource": [
+        "*"
+      ],
+      "Condition": {
+        "Bool": {
+          "ram:AllowsExternalPrincipals": "true"
+        }
+      }
+    },
+    {
+      "Sid": "PreventRootUserFromPerformingAnyActions",
+      "Effect": "Deny",
+      "Action": [
+            "*"
+        ],
+      "Resource": [
+            "*"
+        ],
+      "Condition": {
+            "ArnLike": {
+                "aws:PrincipalArn": "arn:aws:iam::*:root"
+            }
+        }
+    }
+  ]
+}
