@@ -27,6 +27,10 @@ A collection of Cloud Foundation [scripts](./scripts/README.md) to be referenced
 
 The [trackers and planning](./trackers-and-planning/README.md) directory contains project management templates and cloud documentation planning resources to assist in setting up your cloud foundation environment.
 
+## Contributing
+
+Looking to contribute? Read through our [CONTRIBUTING](./CONTRIBUTING.md) guide for more information.
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
