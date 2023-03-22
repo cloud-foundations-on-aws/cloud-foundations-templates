@@ -1,6 +1,6 @@
 # Trackers and planning templates
 
-The [trackers and planning](./trackers-and-planning/README.md) directory contains project management templates and cloud documentation planning resources to assist in setting up your cloud foundation environment.
+The [trackers and planning](./trackers-and-planning/README.md) contains project management and documentation templates and planning resources to assist in setting up your cloud foundation environment. This includes naming conventions, tagging dictionary, capability tracker, and many others.
 
 | Template | Description |
 | -------- | ----------- |
