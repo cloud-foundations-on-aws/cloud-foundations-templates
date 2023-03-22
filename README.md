@@ -1,11 +1,11 @@
-# Cloud Foundations on AWS - Template Solutions
+# Cloud Foundations on AWS - Templates
 
 ![Maintained by](https://img.shields.io/badge/maintained%20by-AWS-orange)
 [![Generic badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://shields.io/)
 
 ## What is Cloud Foundations on AWS
 
-Cloud Foundations (CF) is a pioneering initiative that offers a comprehensive roadmap to assist customers in deploying, operating, and governing their workloads in the cloud. By leveraging AWS Solution Guidance across a wide range of AWS Services, AWS Solutions, and Partner Solutions, Cloud Foundations (CF) empowers customers to make informed decisions and navigate the complexities of establishing a production-ready environment with ease. Whether you're just starting your cloud journey or looking to validate the operational maturity of your existing environment, Cloud Foundations provides assurance that your infrastructure is primed and ready to handle all your production workloads.
+Cloud Foundations (CF) is an initiative that offers a comprehensive roadmap to assist customers in deploying, operating, and governing (DOG) their workloads in the cloud. By leveraging AWS Solution Guidance across a wide range of AWS Services, AWS Solutions, and Partner Solutions, Cloud Foundations (CF) empowers customers to make informed decisions and navigate the complexities of establishing a production-ready environment with ease. Whether you're just starting your cloud journey or looking to validate the operational maturity of your existing environment, Cloud Foundations provides assurance that your infrastructure is primed and ready to handle all your production workloads.
 
 ## Repository
 

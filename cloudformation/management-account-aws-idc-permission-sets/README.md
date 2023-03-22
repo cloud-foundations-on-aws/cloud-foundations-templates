@@ -6,19 +6,25 @@ Follow the [Create a permission set](https://docs.aws.amazon.com/singlesignon/la
 
 > **Note:** that the MA-Administrator permissions set leverages a *Predefined permission set*, whereas the MA-ReadOnly uses a *Custom permission set*:
 
-**MA-Administrator**
-Permission Set Name: MA-Administrator
-Permission Set Type: Predefined
-Description: Gives administrative access to the management account
-Tags: Add your defined mandatory tags to this permission set
-Associated Policies: Predefined permission set: AdministratorAccess
+## MA-Administrator
 
-**MA-ReadOnly**
-Permission Set Name: MA-ReadOnly
-Permission Set Type: Custom
-Description: Gives read-only access to the management account
-Tags: Add your defined mandatory tags to this permission set
-Associated Policies: Custom Permission set: AWS managed policy ReadOnlyAccess
+<table>
+<tr><th>Permission Set Name:</th><td>MA-Administrator</td></tr>
+<tr><th>Permission Set Type:</th><td>Predefined</td></tr>
+<tr><th>Description:</th><td> Gives administrative access to the management account</td></tr>
+<tr><th>Tags:</th><td>Add your defined mandatory tags to this permission set</td></tr>
+<tr><th>Associated Policies:</th><td>  Predefined permission set: AdministratorAccess</td></tr>
+</table>
+
+## MA-ReadOnly
+
+<table>
+<tr><th>Permission Set Name:</th><td> MA-ReadOnly</td></tr>
+<tr><th>Permission Set Type:</th><td> Custom</td></tr>
+<tr><th>Description:</th><td> Gives read-only access to the management account</td></tr>
+<tr><th>Tags:</th><td> Add your defined mandatory tags to this permission set</td></tr>
+<tr><th>Associated Policies:</th><td> Custom Permission set: AWS managed policy ReadOnlyAccess</td></tr>
+</table>
 
 ## CloudFormation Template
 
