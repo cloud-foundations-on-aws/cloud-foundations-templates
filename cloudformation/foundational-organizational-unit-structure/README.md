@@ -19,9 +19,9 @@ Deploy the template from your [AWS management account](https://docs.aws.amazon.c
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
 | `pRootOrgId` | String |  | Organization root Id (r-xxxx) |
-| `pLogArchiveAccountName` | String | `Log Archive` | alias (AWS account name) for the production log archive account |
+| `pLogArchiveAccountName` | String | `Log Archive` | alias (AWS account name) for the production Log Archive account |
 | `pLogArchiveAccountEmail` | String |  | root user email address for the production log archive account. Example: aws-log-archive-[org-identifier]@example.com|
-| `pSecurityToolingAccountName` | String | `Security Tooling` | alias (AWS account name) for the production security account |
+| `pSecurityToolingAccountName` | String | `Security Tooling` | alias (AWS account name) for the production Security Tooling account |
 | `pSecurityToolingAccountEmail` | String |  | root user email address for the production security tooling account. Example: aws-security-tooling-[org-identifier]@example.com |
 
 > **Important:** All email addresses used in the template need to be unique to AWS. The email addresses cannot be repeated or used twice when registering a new AWS account. It is also recommended to use distribution groups for root user email addresses over single user email addresses.
