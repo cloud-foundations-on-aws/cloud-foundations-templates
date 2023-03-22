@@ -4,4 +4,4 @@ A collection of Cloud Foundation scripts to be referenced in creating and managi
 
 | Solution | Description |
 | -------- | ----------- |
-| [Network default VPC  deletion](./network-default-vpc-deletion) | script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account. |
+| [Network default VPC  deletion](./network-default-vpc-deletion) | Script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account. |

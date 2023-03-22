@@ -1,4 +1,4 @@
-# Cloud Foundations on AWS - Template Solutions
+# Cloud Foundations on AWS - Templates
 
 ![Maintained by](https://img.shields.io/badge/maintained%20by-AWS-orange)
 [![Generic badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://shields.io/)
