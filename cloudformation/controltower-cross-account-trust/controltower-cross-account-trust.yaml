@@ -1,0 +1,38 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This template creates an IAM role with administrator access and a trust relationship for Control Tower.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Management Account Trust"
+        Parameters:
+          - pManagementAccountId
+    ParameterLabels:
+      pManagementAccountId: Management Account ID
+
+Parameters:
+  pManagementAccountId:
+    Type: String
+    Description: Management account id which AWS Control Tower is deployed in
+Resources:
+
+  rControlTowerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      RoleName: AWSControlTowerExecution
+      ManagedPolicyArns:
+        - !Sub  arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:${AWS::Partition}:iam::${pManagementAccountId}:root
+Outputs:
+  CrossAccountRoleArn:
+    Description: Cross Account Role for ControlTower
+    Value: !GetAtt rControlTowerRole.Arn
