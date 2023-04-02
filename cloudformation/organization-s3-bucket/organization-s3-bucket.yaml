@@ -36,6 +36,7 @@ Resources:
 
   rOrgS3Bucket:
     Type: "AWS::S3::Bucket"
+    # checkov:skip=CKV_AWS_21: Versioning is a conditional enablement
     Properties:
       BucketName: !Ref pOrgBucketName
       BucketEncryption:
