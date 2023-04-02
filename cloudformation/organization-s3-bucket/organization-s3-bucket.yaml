@@ -47,6 +47,11 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !If [cDeployAccessLogging, !Ref pLogBucketName, !Ref "AWS::NoValue"]
         LogFilePrefix: !If [cDeployAccessLogging, 'access-logs/', !Ref "AWS::NoValue"]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
 
   rBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -76,6 +81,7 @@ Resources:
 
   rLogBucket:
     Type: "AWS::S3::Bucket"
+    # checkov:skip=CKV_AWS_21: Versioning not enabled due to logging bucket
     Condition: cDeployAccessLogging
     Properties:
       BucketName: !Sub pLogBucketName-${AWS::AccountId}
@@ -83,3 +89,8 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
