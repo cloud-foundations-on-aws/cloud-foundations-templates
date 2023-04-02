@@ -1,6 +1,6 @@
 # Organization S3 Bucket
 
-The following template deploys an S3 Bucket that has a trust for an AWS Organization. The bucket is commonly used to centralized a CloudFormation template bucket which can only be accessed by the AWS account within the trusted Organization.
+The following template deploys an S3 Bucket that has a trust for an AWS Organization to allow any AWS account within the Organization to `GetObject` and `ListBucket`. The bucket is commonly used to centrally share CloudFormation templates bucket which can only be accessed by the AWS account within the trusted Organization.
 
 >**Note:** The trust is set for AWS account access and users cannot access templates via public URL through a web browser.
 
