@@ -1,0 +1,97 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: S3 Bucket with trust for all accounts in an AWS Organization
+
+Parameters:
+  pOrgBucketName:
+    Type: String
+    Description: Name of the S3 bucket to create
+  pLogBucketName:
+    Type: String
+    Description: Name of the S3 bucket to use for access logging of the S3 Bucket. Name will be suffixed with Account ID it is deployed in.
+    Default: "Org-Bucket-Logging"
+  pOrganizationId:
+    Type: String
+    Description: The Organization Id
+  pDeployAccessLogging:
+    Type: String
+    Description: Deploy AWS S3 Bucket access logging into separate S3 Bucket.
+    Default: "No"
+    AllowedValues:
+      - "Yes"
+      - "No"
+  pUseVersioning:
+    Type: String
+    Description: Use versioning on the S3 Bucket
+    Default: "No"
+    AllowedValues:
+      - "Yes"
+      - "No"
+
+Conditions:
+  cDeployAccessLogging: !Equals [!Ref pDeployAccessLogging, "Yes"]
+  cUseVersioning: !Equals [!Ref pUseVersioning, "Yes"]
+
+Resources:
+
+  rOrgS3Bucket:
+    Type: "AWS::S3::Bucket"
+    # checkov:skip=CKV_AWS_21: Versioning is a conditional enablement
+    Properties:
+      BucketName: !Ref pOrgBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: !If [cUseVersioning, 'Enabled', 'Suspended']
+      LoggingConfiguration:
+        DestinationBucketName: !If [cDeployAccessLogging, !Ref pLogBucketName, !Ref "AWS::NoValue"]
+        LogFilePrefix: !If [cDeployAccessLogging, 'access-logs/', !Ref "AWS::NoValue"]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+
+  rBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F16
+            reason: Condition requires it to be part of AWS Org.
+    Properties:
+      PolicyDocument:
+        Id: AwsCfnOrgTrust
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowOrgGetObject
+            Effect: Allow
+            Principal: '*'
+            Action:
+            - 's3:GetObject'
+            - 's3:ListBucket'
+            Resource:
+            - !Sub arn:${AWS::Partition}:s3:::${pOrgBucketName}/*
+            - !Sub arn:${AWS::Partition}:s3:::${pOrgBucketName}
+            Condition:
+              StringEquals:
+                "aws:PrincipalOrgID": !Ref pOrganizationId
+      Bucket: !Ref rOrgS3Bucket
+
+  rLogBucket:
+    Type: "AWS::S3::Bucket"
+    # checkov:skip=CKV_AWS_21: Versioning not enabled due to logging bucket
+    Condition: cDeployAccessLogging
+    Properties:
+      BucketName: !Sub pLogBucketName-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
