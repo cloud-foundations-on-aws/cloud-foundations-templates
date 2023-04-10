@@ -26,5 +26,5 @@ This script can be executed locally with [AWS CLI](https://docs.aws.amazon.com/c
 If you choose not to download the script you can run it directly via curl:
 
 ```sh
-curl -fsS https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/scripts/network-default-vpc-deletion/network-default-vpc-deletion.sh | bash
+curl -fsS https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/network/scripts/network-default-vpc-deletion/network-default-vpc-deletion.sh | bash
 ```
