@@ -2,7 +2,7 @@
 
 The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational identity management capability in your cloud environment. Please refer to the following table for a quick description of each solution within the directory:
 
-| Sample Solution | Description | Type |
+| Example | Description | Type |
 | --------------- | ----------- | ---- |
 | [management account AWS IdC assignments](./cloudformation/management-account-aws-idc-assignments/) |  Template creates two assignments for AWS Identity Users in the management account for admin and read-only access. Deploy the template in your AWS Management account under the region your Identity Center is deployed in. | CloudFormation |
 | [management account AWS IdC permission sets](./cloudformation/management-account-aws-idc-permission-sets/) | Template creates two permissions set for AWS Identity Users accessing the management account with admin or read-only permissions. Deploy the template in your AWS Management account under the region your Identity Center is deployed in. | CloudFormation |

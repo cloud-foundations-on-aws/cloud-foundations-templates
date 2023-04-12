@@ -2,7 +2,7 @@
 
 Inside the directory, you can find a collection of sample templates in CloudFormation that can assist you in deploying different components of your AWS cloud foundation centralized logging capability. The templates are grouped into solution directories, each of which includes documentation for implementing the corresponding solution. With these resources at your disposal, you can quickly and effectively deploy the necessary AWS resources to build and maintain a robust cloud infrastructure.
 
-| Sample Solution | Description |
+| Example | Description |
 | --------------- | ----------- |
 | [centralized logging CloudTrail S3 Bucket](./centralized-logging-cloudtrail-s3-bucket/) | Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of CloudTrail. |
 | [centralized logging Config S3 Bucket](./centralized-logging-config-s3-bucket/)  | Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of Config. |

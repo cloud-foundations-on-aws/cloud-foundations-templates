@@ -2,7 +2,7 @@
 
 The `Logging` directory contains various resources for provisioning and configuring centralizing logging within your AWS cloud environment. Please refer to the following table for a quick description of each solution within the directory:
 
-| Sample Solution | Description | Type |
+| Example | Description | Type |
 | --------------- | ----------- | ---- |
 | [centralized logging CloudTrail S3 Bucket](./cloudformation/centralized-logging-cloudtrail-s3-bucket/) | Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of CloudTrail. | CloudFormation |
 | [centralized logging Config S3 Bucket](./cloudformation/centralized-logging-config-s3-bucket/)  | Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of Config. | CloudFormation |
