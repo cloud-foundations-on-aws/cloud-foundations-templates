@@ -4,4 +4,4 @@ The directory contains various templates, scripts, and infrastructure as code fo
 
 | Example | Description | Type |
 | --------------- | ----------- | ---- |
-| [controltower-cross-account-trust](./cloudformation/controltower-cross-account-trust) | Template creates the cross-account trust necessary for Control Tower to manage. Use this template for accounts provisioned outside of the Control Tower environment that need to be enrolled into it. | CloudFormation |
+| [Control Tower cross account trust](./cfn-controltower-cross-account-trust) | Template creates the cross-account trust necessary for Control Tower to manage. Use this template for accounts provisioned outside of the Control Tower environment that need to be enrolled into it. | [CloudFormation](./cfn-controltower-cross-account-trust) |

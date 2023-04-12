@@ -4,5 +4,5 @@ The following directory contains various templates, examples, policies, and scri
 
 | Example | Description | Type |
 | --------------- | ----------- | ---- |
-| [foundational Tagging Policy](./cloudformation/foundational-tagging-policy/) | The foundational tagging policy provides a CloudFormation template example of creating an AWS Organization Tagging policy. Leverage the template to customize for you tagging policy solutions. | CloudFormation |
-| [Foundational Tagging policy](./tag-policies/foundational-tagging-policy/) | The foundational tagging policy provides a template example of creating an AWS Organization Tagging policy. | Tag Policy |
+| [foundational Tagging Policy](./cfn-foundational-tagging-policy/) | The foundational tagging policy provides a CloudFormation template example of creating an AWS Organization Tagging policy. Leverage the template to customize for you tagging policy solutions. | [CloudFormation](./cfn-foundational-tagging-policy/) |
+| [Foundational Tagging policy](./tagging-policy-foundational/) | The foundational tagging policy provides a template example of creating an AWS Organization Tagging policy. | [Tag Policy](./tagging-policy-foundational/) |

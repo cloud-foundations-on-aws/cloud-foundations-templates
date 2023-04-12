@@ -4,4 +4,4 @@ The following directory contains various templates, examples, policies, and scri
 
 | Example | Description | Type |
 | -------- | ----------- | ---- |
-| [Network default VPC  deletion](./scripts/network-default-vpc-deletion) | Script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account. | script/cli |
+| [Network default VPC  deletion](./script-network-default-vpc-deletion) | Script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account. | [script/cli](./script-network-default-vpc-deletion) |
