@@ -13,7 +13,7 @@ jobs:
       - name: Run cfn-nag
         uses: stelligent/cfn_nag@master
         with:
-          input_path: cloudformation
+          input_path: ./
 
   checkov:
     name: checkov
