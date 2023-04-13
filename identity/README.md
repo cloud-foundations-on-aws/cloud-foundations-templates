@@ -1,6 +1,6 @@
 # Identity Management
 
-The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational identity management capability in your cloud environment. Please refer to the following table for a quick description of each solution within the directory:
+The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational [identity management and access control capability](https://aws.amazon.com/solutions/guidance/identity-management-and-access-control-on-aws/) in your cloud environment. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |
 | --------------- | ----------- | ---- |

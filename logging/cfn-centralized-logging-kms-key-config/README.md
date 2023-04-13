@@ -1,6 +1,6 @@
 # KMS Key for Centralized AWS Config logging
 
-Template creates a KMS Key to be deployed in your Security Tooling account for encrypting AWS Config Snapshots and History in the Log Archive account.
+Template creates a KMS Key to be deployed in your [Security Tooling account](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/security-ou-and-accounts.html#security-tooling-accounts) for encrypting AWS Config Snapshots and History in the [Log Archive account](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/security-ou-and-accounts.html#services-in-log-archive-account).
 
 The centralized Config KMS Key policy allows the Log Archive and Management account to decrypt.
 

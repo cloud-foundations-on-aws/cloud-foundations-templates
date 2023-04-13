@@ -1,12 +1,10 @@
 # Network Default VPC deletion
 
-This script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an
- account.
+This script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account.
 
 ## Description
 
-This Bash script deletes the default VPCs in all regions of an AWS account. The script retrieves a list of regions
- from AWS and deletes the default VPC for each region. The script also detaches and deletes any Internet Gateways (IGWs) attached to the default VPC, as well as any subnets in the default VPC.
+This Bash script deletes the default VPCs in all regions of an AWS account. The script retrieves a list of regions from AWS and deletes the default VPC for each region. The script also detaches and deletes any Internet Gateways (IGWs) attached to the default VPC, as well as any subnets in the default VPC.
 
 ## How to Use
 

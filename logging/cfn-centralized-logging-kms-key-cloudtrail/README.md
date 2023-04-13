@@ -1,6 +1,6 @@
 # KMS Key for Centralized AWS CloudTrail logging
 
-Template creates a KMS Key to be deployed in your Security Tooling account for encrypting an Organizational CloudTrail Trail.
+Template creates a KMS Key to be deployed in your [Security Tooling account](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/security-ou-and-accounts.html#security-tooling-accounts) for encrypting an Organizational CloudTrail Trail.
 
 The centralized CloudTrail KMS Key policy allows the Log Archive and Management account to decrypt.
 

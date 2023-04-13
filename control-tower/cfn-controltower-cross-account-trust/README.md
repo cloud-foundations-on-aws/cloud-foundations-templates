@@ -10,4 +10,4 @@ Be sure to review the [Prerequisites for enrollment](https://docs.aws.amazon.com
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
-| pManagementAccountId | String | | Management account id which AWS Control Tower is deployed in |
+| pManagementAccountId | String | | Management account id which AWS Control Tower is deployed in. |

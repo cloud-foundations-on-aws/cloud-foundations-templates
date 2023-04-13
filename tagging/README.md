@@ -1,6 +1,6 @@
 # Tagging
 
-The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational `tagging` capability in the cloud. Please refer to the following table for a quick description of each solution within the directory:
+The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational [`tagging` capability](https://aws.amazon.com/solutions/guidance/tagging-on-aws) in the cloud. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |
 | --------------- | ----------- | ---- |

@@ -1,6 +1,6 @@
 # AWS Account email naming convention template
 
-Leverage the following template to start out defining an email convention for your AWS accounts and tracking the AWS account root users to the email address.
+Use the following template to start out defining an email convention for your AWS accounts and tracking the AWS account root users to the email address.
 
 >**Important:** It is also recommended to use distribution group emails over individual or personal email addresses.
 

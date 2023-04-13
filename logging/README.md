@@ -13,4 +13,3 @@ The `Logging` directory contains various resources for provisioning and configur
 | [KMS key policy for Org Config](./kms-key-policy-for-org-config/)| KMS key policy to encrypt Config within a multi account environment. | [KMS Policy](./kms-key-policy-for-org-config/) |
 | [Centralized logging CloudTrail S3 Bucket policy](./s3-bucket-policy-centralized-logging-cloudtrail/) | S3 Bucket policy that allows AWS Organization CloudTrail trail to write to the bucket. | [S3 Bucket Policy](./s3-bucket-policy-centralized-logging-cloudtrail/) |
 | [Centralized logging Config S3 Bucket policy](./s3-bucket-policy-centralized-logging-config/) | S3 Bucket policy that allows Config recorders within an AWS Organization to write to the bucket. | [S3 Bucket Policy](./s3-bucket-policy-centralized-logging-config/) |
-
