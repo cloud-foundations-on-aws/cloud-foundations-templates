@@ -11,18 +11,18 @@ This Bash script deletes the default VPCs in all regions of an AWS account. The 
 This script can be executed locally with [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) with the appropriate [configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) or it can be executed from [CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html) by cloning this repo to your CloudShell instance or by [uploading the file to CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-cloudshell.html#:~:text=To%20upload%20files%20to%20AWS%20CloudShell).
 
 1. Open a terminal and navigate to the directory where the script is saved.
-2. Run the script by typing `./network-delete-default-vpcs.sh`.
+2. Run the script by typing `./script-network-delete-default-vpcs.sh`.
 3. A list of regions will be displayed, and the script will begin processing each region.
 4. The output of each region will print out to the console.
 
 >**Note** Script requires JQ to be installed.
 
 ```bash
-./network-default-vpc-deletion.sh
+./script-network-default-vpc-deletion.sh
 ```
 
-If you choose not to download the script you can run it directly via curl using the AWS CloudShell:
+If you choose not to download the script in advance you can run it directly via curl using the AWS CloudShell:
 
 ```sh
-curl -fsS https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/network/scripts/network-default-vpc-deletion/network-default-vpc-deletion.sh | bash
+curl -fsS https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/network/network-default-vpc-deletion/script-network-default-vpc-deletion.sh | bash
 ```

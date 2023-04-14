@@ -1,10 +1,20 @@
 # S3 Bucket for Centralized AWS CloudTrail logging
 
-Template creates an S3 Bucket to be deployed in your log archive account for centralized logging of CloudTrail. Template will deploy two S3 buckets: one for centralized config logging and another for access logging.
+To centralize AWS CloudTrail logs, you need to configure a central AWS S3 Bucket with the appropriate permissions, enabling a CloudTrail Organization Trail to write logs to it. You can utilize the resources available in the directory to create your very own AWS S3 Bucket, dedicated to centralized logging of CloudTrail.
+
+## S3 Bucket Policy - Centralized CloudTrail logging
+
+The S3 Bucket policy [s3-bucket-policy-centralized-logging-cloudtrail.json](./s3-bucket-policy-centralized-logging-cloudtrail.json) will enable an S3 bucket to receive AWS CloudTrail events from an Organization CloudTrail Trail.
+
+Follow the [AWS CloudTrail User Guide guidance on creating an S3 bucket policy for CloudTrail](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-s3-bucket-policy-for-cloudtrail.html).
+
+## CloudFormation - S3 Bucket for Centralized AWS CloudTrail logging
+
+The CloudFormation template [cfn-centralized-logging-cloudtrail-s3-bucket.yaml](./cfn-centralized-logging-cloudtrail-s3-bucket.yaml) creates an S3 Bucket to be deployed in your log archive account for centralized logging of CloudTrail. Template will deploy two S3 buckets: one for centralized config logging and another for access logging.
 
 The centralized CloudTrail logging bucket is configured so that AWS CloudTrail can write to it within your Organization. Deploy this bucket to your log archive account.
 
-## Parameters
+### Parameters
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
