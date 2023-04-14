@@ -1,6 +1,6 @@
 # Network Default VPC deletion
 
-This script will look for and delete default VPCs and associated resources (subnets, IGWs) in all AWS regions of an account.
+This script will look for and delete default VPCs and other network resources (subnets, IGWs) in all AWS regions of an account.
 
 ## Description
 

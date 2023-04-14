@@ -1,6 +1,6 @@
 # AWS Organizations
 
-The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational AWS Organization in the cloud. Please refer to the following table for a quick description of each solution within the directory:
+The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational AWS Organization structure in the cloud. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |
 | ------- | ----------- | ---- |
