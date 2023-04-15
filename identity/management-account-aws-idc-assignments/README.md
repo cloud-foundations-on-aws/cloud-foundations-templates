@@ -19,7 +19,7 @@ The CloudFormation template creates two assignments for AWS Identity Users. Depl
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
-| `pIdentityCenterArn` | String |  | Then Identity Center instance ARN. |
+| `pIdentityCenterArn` | String |  | The Identity Center instance ARN. |
 | `pMAAdministratorUserId` | String |   | The MA-Administrator Identity Center User Id. Example: `92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793` |
 | `pMAAdministratorPermissionSetArn` | String |  | The ARN of the MA Administrator permission set to assign the user` |
 | `pMAReadOnlyUserId` | String |   | The MA-ReadOnly Identity Center User Id. Example: `92670cccd8-6c7550b2-66ea-4c80-a7f5-7929bd561793` |
