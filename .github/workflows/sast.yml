@@ -13,7 +13,7 @@ jobs:
       - name: Run cfn-nag
         uses: stelligent/cfn_nag@master
         with:
-          input_path: cloudformation
+          input_path: ./
 
   checkov:
     name: checkov
@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: grolston/cfn-security@v2
       with:
-        cloudformation_directory: './cloudformation/'
+        cloudformation_directory: './'
         scanner: "checkov"
 
   cfn-lint:
@@ -38,4 +38,4 @@ jobs:
     - name: Print the Cloud Formation Linter Version & run Linter.
       run: |
         cfn-lint --version
-        cfn-lint cloudformation/**/*.yaml
+        cfn-lint ./**/*.yaml
