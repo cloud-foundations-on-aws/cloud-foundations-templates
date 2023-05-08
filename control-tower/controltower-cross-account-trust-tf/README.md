@@ -29,7 +29,7 @@ Prior to using this repo you will need awscli and terraform installed on the sys
 
 This directory is intended to be run locally
 
-Getting started you'll need to open a `terminal` window and change direcotries to the working directory (ex `cd ./amq_rmq_dr`)
+Getting started you'll need to open a `terminal` window and change direcotries to the working directory
 
 Next you need to instantiate the terraform working environment by running the following command `terraform init`
 
