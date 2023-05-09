@@ -1,1 +1,8 @@
 .DS_Store
+### Terraform ###
+**/.terraform/*
+*.terraform.*
+
+# tf state files 
+*.tfstate
+*.tfstate.*
