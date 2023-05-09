@@ -49,7 +49,7 @@ Terraform will perform the following actions:
                       + Action    = "sts:AssumeRole"
                       + Effect    = "Allow"
                       + Principal = {
-                          + AWS = "175039216299"
+                          + AWS = "123456789012"
                         }
                       + Sid       = ""
                     },
