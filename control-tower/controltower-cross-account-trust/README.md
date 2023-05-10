@@ -6,8 +6,16 @@ Be sure to review the [Prerequisites for enrollment](https://docs.aws.amazon.com
 
 > **Info:** The template will fail to provision if the account was created by Control Tower account factory or someone manually created the role. Use this template only for accounts created outside of Control Tower account factory.
 
-## CloudFormation Parameters
+## CloudFormation
+
+The solution can be deployed with the single CloudFormation template [cfn-controltower-cross-account-trust.yaml](./cfn-controltower-cross-account-trust.yaml)
+
+### CloudFormation Parameters
 
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
 | pManagementAccountId | String | | Management account id which AWS Control Tower is deployed in. |
+
+## Terraform
+
+Terraform example code and instructions can be found in the [tf-controltower-cross-account-trust](./tf-controltower-cross-account-trust/) directory.
