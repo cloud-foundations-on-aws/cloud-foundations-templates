@@ -85,7 +85,5 @@ Changes to Outputs:
 To build out the resources defined use the command `terrafrom apply` 
 This will provide the same output as above but now you'll be prompted to confirm the build/changes
 
-```
-
 In order to remove the resources from your environment run the command `terraform destroy`
 When using in practice take *EXTREME* caution using this command as it will remove *ALL* resources defined/managed in the `.statefile`
