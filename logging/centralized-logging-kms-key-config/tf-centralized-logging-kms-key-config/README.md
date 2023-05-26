@@ -30,6 +30,8 @@ The centralized Config KMS Key policy allows the Log Archive and Management acco
 
 Deploy this KMS Key Template to your Security Tooling account.
 
+**Note: THIS SHOULD BE DEPLOYED USING CREDENTIALS FOR THE TOP LEVEL ACCOUNT. THIS DIRECTORY USES A SECOND PROVIDER TO DEPLOY INTO THE SECURITY/ADUIT ACCOUNT**
+
 ### Terraform Parameters
 
 | Parameter Name | Type | Default Value | Description |
