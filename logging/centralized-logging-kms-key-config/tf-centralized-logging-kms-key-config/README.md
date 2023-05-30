@@ -22,7 +22,7 @@ The following settings are recommended to be set for the KMS key attributes.
 
 ## KMS Key Policy - Org AWS Config
 
-Leverage the [kms-key-policy-for-org-config.json](./kms-key-policy-for-org-config.json) template to create a KMS key following the [AWS KMS guidance on creating keys](https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html). Deploy the KMS key in the home region of your Security Tooling account ((same region where the Config S3 bucket will be located)).
+Leverage the [kms-key-policy-for-org-config.json](../kms-key-policy-for-org-config.json) template to create a KMS key following the [AWS KMS guidance on creating keys](https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html). Deploy the KMS key in the home region of your Security Tooling account ((same region where the Config S3 bucket will be located)).
 
 ## Terraform - KMS Key for Centralized AWS Config logging
 
