@@ -1,8 +1,20 @@
-# Identity Management and Access Control
+# Custom Lens
 
-The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational [identity management and access control capability](https://aws.amazon.com/solutions/guidance/identity-management-and-access-control-on-aws/) in your cloud environment. Please refer to the following table for a quick description of each solution within the directory:
+This directory contains [Well Architected Custom Lenses](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-custom.html) that can be used to assess and track your Cloud Foundations deployments.
 
-| Example | Description | Type |
+## Usage
+
+To use these custom lenses in your environment, follow the below steps.
+
+1. Copy the Custom Lens you want to use or clone the repository.
+2. Sign in to the AWS Management Console and open the [AWS Well-Architected Tool console](https://console.aws.amazon.com/wellarchitected/).
+3. In the left navigation pane, choose Custom lenses.
+4. Choose Create custom lens.
+5. Choose Choose file to select your JSON file and pick the Custom Lens that you want to use.
+6. [Publish the Lens](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-publish.html)
+
+## Content
+
+| Custom Lens | Description | Type |
 | --------------- | ----------- | ---- |
-| [management account AWS IdC assignments](./management-account-aws-idc-assignments/) |  Template creates two assignments for AWS Identity Users in the management account for admin and read-only access. Deploy the template in your AWS Management account under the region your Identity Center is deployed in. | [CloudFormation](./management-account-aws-idc-assignments/cfn-management-account-aws-idc-assignments.yaml) <br /> [Terraform](./management-account-aws-idc-assignments/tf-management-account-aws-idc-assignments/)|
-| [management account AWS IdC permission sets](./management-account-aws-idc-permission-sets/) | Template creates two permissions set for AWS Identity Users accessing the management account with admin or read-only permissions. Deploy the template in your AWS Management account under the region your Identity Center is deployed in. | [CloudFormation](./management-account-aws-idc-permission-sets/cfn-ma-aws-idc-permission-sets.yaml) <br /> [Terraform](./management-account-aws-idc-permission-sets/tf-ma-aws-idc-permission-sets/)|
+| [CF Acceleration Day Custom Lens](./cf-acceleration-day-custom-lens.json) |  Custom Lens to measure and track your progress during Cloud Foundations Acceleration Day. | [Custom Lens](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-custom.html) |
