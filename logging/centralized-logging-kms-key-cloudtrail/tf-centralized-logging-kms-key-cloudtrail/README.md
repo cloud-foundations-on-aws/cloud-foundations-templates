@@ -1,6 +1,8 @@
 
 # Centralized Logging KMS Key CloudTrail
 
+> **Note:** The example uses a Terraform deployment from the AWS Management Account. The provider leverages assume role with the Control Tower Execution role for cross across access in the environment.
+
 KMS (Key Management Service) encrypts CloudTrail logs by generating and managing encryption keys that are used to encrypt and decrypt the logs. To enable encryption of CloudTrail logs, KMS must be configured with the appropriate permissions to access the CloudTrail S3 bucket. Once configured, KMS will use a customer master key (CMK) to encrypt the logs, which can only be decrypted using the same key. This ensures that the CloudTrail logs are secure and can only be accessed by authorized individuals or services. Additionally, KMS provides detailed auditing and logging of all key usage, providing additional security and compliance measures for the encryption of CloudTrail logs.
 
 > **Note:** By default, the log files delivered by CloudTrail to your bucket are encrypted by [Amazon server-side encryption with Amazon S3-managed encryption keys (SSE-S3)](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html). To provide a security layer that is directly manageable, we recommend that you use [server-side encryption with AWS KMS keys (SSE-KMS)](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html) for your CloudTrail log files.
@@ -31,7 +33,7 @@ The centralized CloudTrail KMS Key policy allows the Log Archive and Management 
 
 Deploy this KMS Key Template to your Security Tooling account.
 
-**Note: THIS SHOULD BE DEPLOYED USING CREDENTIALS FOR THE TOP LEVEL ACCOUNT. THIS DIRECTORY USES A SECOND PROVIDER TO DEPLOY INTO THE SECURITY/ADUIT ACCOUNT**
+> **Note:** THIS SHOULD BE DEPLOYED USING CREDENTIALS THAT ARE IN THE AWS MANAGEMENT ACCOUNT. THIS DIRECTORY USES A SECOND PROVIDER TO DEPLOY INTO THE SECURITY/ADUIT ACCOUNT
 
 ### Terraform Parameters
 
