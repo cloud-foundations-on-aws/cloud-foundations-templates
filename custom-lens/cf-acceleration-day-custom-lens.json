@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2021-11-01",
-  "name": "Cloud Foundations on AWS",
-  "description": "Establishing your Foundation with AWS",
+  "name": "AWS Cloud Foundations Accelerator",
+  "description": "Track and Assess your progress in deploying an initial AWS Cloud Foundation multi-account environment.",
   "pillars": [
     {
       "id": "foundational_prerequisites",
