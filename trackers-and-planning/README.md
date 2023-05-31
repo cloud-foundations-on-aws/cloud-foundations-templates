@@ -5,3 +5,4 @@ The [trackers and planning](./trackers-and-planning/README.md) contains project 
 | Template | Description |
 | -------- | ----------- |
 | [account email naming convention](./account-email-naming-convention/) | A template to start an emailing naming convention for your AWS accounts. |
+| [Cloud Foundations tracker](./cloud-foundations-tracker/) | A template to help plan and track your progress throughout your Cloud Foundations journey. |
