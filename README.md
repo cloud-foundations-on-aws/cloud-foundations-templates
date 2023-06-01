@@ -3,7 +3,7 @@
 ![Maintained by](https://img.shields.io/badge/maintained%20by-AWS-orange)
 [![Generic badge](https://img.shields.io/badge/license-MIT-blue.svg)](https://shields.io/)
 
-> **Notice:** The repository contains sample scripts, templates, policies, etc. which are not intended or supported as fully developed solution. Leverage the repository as a reference to build various aspects of your own landing zone solution.
+> **Notice:** This repository contains sample scripts, templates, policies, etc. which are not intended to be or are not supported as fully developed solutions. Leverage this repository as a reference to build various aspects of your own landing zone solution.
 
 ## What is Cloud Foundations on AWS
 
