@@ -101,6 +101,9 @@ Resources:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
@@ -132,10 +135,10 @@ Resources:
           - Sid: AllowSSLRequestsOnly
             Effect: Deny
             Principal: '*'
-            Action: s3:*
+            Action: "s3:*"
             Resource:
-              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}"
-              - !Sub "arn:aws:s3:::${rS3AccessLoggingBucket}/*"
+              - !Sub "arn:${AWS::Partition}:s3:::${rS3AccessLoggingBucket}"
+              - !Sub "arn:${AWS::Partition}:s3:::${rS3AccessLoggingBucket}/*"
             Condition:
               Bool:
                 aws:SecureTransport: false
@@ -152,6 +155,9 @@ Resources:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Ref rS3AccessLoggingBucket
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
@@ -188,35 +194,35 @@ Resources:
               Service:
                 - cloudtrail.amazonaws.com
             Action: "s3:GetBucketAcl"
-            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${rS3CloudTrailBucket}"
             Condition:
               StringEquals:
-                "aws:SourceArn": !Sub "arn:aws:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
+                "aws:SourceArn": !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
           - Sid: "AWSCloudTrailWrite"
             Effect: "Allow"
             Principal:
               Service:
                 - "cloudtrail.amazonaws.com"
             Action: "s3:PutObject"
-            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/AWSLogs/*"
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${rS3CloudTrailBucket}/AWSLogs/*"
             Condition:
               StringEquals:
                 "s3:x-amz-acl": "bucket-owner-full-control"
-                "aws:SourceArn": !Sub "arn:aws:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
+                "aws:SourceArn": !Sub "arn:${AWS::Partition}:cloudtrail:${AWS::Region}:${pTrailAccountId}:trail/${pTrailName}"
           - Sid: AWSCloudTrailOrganizationWrite
             Effect: "Allow"
             Principal:
               Service:
                 - "cloudtrail.amazonaws.com"
             Action: "s3:PutObject"
-            Resource: !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/AWSLogs/${pOrganizationId}/*"
+            Resource: !Sub "arn:${AWS::Partition}:s3:::${rS3CloudTrailBucket}/AWSLogs/${pOrganizationId}/*"
           - Sid: AllowSSLRequestsOnly
             Effect: Deny
             Principal: '*'
-            Action: s3:*
+            Action: "s3:*"
             Resource:
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}"
-              - !Sub "arn:aws:s3:::${rS3CloudTrailBucket}/*"
+              - !Sub "arn:${AWS::Partition}:s3:::${rS3CloudTrailBucket}"
+              - !Sub "arn:${AWS::Partition}:s3:::${rS3CloudTrailBucket}/*"
             Condition:
               Bool:
                 aws:SecureTransport: false
