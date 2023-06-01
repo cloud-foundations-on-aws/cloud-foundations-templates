@@ -1,5 +1,8 @@
 # Management Account Identity Center Assignments
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
+
 From the management account in AWS IAM Identity Center, you will need to assign your users to a permission set and to the management account. It is best practice to assign only users and not groups to the management account administrator assignment. Groups can be updated in the IAM Identity Center delegated admin account and could give unauthorized access to the management account.
 
 Follow the instructions below assigning your management account users to both the MA-Administrator and MA-ReadOnly permission sets:

@@ -1,5 +1,7 @@
 # Logging
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 The `Logging` directory contains various resources for provisioning and configuring centralizing logging within your AWS cloud environment. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |

@@ -1,5 +1,7 @@
 # S3 Bucket for Centralized AWS CloudTrail logging
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 To centralize AWS CloudTrail logs, you need to configure a central AWS S3 Bucket with the appropriate permissions, enabling a CloudTrail Organization Trail to write logs to it. You can utilize the resources available in the directory to create your very own AWS S3 Bucket, dedicated to centralized logging of CloudTrail.
 
 ## S3 Bucket Policy - Centralized CloudTrail logging

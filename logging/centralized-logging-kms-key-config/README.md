@@ -1,5 +1,7 @@
 # Centralized Logging KMS Key Config
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 KMS (Key Management Service) can be used to encrypt AWS Config logs by generating and managing encryption keys that are used to encrypt and decrypt the logs. To enable encryption of AWS Config logs, KMS must be configured with the appropriate permissions to access the S3 bucket where the logs are stored. Once configured, KMS will use a customer master key (CMK) to encrypt the logs, which can only be decrypted using the same key. This ensures that the AWS Config logs are secure and can only be accessed by authorized individuals or services. Additionally, KMS provides detailed auditing and logging of all key usage, providing additional security and compliance measures for the encryption of AWS Config logs.
 
 > **Note:** By default, the log files delivered by Config to your bucket are encrypted by [Amazon server-side encryption with Amazon S3-managed encryption keys (SSE-S3)](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html). To provide a security layer that is directly manageable, we recommend that you use [server-side encryption with AWS KMS keys (SSE-KMS)](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingKMSEncryption.html) for your Config log files.

@@ -1,5 +1,6 @@
-
 # Centralized Logging AWS Config
+
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
 
 To centralize AWS Config logs, you'll need to configure a central AWS S3 Bucket with the necessary permissions, allowing AWS Config to write logs to it. Take advantage of the directory's resources to create your own AWS S3 Bucket exclusively for centralized logging of AWS Config.
 

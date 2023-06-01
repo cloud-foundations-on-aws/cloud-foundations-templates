@@ -1,5 +1,6 @@
-
 # Centralized Logging KMS Key CloudTrail
+
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
 
 KMS (Key Management Service) encrypts CloudTrail logs by generating and managing encryption keys that are used to encrypt and decrypt the logs. To enable encryption of CloudTrail logs, KMS must be configured with the appropriate permissions to access the CloudTrail S3 bucket. Once configured, KMS will use a customer master key (CMK) to encrypt the logs, which can only be decrypted using the same key. This ensures that the CloudTrail logs are secure and can only be accessed by authorized individuals or services. Additionally, KMS provides detailed auditing and logging of all key usage, providing additional security and compliance measures for the encryption of CloudTrail logs.
 

@@ -1,5 +1,7 @@
 # Identity Management and Access Control
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational [identity management and access control capability](https://aws.amazon.com/solutions/guidance/identity-management-and-access-control-on-aws/) in your cloud environment. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |
