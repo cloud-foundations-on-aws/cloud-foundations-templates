@@ -1,5 +1,7 @@
 # Tagging
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 The following directory contains various templates, examples, policies, and scripts that can help you establish your foundational [tagging capability](https://aws.amazon.com/solutions/guidance/tagging-on-aws) in the cloud. Please refer to the following table for a quick description of each solution within the directory:
 
 | Example | Description | Type |

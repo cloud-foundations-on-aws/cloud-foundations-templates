@@ -1,5 +1,7 @@
 # Management Account Identity Center Permissions Sets
 
+> **Notice:** This repository provides sample scripts, templates, policies, etc. They are not intended to be or supported as solutions, but serve as a helpful reference for building your own landing zone solution.
+
 From your AWS management account in  AWS IAM Identity Center, you will need to add/create the permission set for your management account administrators. Note that any permission set assigned to the management account cannot be leveraged or edited from the AWS IAM Identity Center delegated admin AWS account.
 
 Follow the [Create a permission set](https://docs.aws.amazon.com/singlesignon/latest/userguide/howtocreatepermissionset.html) instructions from the AWS Identity Center documentation to create the following permission sets or deploy the CloudFormation template in this directory.
