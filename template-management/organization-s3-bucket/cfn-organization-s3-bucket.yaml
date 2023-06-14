@@ -85,7 +85,7 @@ Resources:
     # checkov:skip=CKV_AWS_21: Versioning not enabled due to logging bucket
     Condition: cDeployAccessLogging
     Properties:
-      BucketName: !Sub pLogBucketName-${AWS::AccountId}
+      BucketName: !Sub ${pLogBucketName}-${AWS::AccountId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
