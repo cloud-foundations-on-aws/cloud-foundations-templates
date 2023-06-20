@@ -18,3 +18,4 @@ To use these custom lenses in your environment, follow the below steps.
 | Custom Lens | Description | Type |
 | --------------- | ----------- | ---- |
 | [CF Acceleration Day Custom Lens](./cf-acceleration-day-custom-lens.json) |  Custom Lens to measure and track your progress during Cloud Foundations Acceleration Day. | [Custom Lens](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-custom.html) |
+| [Cloud Foundations Accelerator Custom Lens](./cf-acceleration-day-custom-lens.json) |  Custom Lens to measure and track your progress as you complete the core Cloud Foundations capabilities. This Custom Lens goes into greater depth than the Acceleration Day Custom Lens | [Custom Lens](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-custom.html) |
