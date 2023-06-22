@@ -676,6 +676,69 @@
               "risk": "HIGH_RISK"
             }
           ]
+        },
+        {
+          "id": "develop_account_lifecycle_processes",
+          "title": "Develop Account lifecycle processes",
+          "description": "It is important to establish an account provisioning and decommissioning process for your AWS environment.  At a smaller scale, request and review processes for creating and decommissioning accounts often start with manual-based inputs to a cloud management team through a ticketing system or other request process. As your environment matures, request, review, and approval processes can be automated using integration with existing IT service management or human workflow tools.",
+          "choices": [
+            {
+              "id": "establish_account_provisioning_process",
+              "title": "Establish account provisioning process",
+              "helpfulResource": {
+                "displayText": "It is helpful to establish and document a process for requesting new account creation.  This includes determining which groups or individuals can provision accounts, how requests will be made (email or ticketing system), what information is required in the account request, and if an approval process is necessary.",
+                "url": "https://aws.amazon.com/solutions/guidance/workload-isolation-on-aws/?did=sl_card&trk=sl_card"
+              },
+              "improvementPlan": {
+                "displayText": "Establish an account provisioning process"
+              }
+            },
+            {
+              "id": "provide_access_to_provision_accounts_in_aws_control_tower",
+              "title": "Provide access to provision accounts in AWS Control Tower",
+              "helpfulResource": {
+                "displayText": "AWS Control Tower offers preconfigured groups to organize users that perform specific tasks in your accounts.  The AWSAccountFactory group is used to provision new accounts using Account Factory.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
+              },
+              "improvementPlan": {
+                "displayText": "Add users to the AWS IAM Identity Center AWSAccountFactory group to provide access to provision accounts in Control Tower",
+                "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/adduserstogroups.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Overview of AWS Control Tower Account Factory",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "establish_account_provisioning_process && provide_access_to_provision_accounts_in_aws_control_tower",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "establish_account_provisioning_process && provide_access_to_provision_accounts_in_aws_control_tower",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
         }
       ]
     },
