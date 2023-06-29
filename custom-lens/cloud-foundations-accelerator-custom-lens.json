@@ -500,6 +500,18 @@
               }
             },
             {
+              "id": "deny_unused_regions_from_control_tower",
+              "title": "Deny unused regions from Control Tower",
+              "helpfulResource": {
+                "displayText": "You can deny access to AWS services and operations in any AWS Regions showing the AWS Control Tower status of Not governed, and Regions in which AWS Control Tower is not available. You cannot deny access to your home Region.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html"
+              },
+              "improvementPlan": {
+                "displayText": "Configure region deny feature in Control Tower to prohibit actions in Control Tower non-managed regions",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html"
+              }
+            },
+            {
               "id": "none_no",
               "title": "None of these",
               "helpfulResource": {
@@ -524,86 +536,181 @@
           ]
         },
         {
-          "id": "create_foundational_ous_from_control_tower",
-          "title": "Create Foundational OUs from Control Tower",
-          "description": "Foundational OUs are OUs that contains accounts, workloads, and other AWS resources that provide common security and infrastructure capabilities to secure and support your overall AWS environment. It is important to establish the foundational OUs early on.",
+          "id": "apply_control_tower_initial_detective_controls",
+          "title": "Apply Control Tower initial detective controls",
+          "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
           "choices": [
             {
-              "id": "create_infrastructure_ou",
-              "title": "Create Infrastructure OU",
+              "id": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled",
+              "title": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled",
               "helpfulResource": {
-                "displayText": "The Infrastructure Organizational Unit (OU) is intended for shared infrastructure services. It is designed to be used to hold AWS accounts containing AWS infrastructure resources that are shared or utilized by the rest of the organization. No application accounts or application workloads are intended to exist within this OU.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
+                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#enable-root-mfa"
               },
               "improvementPlan": {
-                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Infrastructure.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-              },
-              "additionalResources": [
-                {
-                  "type": "HELPFUL_RESOURCE",
-                  "content": [
-                    {
-                      "displayText": "Organizing your AWS environment whitepaper",
-                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-workload-oriented-ous.html"
-                    },
-                    {
-                      "displayText": "AWS Control Tower guidance on creating OUs",
-                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-                    }
-                  ]
-                }
-              ]
+                "displayText": "Enable AWS Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled in all OUs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+              }
             },
             {
-              "id": "create_workloads_ou",
-              "title": "Create Workloads OU",
+              "id": "enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
+              "title": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
               "helpfulResource": {
-                "displayText": "The Workloads Organizational Unit (OU) is intended to hold your business-specific workloads including both production and non-production environments. To maintain a clear separation between production and non-production workloads, you will be able create a Production and one or more Non-production OUs within the Workload OU. Reference the Organizing Workload-oriented OUs section of the AWS multi-account strategy whitepaper for more information.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/workloads-ou.html"
+                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-read"
               },
               "improvementPlan": {
-                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Workloads.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-              },
-              "additionalResources": [
-                {
-                  "type": "HELPFUL_RESOURCE",
-                  "content": [
-                    {
-                      "displayText": "Organizing your AWS environment whitepaper",
-                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-workload-oriented-ous.html"
-                    },
-                    {
-                      "displayText": "AWS Control Tower guidance on creating OUs",
-                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-                    }
-                  ]
-                }
-              ]
+                "displayText": "Enable AWS Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed in all OUs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+              }
             },
             {
-              "id": "create_exceptions_ou",
-              "title": "Create Exceptions OU",
+              "id": "enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
+              "title": "Enable Control Tower detective control detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
               "helpfulResource": {
-                "displayText": "The Exceptions Organizational Unit (OU) is designed to be a service control policy (SCP) exception OU. Therefore, SCPs should not be attached to this OU outside of the AWS Control Tower mandatory preventative controls Instead, SCPs should be attached directly to the accounts within this OU to provide the flexibility to manage different types of exceptions. For more information, visit the Exceptions OU section of the Organizing Your AWS Environment whitepaper for more information.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/exceptions-ou.html"
+                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-write"
               },
               "improvementPlan": {
-                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Exceptions.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                "displayText": "Enable AWS Control Tower detective control detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed in all OUs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+              }
+            },
+            {
+              "id": "enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "title": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "helpfulResource": {
+                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/elective-controls.html#disallow-access-mfa"
+              },
+              "improvementPlan": {
+                "displayText": "Enable AWS Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users in all OUs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+              }
+            },
+            {
+              "id": "review_additional_control_tower_detective_controls",
+              "title": "Review additional Control Tower Detective Controls",
+              "helpfulResource": {
+                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review additional available Control Tower Controls",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && !enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "apply_control_tower_initial_preventative_controls",
+          "title": "Apply Control Tower initial preventative controls",
+          "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. PREVENTATIVE CONTROLS allow you to manage permissions in your organization by setting the maximum available permissions for all or some accounts in your organization. Preventative controls help you to ensure your accounts stay within your organization’s access control guidelines. AWS Control Tower preventative controls are implemented using Service Control Policies (SCPs).",
+          "choices": [
+            {
+              "id": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "title": "Enable Control Tower preventative control disallow_creation_of_access_keys_for_the_root_user",
+              "helpfulResource": {
+                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control helps secure your AWS accounts by disallowing creation of access keys for the root user.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#disallow-root-access-keys"
+              },
+              "improvementPlan": {
+                "displayText": "Enable AWS Control Tower preventative control disallow_creation_of_access_keys_for_the_root_user in all OUs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+              }
+            },
+            {
+              "id": "review_additional_control_tower_preventative_controls",
+              "title": "Review additional Control Tower Preventative Controls",
+              "helpfulResource": {
+                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review additional available Control Tower Controls",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "develop_account_lifecycle_processes",
+          "title": "Develop Account lifecycle processes",
+          "description": "It is important to establish an account provisioning and decommissioning process for your AWS environment.  At a smaller scale, request and review processes for creating and decommissioning accounts often start with manual-based inputs to a cloud management team through a ticketing system or other request process. As your environment matures, request, review, and approval processes can be automated using integration with existing IT service management or human workflow tools.",
+          "choices": [
+            {
+              "id": "establish_account_provisioning_process",
+              "title": "Establish account provisioning process",
+              "helpfulResource": {
+                "displayText": "It is helpful to establish and document a process for requesting new account creation.  This includes determining which groups or individuals can provision accounts, how requests will be made (email or ticketing system), what information is required in the account request, and if an approval process is necessary.",
+                "url": "https://aws.amazon.com/solutions/guidance/workload-isolation-on-aws/?did=sl_card&trk=sl_card"
+              },
+              "improvementPlan": {
+                "displayText": "Establish an account provisioning process"
+              }
+            },
+            {
+              "id": "provide_access_to_provision_accounts_in_aws_control_tower",
+              "title": "Provide access to provision accounts in AWS Control Tower",
+              "helpfulResource": {
+                "displayText": "AWS Control Tower offers preconfigured groups to organize users that perform specific tasks in your accounts.  The AWSAccountFactory group is used to provision new accounts using Account Factory.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
+              },
+              "improvementPlan": {
+                "displayText": "Add users to the AWS IAM Identity Center AWSAccountFactory group to provide access to provision accounts in Control Tower",
+                "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/adduserstogroups.html"
               },
               "additionalResources": [
                 {
                   "type": "HELPFUL_RESOURCE",
                   "content": [
                     {
-                      "displayText": "Organizing your AWS environment whitepaper",
-                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/exceptions-ou.html"
-                    },
-                    {
-                      "displayText": "AWS Control Tower guidance on creating OUs",
-                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                      "displayText": "Overview of AWS Control Tower Account Factory",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
                     }
                   ]
                 }
@@ -620,11 +727,11 @@
           ],
           "riskRules": [
             {
-              "condition": "create_infrastructure_ou && create_workloads_ou && create_exceptions_ou",
+              "condition": "establish_account_provisioning_process && provide_access_to_provision_accounts_in_aws_control_tower",
               "risk": "NO_RISK"
             },
             {
-              "condition": "create_infrastructure_ou && create_workloads_ou && !create_exceptions_ou",
+              "condition": "establish_account_provisioning_process && provide_access_to_provision_accounts_in_aws_control_tower",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -854,6 +961,143 @@
             },
             {
               "condition": "create_infrastructure_ou && create_workloads_ou && create_exceptions_ou",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "create_additional_recommended_ous",
+          "title": "Create additional recommended OUs",
+          "description": "The multi-account strategy (MAS) guidance has a number of recommended OUs that are designed for different use-cases.  You can create these OUs in advance or as they are needed.",
+          "choices": [
+            {
+              "id": "create_transitional_ou",
+              "title": "Create Transitional OU",
+              "helpfulResource": {
+                "displayText": "The Transitional OU is intended as a temporary holding area for existing accounts and workloads that you move to your organization before formally integrating them into the more standardized areas of your AWS environment structure.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/transitional-ou.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Transitional.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Organizing your AWS environment whitepaper",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-workload-oriented-ous.html"
+                    },
+                    {
+                      "displayText": "AWS Control Tower guidance on creating OUs",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "create_deployments_ou",
+              "title": "Create Deployments OU",
+              "helpfulResource": {
+                "displayText": "The Deployments OU contains resources and workloads that support how you build, validate, promote, and release changes to your workloads.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/deployments-ou.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Deployments.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Organizing your AWS environment whitepaper",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-workload-oriented-ous.html"
+                    },
+                    {
+                      "displayText": "AWS Control Tower guidance on creating OUs",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "create_policy_staging_ou",
+              "title": "Create Policy Staging OU",
+              "helpfulResource": {
+                "displayText": "The Policy Staging OU is intended to help teams that manage overall policies for your AWS environment to safely test potentially broadly impacting policy changes before applying them to the intended OUs or accounts. For example, SCPs and tag policies should be tested prior to applying them to the intended OUs or accounts.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/policy-staging-ou.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named PolicyStaging.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Organizing your AWS environment whitepaper",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/exceptions-ou.html"
+                    },
+                    {
+                      "displayText": "AWS Control Tower guidance on creating OUs",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "create_suspended_ou",
+              "title": "Create Suspended OU",
+              "helpfulResource": {
+                "displayText": "The Suspended OU is used as a temporary holding area for accounts that are required to have their use suspended either temporarily or permanently. Moving an account to this OU doesn’t automatically change the overall status of the account. For example, in cases where you intend to permanently stop using an account, you would follow the Closing an account process to permanently close the account.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/suspended-ou.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower documentation to create and enroll a top-level OU (select Root for the Parent OU) named Suspended.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Organizing your AWS environment whitepaper",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/exceptions-ou.html"
+                    },
+                    {
+                      "displayText": "AWS Control Tower guidance on creating OUs",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "default",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "create_transitional_ou && create_deployments_ou && create_policy_staging_ou && create_suspended_ou",
               "risk": "MEDIUM_RISK"
             },
             {
