@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2021-11-01",
-  "name": "AWS Cloud Foundations Accelerator",
-  "description": "AWS Cloud Foundations Accelerator",
+  "name": "Cloud Foundations on AWS Acceleration Day",
+  "description": "Cloud Foundations on AWS Acceleration Day",
   "pillars": [
     {
       "id": "prerequisites",
