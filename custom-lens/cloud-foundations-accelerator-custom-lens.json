@@ -432,6 +432,98 @@
           ]
         },
         {
+          "id": "aws_control_tower_deployment_and_configuration",
+          "title": "AWS Control Tower deployment and configuration",
+          "description": "AWS Control Tower is a managed service that orchestrates the deployment of resources to apply a consistent security configuration baseline across your AWS accounts and AWS environment. We recommend deploying AWS Control Tower as the orchestration tool to set up your initial AWS environment and apply post-deployment configurations.  During AWS Control Tower setup, you need to apply several parameters for deployment.",
+          "choices": [
+            {
+              "id": "document_control_tower_required_parameters",
+              "title": "Document Control Tower required parameters",
+              "helpfulResource": {
+                "displayText": "Before you deploy AWS Control Tower, we recommend that you collect and document the configuration parameters for your initial AWS Control Tower deployment (home region, operating regions, OU names, shared account names and unique email addresses). This will help ensure you adhere to the policies when setting up your environment on AWS and follow a naming convention from the start, allowing you to scale later on.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-two.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review and document the necessary AWS Control Tower parameters",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-two.html"
+              }
+            },
+            {
+              "id": "deploy_aws_control_tower_in_your_home_region",
+              "title": "Deploy Control Tower in your home region",
+              "helpfulResource": {
+                "displayText": "Before AWS Control Tower sets up the landing zone, it automatically runs a series of pre-launch checks in your account. There's no action required on your part for these checks, which ensure that your management account is ready for the changes that establish your landing zone.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-with-control-tower.html"
+              },
+              "improvementPlan": {
+                "displayText": "Deploy AWS Control Tower in your home region using the parameters that you have documented",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-with-control-tower.html"
+              }
+            },
+            {
+              "id": "use_control_tower_admin_aws_iam_identity_center_user",
+              "title": "Use Control Tower admin AWS IAM Identity Center User",
+              "helpfulResource": {
+                "displayText": "We recommend that you do not use the AWS IAM root user accounts except for activities that require it. Reference AWS documentation for tasks that require the root user for more information.  AWS Control Tower enables IAM Identity Center (if not already enabled) and creates standard groups and permission sets.  AWS Control Tower also creates an IAM Identity Center User from the account (root user) email address.  This user can be used to login to the management account to avoid using the root user by using the link sent to the root user email address to set the password and login as a Control Tower IAM Identity Center admin.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/sso.html"
+              },
+              "improvementPlan": {
+                "displayText": "Set the password and login to the management account using Control Tower IAM Identity Center admin user",
+                "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/get-started-use-identity-center-directory-create-user-in-identity-center.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Root user tasks",
+                      "url": "https://docs.aws.amazon.com/accounts/latest/reference/root-user-tasks.html"
+                    },
+                    {
+                      "displayText": "About AWS IAM Identity Center",
+                      "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "configure_aws_control_tower_account_factory",
+              "title": "Configure AWS Control Tower Account Factory",
+              "helpfulResource": {
+                "displayText": "AWS Control Tower account factory enables customers to provision accounts within organization under the governance of AWS Control Tower. AWS Control Tower account factory is configured, by default, to provision a virtual private cloud (VPC) and subnet in each new account. It is recommended to configure AWS Control Tower Account Factory default settings to not provision a default VPC(s) in new accounts. This will allow for greater control of your VPCs, subnets, and classless inter-domain routing (CIDR) ranges.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower guidance to configure Account Factory to not deploy VPCs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "document_control_tower_required_parameters && deploy_aws_control_tower_in_your_home_region && configure_aws_control_tower_account_factory",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "deploy_aws_control_tower_in_your_home_region && configure_aws_control_tower_account_factory && !document_control_tower_required_parameters",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
           "id": "apply_control_tower_initial_detective_controls",
           "title": "Apply Control Tower initial detective controls",
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
