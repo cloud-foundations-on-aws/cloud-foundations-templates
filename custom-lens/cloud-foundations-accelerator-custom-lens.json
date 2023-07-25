@@ -488,6 +488,18 @@
               ]
             },
             {
+              "id": "deny_unused_regions_from_control_tower",
+              "title": "Deny unused regions from Control Tower",
+              "helpfulResource": {
+                "displayText": "You can deny access to AWS services and operations in any AWS Regions showing the AWS Control Tower status of Not governed, and Regions in which AWS Control Tower is not available. You cannot deny access to your home Region.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html"
+              },
+              "improvementPlan": {
+                "displayText": "Configure region deny feature in Control Tower to prohibit actions in Control Tower non-managed regions",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html"
+              }
+            },
+            {
               "id": "configure_aws_control_tower_account_factory",
               "title": "Configure AWS Control Tower Account Factory",
               "helpfulResource": {
