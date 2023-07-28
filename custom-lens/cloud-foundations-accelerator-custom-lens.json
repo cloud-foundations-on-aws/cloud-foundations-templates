@@ -538,7 +538,7 @@
         {
           "id": "apply_control_tower_initial_detective_controls",
           "title": "Apply Control Tower initial detective controls",
-          "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
+          "description": "AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
           "choices": [
             {
               "id": "enable_ct_detective_control_for_root_user_MFA",
@@ -1257,6 +1257,14 @@
                 "displayText": "Use the Identity groups and permissions document template, or create your own, to document known groups, members, and permissions",
                 "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/tree/main/trackers-and-planning/cloud-foundations-accelerator"
               }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
             }
           ],
           "riskRules": [
@@ -1870,6 +1878,14 @@
               "improvementPlan": {
                 "displayText": "Document AWS organization budget limit",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
               }
             }
           ],
@@ -2762,6 +2778,14 @@
                 "displayText": "Design and document a VPC endpoint strategy",
                 "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/aws-services-privatelink-support.html"
               }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
             }
           ],
           "riskRules": [
@@ -2831,6 +2855,14 @@
                 "displayText": "Create an IPAM pool",
                 "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-ipam.html"
               }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
             }
           ],
           "riskRules": [
@@ -2863,6 +2895,14 @@
               "improvementPlan": {
                 "displayText": "Review the guidance on Amazon Route 53",
                 "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
               }
             }
           ],
@@ -3107,8 +3147,8 @@
               }
             },
             {
-              "id": "set_member_account_alternate_contacts_for_operations_security_billing",
-              "title": "Set member account alternate contacts for operations, security, billing",
+              "id": "set_member_account_alternate_contacts",
+              "title": "Set member account alternate contacts",
               "helpfulResource": {
                 "displayText": "In order to ensure the right people are notified, you need to add an alternate contact for Billing, Operations, and Security communications for member accounts AWS account.  Once trusted access is enabled, this can be done from the management account.",
                 "url": "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-alternate.html#manage-acct-update-contact-alternate-orgs"
@@ -3355,10 +3395,10 @@
           "description": "Amazon GuardDuty is a security monitoring service that analyzes and processes Foundational data sources, such as AWS CloudTrail management events, AWS CloudTrail event logs, VPC flow logs (from Amazon EC2 instances), and DNS logs. It also processes Features such as Kubernetes audit logs, RDS login activity, S3 logs, EBS volumes, Runtime monitoring, and Lambda network activity logs.",
           "choices": [
             {
-              "id": "delegate_amazon_guardduty_administration_to_the_security_tooling_account",
-              "title": "Delegate Amazon GuardDuty administration to the Security Tooling account",
+              "id": "delegate_amazon_guardduty_administration",
+              "title": "Delegate Amazon GuardDuty administration",
               "helpfulResource": {
-                "displayText": "When you use GuardDuty with an AWS Organizations organization, you can designate any account within the organization to be the GuardDuty delegated administrator. Only the organization management account can designate GuardDuty delegated administrators.  It is a best practice to delegate Amazon GuardDuty outside of the management account.",
+                "displayText": "When you use GuardDuty with an AWS Organizations organization, you can designate any account within the organization to be the GuardDuty delegated administrator. Only the organization management account can designate GuardDuty delegated administrators.  It is a best practice to delegate Amazon GuardDuty outside of the management account.  It is recommended to delegate to the Security Tooling account.",
                 "url": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_organizations.html"
               },
               "improvementPlan": {
@@ -3393,11 +3433,11 @@
           ],
           "riskRules": [
             {
-              "condition": "delegate_amazon_guardduty_administration_to_the_security_tooling_account && enable_amazon_guardduty_in_delegated_account && configure_exporting_guardduty_findings_to_an_amazon_s3_bucket",
+              "condition": "delegate_amazon_guardduty_administration && enable_amazon_guardduty_in_delegated_account && configure_exporting_guardduty_findings_to_an_amazon_s3_bucket",
               "risk": "NO_RISK"
             },
             {
-              "condition": "delegate_amazon_guardduty_administration_to_the_security_tooling_account && enable_amazon_guardduty_in_delegated_account && configure_exporting_guardduty_findings_to_an_amazon_s3_bucket",
+              "condition": "delegate_amazon_guardduty_administration && enable_amazon_guardduty_in_delegated_account && configure_exporting_guardduty_findings_to_an_amazon_s3_bucket",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -3412,10 +3452,10 @@
           "description": "AWS Security Hub is an AWS service that provides you with a comprehensive view of your security state in AWS and helps you check your environment against security industry standards and best practices. Security Hub collects security data from across AWS accounts, services, and supported third-party partner products and helps you analyze your security trends and identify the highest priority security issues.",
           "choices": [
             {
-              "id": "delegate_aws_security_hub_administration_to_the_security_tooling_account",
-              "title": "Delegate AWS Security Hub administration to the Security Tooling account",
+              "id": "delegate_aws_security_hub_administration",
+              "title": "Delegate AWS Security Hub administration",
               "helpfulResource": {
-                "displayText": "When you use AWS Security Hub with an AWS Organizations organization, you can designate any account within the organization to be the Security Hub delegated administrator. Only the organization management account can designate Security Hub delegated administrators.  It is a best practice to delegate AWS Security Hub outside of the management account.",
+                "displayText": "When you use AWS Security Hub with an AWS Organizations organization, you can designate any account within the organization to be the Security Hub delegated administrator. Only the organization management account can designate Security Hub delegated administrators.  It is a best practice to delegate AWS Security Hub outside of the management account.  It is recommended to delegate Security Hub to the Security Tool account.",
                 "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/designate-orgs-admin-account.html"
               },
               "improvementPlan": {
@@ -3448,10 +3488,10 @@
               }
             },
             {
-              "id": "enable_cross_region_aggregation_in_the_security_hub_administrative_account",
-              "title": "Enable cross region aggregation in the Security Hub administrative account",
+              "id": "enable_cross_region_aggregation",
+              "title": "Enable cross region aggregation",
               "helpfulResource": {
-                "displayText": "With cross-Region aggregation, you can aggregate findings, finding updates, insights, control compliance statuses, and security scores from multiple Regions to a single aggregation Region. You can then manage all of this data from the aggregation Region.",
+                "displayText": "With cross-Region aggregation, you can aggregate findings, finding updates, insights, control compliance statuses, and security scores from multiple Regions to a single aggregation Region. You can then manage all of this data from the aggregation Region in the Security Hub administrator account.",
                 "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation.html"
               },
               "improvementPlan": {
@@ -3462,11 +3502,11 @@
           ],
           "riskRules": [
             {
-              "condition": "delegate_aws_security_hub_administration_to_the_security_tooling_account && enable_aws_security_hub_in_delegated_account && enable_aws_security_hub_in_existing_accounts && enable_cross_region_aggregation_in_the_security_hub_administrative_account",
+              "condition": "delegate_aws_security_hub_administration && enable_aws_security_hub_in_delegated_account && enable_aws_security_hub_in_existing_accounts && enable_cross_region_aggregation",
               "risk": "NO_RISK"
             },
             {
-              "condition": "delegate_aws_security_hub_administration_to_the_security_tooling_account && enable_aws_security_hub_in_delegated_account && enable_aws_security_hub_in_existing_accounts && enable_cross_region_aggregation_in_the_security_hub_administrative_account",
+              "condition": "delegate_aws_security_hub_administration && enable_aws_security_hub_in_delegated_account && enable_aws_security_hub_in_existing_accounts && enable_cross_region_aggregation",
               "risk": "MEDIUM_RISK"
             },
             {
