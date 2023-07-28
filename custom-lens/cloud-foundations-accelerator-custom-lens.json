@@ -113,8 +113,8 @@
               }
             },
             {
-              "id": "set_management_account_alternate_contacts_for_operations_security_billing",
-              "title": "Set management account alternate contacts for operations, security, billing",
+              "id": "set_management_account_alternate_contacts",
+              "title": "Set management account alternate contacts",
               "helpfulResource": {
                 "displayText": "This task requires the root user. In order to keep the right teams or people notified, you can add an alternate contact for Billing, Operations, and Security communications for the AWS account.",
                 "url": "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-alternate.html#manage-acct-update-contact-alternate-edit"
@@ -170,11 +170,11 @@
           ],
           "riskRules": [
             {
-              "condition": "allow_iam_role_access_to_billing && set_management_account_alternate_contacts_for_operations_security_billing && configure_billing_and_tax_information && select_aws_support_tier",
+              "condition": "allow_iam_role_access_to_billing && set_management_account_alternate_contacts && configure_billing_and_tax_information && select_aws_support_tier",
               "risk": "NO_RISK"
             },
             {
-              "condition": "allow_iam_role_access_to_billing && !set_management_account_alternate_contacts_for_operations_security_billing && !select_aws_support_tier && configure_billing_and_tax_information",
+              "condition": "allow_iam_role_access_to_billing && !set_management_account_alternate_contacts && !select_aws_support_tier && configure_billing_and_tax_information",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -260,8 +260,8 @@
           "description": "It is important to define owners and stakeholders of the  Cloud Foundations Accelerator modules.",
           "choices": [
             {
-              "id": "identify_and_document_owners_of_cloud_foundation_accelerator_modules",
-              "title": "Identify and document owners of Cloud Foundation Accelerator modules",
+              "id": "identify_owners_of_cloud_foundation_accelerator_modules",
+              "title": "Identify owners of Cloud Foundation Accelerator modules",
               "helpfulResource": {
                 "displayText": "Owners are the key decision makers made during a module and are responsible for ensuring the execution of implementation steps.",
                 "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#AboutAccountAlias"
@@ -272,8 +272,8 @@
               }
             },
             {
-              "id": "identify_and_document_stakeholders_of_cloud_foundation_accelerator_modules",
-              "title": "Identify and document stakeholders of Cloud Foundation Accelerator modules",
+              "id": "identify_stakeholders_of_cloud_foundation_accelerator_modules",
+              "title": "Identify stakeholders of Cloud Foundation Accelerator modules",
               "helpfulResource": {
                 "displayText": "Stakeholders are individuals that should understand the material within a module and will provide input for decisions made during the module.",
                 "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#AboutAccountAlias"
@@ -294,11 +294,11 @@
           ],
           "riskRules": [
             {
-              "condition": "identify_and_document_owners_of_cloud_foundation_accelerator_modules && identify_and_document_stakeholders_of_cloud_foundation_accelerator_modules",
+              "condition": "identify_owners_of_cloud_foundation_accelerator_modules && identify_stakeholders_of_cloud_foundation_accelerator_modules",
               "risk": "NO_RISK"
             },
             {
-              "condition": "identify_and_document_owners_of_cloud_foundation_accelerator_modules && identify_and_document_stakeholders_of_cloud_foundation_accelerator_modules",
+              "condition": "identify_owners_of_cloud_foundation_accelerator_modules && identify_stakeholders_of_cloud_foundation_accelerator_modules",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -381,7 +381,7 @@
         {
           "id": "review_lz_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following landing zone concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "landing_zones",
@@ -441,11 +441,11 @@
               "title": "Document Control Tower required parameters",
               "helpfulResource": {
                 "displayText": "Before you deploy AWS Control Tower, we recommend that you collect and document the configuration parameters for your initial AWS Control Tower deployment (home region, operating regions, OU names, shared account names and unique email addresses). This will help ensure you adhere to the policies when setting up your environment on AWS and follow a naming convention from the start, allowing you to scale later on.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-one.html"
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-two.html"
               },
               "improvementPlan": {
                 "displayText": "Review and document the necessary AWS Control Tower parameters",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-one.html"
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/step-two.html"
               }
             },
             {
@@ -488,18 +488,6 @@
               ]
             },
             {
-              "id": "configure_aws_control_tower_account_factory",
-              "title": "Configure AWS Control Tower Account Factory",
-              "helpfulResource": {
-                "displayText": "AWS Control Tower account factory enables customers to provision accounts within organization under the governance of AWS Control Tower. AWS Control Tower account factory is configured, by default, to provision a virtual private cloud (VPC) and subnet in each new account. It is recommended to configure AWS Control Tower Account Factory default settings to not provision a default VPC(s) in new accounts. This will allow for greater control of your VPCs, subnets, and classless inter-domain routing (CIDR) ranges.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
-              },
-              "improvementPlan": {
-                "displayText": "Follow the AWS Control Tower guidance to configure Account Factory to not deploy VPCs",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
-              }
-            },
-            {
               "id": "deny_unused_regions_from_control_tower",
               "title": "Deny unused regions from Control Tower",
               "helpfulResource": {
@@ -509,6 +497,18 @@
               "improvementPlan": {
                 "displayText": "Configure region deny feature in Control Tower to prohibit actions in Control Tower non-managed regions",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html"
+              }
+            },
+            {
+              "id": "configure_aws_control_tower_account_factory",
+              "title": "Configure AWS Control Tower Account Factory",
+              "helpfulResource": {
+                "displayText": "AWS Control Tower account factory enables customers to provision accounts within organization under the governance of AWS Control Tower. AWS Control Tower account factory is configured, by default, to provision a virtual private cloud (VPC) and subnet in each new account. It is recommended to configure AWS Control Tower Account Factory default settings to not provision a default VPC(s) in new accounts. This will allow for greater control of your VPCs, subnets, and classless inter-domain routing (CIDR) ranges.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
+              },
+              "improvementPlan": {
+                "displayText": "Follow the AWS Control Tower guidance to configure Account Factory to not deploy VPCs",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/configuring-account-factory-with-VPC-settings.html"
               }
             },
             {
@@ -541,10 +541,10 @@
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
           "choices": [
             {
-              "id": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled",
-              "title": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled",
+              "id": "enable_ct_detective_control_for_root_user_MFA",
+              "title": "Enable detective control for root user MFA",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
+                "displayText": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#enable-root-mfa"
               },
               "improvementPlan": {
@@ -553,10 +553,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
-              "title": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
+              "id": "enable_ct_detective_control_for_s3_public_read_access",
+              "title": "Enable detective control for S3 public read access",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "displayText": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-read"
               },
               "improvementPlan": {
@@ -565,10 +565,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
-              "title": "Enable Control Tower detective control detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
+              "id": "enable_ct_detective_control_for_s3_public_write_access",
+              "title": "Enable detective control for S3 public write access",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "displayText": "Enable Control Tower detective control enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-write"
               },
               "improvementPlan": {
@@ -577,10 +577,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
-              "title": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "id": "enable_ct_detective_control_for_mfa_for_iam_users",
+              "title": "Enable detective control for MFA for IAM users",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
+                "displayText": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/elective-controls.html#disallow-access-mfa"
               },
               "improvementPlan": {
@@ -589,7 +589,7 @@
               }
             },
             {
-              "id": "review_additional_control_tower_detective_controls",
+              "id": "review_additional_ct_control_tower_detective_controls",
               "title": "Review additional Control Tower Detective Controls",
               "helpfulResource": {
                 "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
@@ -611,11 +611,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "condition": "enable_ct_detective_control_for_root_user_MFA && enable_ct_detective_control_for_s3_public_read_access && enable_ct_detective_control_for_s3_public_write_access && enable_ct_detective_control_for_mfa_for_iam_users",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && !enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "condition": "enable_ct_detective_control_for_root_user_MFA && enable_ct_detective_control_for_s3_public_read_access && enable_ct_detective_control_for_s3_public_write_access && !enable_ct_detective_control_for_mfa_for_iam_users",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -630,8 +630,8 @@
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. PREVENTATIVE CONTROLS allow you to manage permissions in your organization by setting the maximum available permissions for all or some accounts in your organization. Preventative controls help you to ensure your accounts stay within your organization’s access control guidelines. AWS Control Tower preventative controls are implemented using Service Control Policies (SCPs).",
           "choices": [
             {
-              "id": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
-              "title": "Enable Control Tower preventative control disallow_creation_of_access_keys_for_the_root_user",
+              "id": "enable_preventative_ct_control_for_root_user_access_keys",
+              "title": "Enable preventative control for root user access keys",
               "helpfulResource": {
                 "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control helps secure your AWS accounts by disallowing creation of access keys for the root user.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#disallow-root-access-keys"
@@ -642,7 +642,7 @@
               }
             },
             {
-              "id": "review_additional_control_tower_preventative_controls",
+              "id": "review_additional_ct_preventative_controls",
               "title": "Review additional Control Tower Preventative Controls",
               "helpfulResource": {
                 "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
@@ -664,11 +664,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "condition": "enable_preventative_ct_control_for_root_user_access_keys",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "condition": "enable_preventative_ct_control_for_root_user_access_keys",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -749,7 +749,7 @@
         {
           "id": "review_lz_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following multi-account strategy concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_organizations",
@@ -1083,6 +1083,33 @@
               ]
             },
             {
+              "id": "create_workload_sdlc_nested_ous_as_needed",
+              "title": "Create Workload SDLC nested OUs as needed",
+              "helpfulResource": {
+                "displayText": "Organizational units can hold accounts and other (nested) organizational units.  It is a best practice to separate your production and nonproduction workloads into separate OUs to allow you to apply stricter policies and controls on the production environment.  You can create a nested OU in the Workloads OU for each SDLC environment as needed (example- Dev, Test, Prod) to allow different controls and baseline automation for those environments.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/basic-organization.html"
+              },
+              "improvementPlan": {
+                "displayText": "Create nested OUs in the Workloads OU for each SDLC environment that makes sense for your business (eg. Dev, Prod)",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/basic-organization.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Organizing your AWS environment whitepaper",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/exceptions-ou.html"
+                    },
+                    {
+                      "displayText": "AWS Control Tower guidance on creating OUs",
+                      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "id": "none_no",
               "title": "None of these",
               "helpfulResource": {
@@ -1115,7 +1142,7 @@
         {
           "id": "review_identity_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following Identity concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_iam_service",
@@ -1179,8 +1206,8 @@
               }
             },
             {
-              "id": "control_tower_created_iam_identity_center_permission_sets_and_groups",
-              "title": "Control Tower created IAM Identity Center permission sets and groups",
+              "id": "control_tower_iam_identity_center_permission_sets_and_groups",
+              "title": "Control Tower IAM Identity Center permission sets and groups",
               "helpfulResource": {
                 "displayText": "AWS Control Tower offers preconfigured groups to organize users that perform specific tasks in your accounts. You can add users and assign them to these groups directly in IAM Identity Center. Doing so matches permission sets to users in groups within your accounts.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/sso.html"
@@ -1359,8 +1386,8 @@
           "description": "Delegated administration provides a convenient way for assigned users in a registered member account to perform most IAM Identity Center administrative tasks. Even though your IAM Identity Center instance must always reside in the management account, you can choose to delegate administration of IAM Identity Center to a member account in AWS Organizations, thereby extending the ability to manage IAM Identity Center from outside the management account.",
           "choices": [
             {
-              "id": "create_aws_iam_identity_center_delegated_administrator_account_in_control_tower",
-              "title": "Create IAM Identity Center delegated administrator Account in Control Tower",
+              "id": "create_iam_identity_center_account_in_control_tower",
+              "title": "Create IAM Identity Center Account in Control Tower",
               "helpfulResource": {
                 "displayText": "An AWS account should be created to allow for the delegation of AWS IAM Identity Center so that access to the management account is not required in order to manage access to the member accounts and applications in the organization.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/provision-as-end-user.html"
@@ -1393,7 +1420,7 @@
           ],
           "riskRules": [
             {
-              "condition": "create_aws_iam_identity_center_delegated_administrator_account_in_control_tower && delegate_aws_iam_identity_center",
+              "condition": "create_iam_identity_center_account_in_control_tower && delegate_aws_iam_identity_center",
               "risk": "NO_RISK"
             },
             {
@@ -1545,7 +1572,7 @@
         {
           "id": "review_tagging_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_tags",
@@ -1742,7 +1769,7 @@
         {
           "id": "review_finance_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following FinOps concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_billing",
@@ -2101,7 +2128,7 @@
         {
           "id": "review_observability_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following multi-account observability concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_cloudwatch_metrics",
@@ -2379,7 +2406,7 @@
         {
           "id": "review_network_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following network concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "aws_vpcs_and_subnets",
@@ -2394,6 +2421,42 @@
               }
             },
             {
+              "id": "vpc_ip_address_manager",
+              "title": "VPC IP Address Manager (IPAM)",
+              "helpfulResource": {
+                "displayText": "Amazon VPC IP Address Manager (IPAM) is a VPC feature that makes it easier for you to plan, track, and monitor IP addresses for your AWS workloads. You can use IPAM automated workflows to more efficiently manage IP addresses.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review the guidance for Amazon VPC IP Address Manager (IPAM)",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
+              }
+            },
+            {
+              "id": "security_groups",
+              "title": "Security Groups",
+              "helpfulResource": {
+                "displayText": "A security group acts as a firewall that controls the traffic allowed to and from the resources in your virtual private cloud (VPC). You can choose the ports and protocols to allow for inbound traffic and for outbound traffic. For each security group, you add separate sets of rules for inbound traffic and outbound traffic.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review Security Groups",
+                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html"
+              }
+            },
+            {
+              "id": "centralized_networking_account",
+              "title": "Centralized Networking Account",
+              "helpfulResource": {
+                "displayText": "The networking account serves as the central hub for your network on AWS. You can manage your networking resources and route traffic between accounts in your environment, your on-premises, and egress/ingress traffic to the internet. Within this account, your networking administrators can manage and build security measures to protect outbound and inbound traffic on your environment centralizing AWS Site-to-Site VPN connections, AWS Direct Connect integrations, AWS Transit Gateway configurations, DNS services, Amazon VPC endpoints, and shared VPCs and subnets.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review the concept of a centralized networking account",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
+              }
+            },
+            {
               "id": "aws_transit_gateway",
               "title": "AWS Transit Gateway",
               "helpfulResource": {
@@ -2403,6 +2466,18 @@
               "improvementPlan": {
                 "displayText": "Review AWS Transit Gateway",
                 "url": "https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html"
+              }
+            },
+            {
+              "id": "aws_resource_access_manager",
+              "title": "AWS Resource Access Manager (RAM)",
+              "helpfulResource": {
+                "displayText": "AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or organizational units (OUs), and with IAM roles and users for supported resource types. You can use AWS Resource Access Manager (RAM) to share a transit gateway for VPC attachments across accounts or across your organization in AWS Organizations.",
+                "url": "https://docs.aws.amazon.com/ram/latest/userguide/working-with.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review AWS Transit Gateway sharing with Resource Access Manager",
+                "url": "https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-share.html"
               }
             },
             {
@@ -2430,18 +2505,6 @@
               }
             },
             {
-              "id": "centralized_networking_account",
-              "title": "Centralized Networking Account",
-              "helpfulResource": {
-                "displayText": "The networking account serves as the central hub for your network on AWS. You can manage your networking resources and route traffic between accounts in your environment, your on-premises, and egress/ingress traffic to the internet. Within this account, your networking administrators can manage and build security measures to protect outbound and inbound traffic on your environment centralizing AWS Site-to-Site VPN connections, AWS Direct Connect integrations, AWS Transit Gateway configurations, DNS services, Amazon VPC endpoints, and shared VPCs and subnets.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
-              },
-              "improvementPlan": {
-                "displayText": "Review the concept of a centralized networking account",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
-              }
-            },
-            {
               "id": "aws_vpn",
               "title": "AWS VPN",
               "helpfulResource": {
@@ -2466,18 +2529,6 @@
               }
             },
             {
-              "id": "vpc_ip_address_manager",
-              "title": "VPC IP Address Manager (IPAM)",
-              "helpfulResource": {
-                "displayText": "Amazon VPC IP Address Manager (IPAM) is a VPC feature that makes it easier for you to plan, track, and monitor IP addresses for your AWS workloads. You can use IPAM automated workflows to more efficiently manage IP addresses.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
-              },
-              "improvementPlan": {
-                "displayText": "Review the guidance for Amazon VPC IP Address Manager (IPAM)",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/what-it-is-ipam.html"
-              }
-            },
-            {
               "id": "none_no",
               "title": "None of these",
               "helpfulResource": {
@@ -2488,11 +2539,11 @@
           ],
           "riskRules": [
             {
-              "condition": "aws_vpcs_and_subnets && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
+              "condition": "aws_vpcs_and_subnets && security_groups && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
               "risk": "NO_RISK"
             },
             {
-              "condition": "aws_vpcs_and_subnets && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
+              "condition": "aws_vpcs_and_subnets && security_groups && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2839,7 +2890,7 @@
         {
           "id": "review_security_concepts_and_services",
           "title": "Review concepts and services",
-          "description": "It is important to review and understand the following concepts, processes, and services.",
+          "description": "It is important to review and understand the following security concepts, processes, and AWS services.",
           "choices": [
             {
               "id": "security_best_practices_in_iam",
@@ -3044,8 +3095,8 @@
               }
             },
             {
-              "id": "enable_management_account_to_manage_alternate_contacts_of_member_accounts",
-              "title": "Enable management account to manage alternate contacts of member accounts",
+              "id": "enable_management_account_to_manage_alternate_contacts",
+              "title": "Enable management account to manage alternate contacts",
               "helpfulResource": {
                 "displayText": "In order to manage the alternate contacts for member accounts in the organization, trusted access for AWS Account Management must be enabled.",
                 "url": "https://docs.aws.amazon.com/accounts/latest/reference/using-orgs-trusted-access.html"
@@ -3097,10 +3148,10 @@
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
           "choices": [
             {
-              "id": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled",
-              "title": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled",
+              "id": "enable_detective_control_for_root_user_MFA",
+              "title": "Enable detective control for root user MFA",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
+                "displayText": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#enable-root-mfa"
               },
               "improvementPlan": {
@@ -3109,10 +3160,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
-              "title": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed",
+              "id": "enable_detective_control_for_s3_public_read_access",
+              "title": "Enable detective control for S3 public read access",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "displayText": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-read"
               },
               "improvementPlan": {
@@ -3121,10 +3172,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
-              "title": "Enable Control Tower detective control detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed",
+              "id": "enable_detective_control_for_s3_public_write_access",
+              "title": "Enable detective control for S3 public write access",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
+                "displayText": "Enable Control Tower detective control enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-write"
               },
               "improvementPlan": {
@@ -3133,10 +3184,10 @@
               }
             },
             {
-              "id": "enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
-              "title": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "id": "enable_detective_control_for_mfa_for_iam_users",
+              "title": "Enable detective control for MFA for IAM users",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
+                "displayText": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/elective-controls.html#disallow-access-mfa"
               },
               "improvementPlan": {
@@ -3167,11 +3218,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "condition": "enable_detective_control_for_root_user_MFA && enable_detective_control_for_s3_public_read_access && enable_detective_control_for_s3_public_write_access && enable_detective_control_for_mfa_for_iam_users",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_detective_control_detect_whether_mfa_for_the_root_user_is_enabled && enable_detective_control_detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed && enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed && !enable_detective_control_detect_whether_mfa_is_enabled_for_aws_iam_users",
+              "condition": "enable_detective_control_for_root_user_MFA && enable_detective_control_for_s3_public_read_access && enable_detective_control_for_s3_public_write_access && !enable_detective_control_for_mfa_for_iam_users",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -3186,8 +3237,8 @@
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. PREVENTATIVE CONTROLS allow you to manage permissions in your organization by setting the maximum available permissions for all or some accounts in your organization. Preventative controls help you to ensure your accounts stay within your organization’s access control guidelines. AWS Control Tower preventative controls are implemented using Service Control Policies (SCPs).",
           "choices": [
             {
-              "id": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
-              "title": "Enable Control Tower preventative control disallow_creation_of_access_keys_for_the_root_user",
+              "id": "enable_preventative_control_for_root_user_access_keys",
+              "title": "Enable preventative control for root user access keys",
               "helpfulResource": {
                 "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control helps secure your AWS accounts by disallowing creation of access keys for the root user.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#disallow-root-access-keys"
@@ -3220,11 +3271,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "condition": "enable_preventative_control_for_root_user_access_keys",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_preventative_control_disallow_creation_of_access_keys_for_the_root_user",
+              "condition": "enable_preventative_control_for_root_user_access_keys",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -3239,8 +3290,8 @@
           "description": "Service control policies (SCPs) are a type of organization policy that you can use to manage permissions in your organization. SCPs offer central control over the maximum available permissions for all accounts in your organization. SCPs help you to ensure your accounts stay within your organization’s access control guidelines. No permissions are granted by an SCP. An SCP defines a guardrail, or sets limits, on the actions that the account's administrator can delegate to the IAM users and roles in the affected accounts.",
           "choices": [
             {
-              "id": "create_and_attach_an_scp_to_prevent_member_accounts_from_leaving_the_organization",
-              "title": "Create and attach an SCP to prevent member accounts from leaving the organization",
+              "id": "prevent_member_accounts_from_leaving_the_organization",
+              "title": "Prevent member accounts from leaving the organization",
               "helpfulResource": {
                 "displayText": "An SCP can be used to block use of the LeaveOrganization API operation so that administrators of member accounts can't remove their accounts from the organization. This SCP should be attached to all OUs in the organization.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#disallow-root-access-keys"
@@ -3251,8 +3302,8 @@
               }
             },
             {
-              "id": "create_and_attach_an_scp_to_prevent_resource_sharing_outside_of_the_organization",
-              "title": "Create and attach an SCP to prevent resource sharing outside of the organization",
+              "id": "prevent_resource_sharing_outside_of_the_organization",
+              "title": "Prevent resource sharing outside of the organization",
               "helpfulResource": {
                 "displayText": "An SCP can be used to prevent users from creating resource shares that allow sharing with IAM users and roles that aren't part of the organization.",
                 "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_ram.html"
@@ -3285,11 +3336,11 @@
           ],
           "riskRules": [
             {
-              "condition": "create_and_attach_an_scp_to_prevent_member_accounts_from_leaving_the_organization && create_and_attach_an_scp_to_prevent_resource_sharing_outside_of_the_organization",
+              "condition": "prevent_member_accounts_from_leaving_the_organization && prevent_resource_sharing_outside_of_the_organization",
               "risk": "NO_RISK"
             },
             {
-              "condition": "create_and_attach_an_scp_to_prevent_member_accounts_from_leaving_the_organization && create_and_attach_an_scp_to_prevent_resource_sharing_outside_of_the_organization",
+              "condition": "prevent_member_accounts_from_leaving_the_organization && prevent_resource_sharing_outside_of_the_organization",
               "risk": "MEDIUM_RISK"
             },
             {
