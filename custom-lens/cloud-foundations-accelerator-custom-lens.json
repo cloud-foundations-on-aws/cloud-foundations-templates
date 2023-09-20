@@ -624,12 +624,12 @@
           ]
         },
         {
-          "id": "apply_control_tower_initial_preventative_controls",
+          "id": "apply_control_tower_initial_preventative_controls_lz",
           "title": "Apply Control Tower initial preventative controls",
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. PREVENTATIVE CONTROLS allow you to manage permissions in your organization by setting the maximum available permissions for all or some accounts in your organization. Preventative controls help you to ensure your accounts stay within your organization’s access control guidelines. AWS Control Tower preventative controls are implemented using Service Control Policies (SCPs).",
           "choices": [
             {
-              "id": "enable_preventative_ct_control_for_root_user_access_keys",
+              "id": "enable_preventative_ct_control_for_root_user_access_keys_lz",
               "title": "Enable preventative control for root user access keys",
               "helpfulResource": {
                 "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control helps secure your AWS accounts by disallowing creation of access keys for the root user.",
@@ -641,7 +641,7 @@
               }
             },
             {
-              "id": "review_additional_ct_preventative_controls",
+              "id": "review_additional_ct_preventative_controls_lz",
               "title": "Review additional Control Tower Preventative Controls",
               "helpfulResource": {
                 "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
@@ -663,11 +663,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_preventative_ct_control_for_root_user_access_keys && review_additional_ct_preventative_controls",
+              "condition": "enable_preventative_ct_control_for_root_user_access_keys_lz && review_additional_ct_preventative_controls_lz",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_preventative_ct_control_for_root_user_access_keys && !review_additional_ct_preventative_controls",
+              "condition": "enable_preventative_ct_control_for_root_user_access_keys_lz && !review_additional_ct_preventative_controls_lz",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -813,6 +813,14 @@
               "improvementPlan": {
                 "displayText": "Reference the Multi-Account Strategy Whitepaper to design a multi-account architecture for your environment",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/basic-organization.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
               }
             }
           ],
@@ -3148,63 +3156,27 @@
           ]
         },
         {
-          "id": "apply_control_tower_initial_detective_controls",
-          "title": "Apply Control Tower initial detective controls",
+          "id": "document_and_apply_Control_Tower_detective_controls",
+          "title": "Document and apply Control Tower detective controls",
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. DETECTIVE CONTROLS continuously monitor deployed resources for nonconformance and generate alerts when nonconformance is detected. You can automate responses to alerts to take action. AWS Control Tower detective controls are implemented using AWS Config rules.",
           "choices": [
             {
-              "id": "enable_detective_control_for_root_user_MFA",
-              "title": "Enable detective control for root user MFA",
+              "id": "review_and_document_control_tower_detective_controls",
+              "title": "Review and document Control Tower detective controls",
               "helpfulResource": {
-                "displayText": "Enable Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled for all applicable OUs (it is recommended to enable for all OUs). This control detects whether multi-factor authentication (MFA) is enabled for the root user of the management account. MFA reduces vulnerability risks from weak authentication by requiring an additional authentication code after the user name and password are successful.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#enable-root-mfa"
+                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. Design and document the Control Tower detective controls that will be applied to different OUs in your organization.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               },
               "improvementPlan": {
-                "displayText": "Enable AWS Control Tower detective control detect_whether_mfa_for_the_root_user_is_enabled in all OUs.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+                "displayText": "Review additional available Control Tower Controls.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               }
             },
             {
-              "id": "enable_detective_control_for_s3_public_read_access",
-              "title": "Enable detective control for S3 public read access",
+              "id": "apply_documented_control_tower_detective_controls",
+              "title": "Apply documented Control Tower detective controls",
               "helpfulResource": {
-                "displayText": "Enable Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public readable S3 buckets). This control detects whether public read access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-read"
-              },
-              "improvementPlan": {
-                "displayText": "Enable AWS Control Tower detective control detect_whether_public_read_access_to_amazon_s3_buckets_is_allowed in all OUs.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
-              }
-            },
-            {
-              "id": "enable_detective_control_for_s3_public_write_access",
-              "title": "Enable detective control for S3 public write access",
-              "helpfulResource": {
-                "displayText": "Enable Control Tower detective control enable_detective_control_detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed for all applicable OUs (it is recommended to enable for all OUs that are not designed to host public writable S3 buckets). This control detects whether public write access is allowed to Amazon S3 buckets. It helps you maintain secure access to data stored in the buckets.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#s3-disallow-public-write"
-              },
-              "improvementPlan": {
-                "displayText": "Enable AWS Control Tower detective control detect_whether_public_write_access_to_amazon_s3_buckets_is_allowed in all OUs.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
-              }
-            },
-            {
-              "id": "enable_detective_control_for_mfa_for_iam_users",
-              "title": "Enable detective control for MFA for IAM users",
-              "helpfulResource": {
-                "displayText": "Enable Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users for all applicable OUs (it is recommended to enable for all OUs). This control detects whether MFA is enabled for AWS IAM users. You can protect your account by requiring MFA for all AWS users in the account. MFA requires an additional authentication code after the user name and password are successful.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/elective-controls.html#disallow-access-mfa"
-              },
-              "improvementPlan": {
-                "displayText": "Enable AWS Control Tower detective control detect_whether_mfa_is_enabled_for_aws_iam_users in all OUs.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
-              }
-            },
-            {
-              "id": "review_additional_control_tower_detective_controls",
-              "title": "Review additional Control Tower Detective Controls",
-              "helpfulResource": {
-                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
+                "displayText": "Apply applicable Control Tower detective controls to applicable OUs based on your design. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               },
               "improvementPlan": {
@@ -3223,11 +3195,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_detective_control_for_root_user_MFA && enable_detective_control_for_s3_public_read_access && enable_detective_control_for_s3_public_write_access && enable_detective_control_for_mfa_for_iam_users && review_additional_control_tower_detective_controls",
+              "condition": "review_and_document_control_tower_detective_controls && apply_documented_control_tower_detective_controls",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_detective_control_for_root_user_MFA && enable_detective_control_for_s3_public_read_access && enable_detective_control_for_s3_public_write_access && !enable_detective_control_for_mfa_for_iam_users",
+              "condition": "review_and_document_control_tower_detective_controls && apply_documented_control_tower_detective_controls",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -3237,27 +3209,27 @@
           ]
         },
         {
-          "id": "apply_control_tower_initial_preventative_controls",
-          "title": "Apply Control Tower initial preventative controls",
+          "id": "document_and_apply_control_tower_preventative_controls",
+          "title": "Document and apply Control Tower preventative controls",
           "description": "Controls are governance rules for security, operations, and compliance that you can define and apply either across your AWS environment or to specific groups of accounts.  AWS Control Tower provides a set of managed controls that you can apply to the Organizational Units (OUs) in your environment. AWS Control Tower are enabled and enforced by default and protect the resources and controls that AWS Control Tower creates and manages. Additional strongly recommended controls and elective controls can be enabled on desired OUs through the Control Tower console. PREVENTATIVE CONTROLS allow you to manage permissions in your organization by setting the maximum available permissions for all or some accounts in your organization. Preventative controls help you to ensure your accounts stay within your organization’s access control guidelines. AWS Control Tower preventative controls are implemented using Service Control Policies (SCPs).",
           "choices": [
             {
-              "id": "enable_preventative_control_for_root_user_access_keys",
-              "title": "Enable preventative control for root user access keys",
+              "id": "review_and_document_control_tower_preventative_controls",
+              "title": "Review and document control tower preventative controls",
               "helpfulResource": {
-                "displayText": "Enable this control for all applicable OUs (it is recommended to enable for all OUs). This control helps secure your AWS accounts by disallowing creation of access keys for the root user.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/strongly-recommended-controls.html#disallow-root-access-keys"
+                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. Design and document the Control Tower preventative controls that will be applied to different OUs in your organization.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               },
               "improvementPlan": {
-                "displayText": "Enable AWS Control Tower preventative control disallow_creation_of_access_keys_for_the_root_user in all OUs.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/enable-controls-on-ou.html"
+                "displayText": "Review additional available Control Tower Controls.",
+                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               }
             },
             {
-              "id": "review_additional_control_tower_preventative_controls",
-              "title": "Review additional Control Tower Preventative Controls",
+              "id": "apply_documented_control_tower_preventative_controls",
+              "title": "Apply documented Control Tower preventative controls",
               "helpfulResource": {
-                "displayText": "Optional controls in AWS Control Tower are applied at the OU level. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
+                "displayText": "Apply applicable Control Tower preventative controls to applicable OUs based on your design. You can activate and deactivate these optional controls through the AWS Control Tower console, or by means of the control APIs.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/optional-controls.html"
               },
               "improvementPlan": {
@@ -3276,11 +3248,11 @@
           ],
           "riskRules": [
             {
-              "condition": "enable_preventative_control_for_root_user_access_keys && review_additional_control_tower_preventative_controls",
+              "condition": "review_and_document_control_tower_preventative_controls && apply_documented_control_tower_preventative_controls",
               "risk": "NO_RISK"
             },
             {
-              "condition": "enable_preventative_control_for_root_user_access_keys",
+              "condition": "review_and_document_control_tower_preventative_controls && apply_documented_control_tower_preventative_controls",
               "risk": "MEDIUM_RISK"
             },
             {
