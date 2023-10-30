@@ -1,0 +1,44 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure the Blueprint Access Role for Control Tower AFC
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Management Account Access"
+        Parameters:
+          - pManagementAccount
+          - pAWSAdministratorAccessRole
+    ParameterLabels:
+      pManagementAccountId: Management Account ID
+      pAWSAdministratorAccessRole: "AWS Admin Access Role"
+
+Parameters:
+  pManagementAccount:
+    Description: AWS Account hosting your AWS Control Tower instance
+    Type: String
+    AllowedPattern: '[0-9]+'
+  pAWSAdministratorAccessRole:
+    Description: The IAM Identity Center managed IAM Role you use to access the AWS Control Tower dashboard
+    Type: String
+
+Resources:
+  rAWSControlTowerBlueprintAccess:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'AWSControlTowerBlueprintAccess'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub 'arn:aws:iam::${pManagementAccount}:role/service-role/AWSControlTowerAdmin'
+                - !Sub 'arn:aws:iam::${pManagementAccount}:role/aws-reserved/sso.amazonaws.com/${pAWSAdministratorAccessRole}'
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess
