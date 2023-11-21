@@ -8,14 +8,14 @@ Metadata:
       - Label:
           default: "Management Account Access"
         Parameters:
-          - pManagementAccount
+          - pManagementAccountId
           - pAWSAdministratorAccessRole
     ParameterLabels:
       pManagementAccountId: Management Account ID
       pAWSAdministratorAccessRole: "AWS Admin Access Role"
 
 Parameters:
-  pManagementAccount:
+  pManagementAccountId:
     Description: AWS Account hosting your AWS Control Tower instance
     Type: String
     AllowedPattern: '[0-9]+'
@@ -34,8 +34,8 @@ Resources:
           - Effect: Allow
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${pManagementAccount}:role/service-role/AWSControlTowerAdmin'
-                - !Sub 'arn:aws:iam::${pManagementAccount}:role/aws-reserved/sso.amazonaws.com/${pAWSAdministratorAccessRole}'
+                - !Sub 'arn:aws:iam::${pManagementAccountId}:role/service-role/AWSControlTowerAdmin'
+                - !Sub 'arn:aws:iam::${pManagementAccountId}:role/aws-reserved/sso.amazonaws.com/${pAWSAdministratorAccessRole}'
             Action:
               - 'sts:AssumeRole'
       Path: /
