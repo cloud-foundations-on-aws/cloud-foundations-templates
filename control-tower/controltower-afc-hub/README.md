@@ -15,5 +15,5 @@ The solution can be deployed with the single CloudFormation template [cfn-contro
 | Parameter | Type | Default Value | Description |
 | --------- | ---- | ------------- | ----------- |
 | pManagementAccount | String | | Management account id which AWS Control Tower is deployed in. |
-| pAWSAdministratorAccessRole | String | The IAM Identity Center managed IAM Role you use to access the AWS Control Tower dashboard |
+| pAWSAdministratorAccessRole | String | | The IAM Identity Center managed IAM Role you use to access the AWS Control Tower dashboard |
 
