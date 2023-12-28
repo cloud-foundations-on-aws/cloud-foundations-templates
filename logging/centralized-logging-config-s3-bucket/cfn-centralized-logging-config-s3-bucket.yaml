@@ -102,6 +102,9 @@ Resources:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
@@ -165,6 +168,9 @@ Resources:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Ref rS3AccessLoggingBucket
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
