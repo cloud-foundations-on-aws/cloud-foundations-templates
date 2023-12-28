@@ -162,10 +162,6 @@ Resources:
                 aws:SecureTransport: false
 
   rS3ConfigBucket:
-    Metadata:
-      cfn-lint:
-          ignore_checks:
-            - W3045
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Type: AWS::S3::Bucket
