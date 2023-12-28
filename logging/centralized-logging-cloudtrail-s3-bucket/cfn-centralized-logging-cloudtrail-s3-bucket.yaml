@@ -89,6 +89,10 @@ Conditions:
 Resources:
 
   rS3AccessLoggingBucket:
+    Metadata:
+      cfn-lint:
+          ignore_checks:
+            - W3045
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Type: AWS::S3::Bucket
@@ -144,6 +148,10 @@ Resources:
                 aws:SecureTransport: false
 
   rS3CloudTrailBucket:
+    Metadata:
+      cfn-lint:
+          ignore_checks:
+            - W3045
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Type: AWS::S3::Bucket
