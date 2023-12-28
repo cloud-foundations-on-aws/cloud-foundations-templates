@@ -90,15 +90,16 @@ Conditions:
 Resources:
 
   rS3AccessLoggingBucket:
-    Metadata:
-      cfn-lint:
-          ignore_checks:
-            - W3045
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Type: AWS::S3::Bucket
     # false positive due to if statement
     # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W3045
     Properties:
       BucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
       AccessControl: LogDeliveryWrite
@@ -170,6 +171,11 @@ Resources:
     Type: AWS::S3::Bucket
     # false positive due to if statement
     # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W3045
     Properties:
       BucketName: !Sub ${pS3BucketName}-${AWS::AccountId}
       VersioningConfiguration:
