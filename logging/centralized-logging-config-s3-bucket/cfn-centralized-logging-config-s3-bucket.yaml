@@ -95,6 +95,11 @@ Resources:
     Type: AWS::S3::Bucket
     # false positive due to if statement
     # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W3045
     Properties:
       BucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
       AccessControl: LogDeliveryWrite
@@ -102,6 +107,9 @@ Resources:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Sub ${pS3BucketName}-access-logs-${AWS::AccountId}
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
@@ -159,12 +167,20 @@ Resources:
     Type: AWS::S3::Bucket
     # false positive due to if statement
     # checkov:skip=CKV_AWS_19:Ensure the S3 bucket has server-side-encryption enabled
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W3045
     Properties:
       BucketName: !Sub ${pS3BucketName}-${AWS::AccountId}
       VersioningConfiguration:
         Status: Enabled
       LoggingConfiguration:
         DestinationBucketName: !Ref rS3AccessLoggingBucket
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
       PublicAccessBlockConfiguration:
         BlockPublicAcls: TRUE
         BlockPublicPolicy: TRUE
