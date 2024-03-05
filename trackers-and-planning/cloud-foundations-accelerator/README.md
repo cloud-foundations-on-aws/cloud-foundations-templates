@@ -1,6 +1,6 @@
 # Cloud Foundations Accelerator trackers and planning templates
 
-The [Cloud Foundations Accelerator](./cloud-foundations-accelerator/README.md) trackers and planning templates contains project management and documentation templates and planning resources to assist in setting up your cloud foundation environment.
+The [Cloud Foundations Accelerator](./cloud-foundations-accelerator/) trackers and planning templates contains project management and documentation templates and planning resources to assist in setting up your cloud foundation environment.
 
 | Template | Description |
 | -------- | ----------- |
