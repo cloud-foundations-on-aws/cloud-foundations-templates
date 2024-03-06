@@ -18,7 +18,5 @@ for i in \
 
 echo "installation complete, starting pathfinder..."
 # EXAMPLE URL...will change....
-download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/pathfinder/dist/pathfinder.js"
+download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/feat-pathfinder/pathfinder/dist/pathfinder.js"
 curl -sS $download_url | node
-
-
