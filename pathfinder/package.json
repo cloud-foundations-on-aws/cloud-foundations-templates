@@ -1,0 +1,36 @@
+{
+	"type": "module",
+	"devDependencies": {
+		"@types/node": "^20.11.20",
+		"typescript": "^5.3.3"
+	},
+	"scripts": {
+		"start": "node ./build/app.js",
+		"lint": "eslint '*.ts' --quiet --fix",
+		"build": "rm -rf ./build && tsc"
+	},
+	"dependencies": {
+		"@aws-sdk/client-cloudformation": "^3.499.0",
+		"@aws-sdk/client-cloudtrail": "^3.507.0",
+		"@aws-sdk/client-config-service": "^3.507.0",
+		"@aws-sdk/client-controltower": "^3.515.0",
+		"@aws-sdk/client-cost-and-usage-report-service": "^3.515.0",
+		"@aws-sdk/client-cost-explorer": "^3.501.0",
+		"@aws-sdk/client-ec2": "^3.504.0",
+		"@aws-sdk/client-iam": "^3.501.0",
+		"@aws-sdk/client-organizations": "^3.497.0",
+		"@aws-sdk/client-ram": "^3.499.0",
+		"@aws-sdk/client-sso-admin": "^3.499.0",
+		"@typescript-eslint/parser": "^5.10.2",
+		"eslint": "^8.8.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"prettier": "^2.5.1",
+		"ts-loader": "^9.5.1",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.8.4",
+		"webpack": "^5.90.3",
+		"webpack-cli": "^5.1.4",
+		"webpack-node-externals": "^3.0.0"
+	}
+}
