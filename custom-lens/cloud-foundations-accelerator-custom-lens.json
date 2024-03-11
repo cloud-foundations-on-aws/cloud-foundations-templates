@@ -1878,10 +1878,10 @@
               }
             },
             {
-              "id": "document_budget_limit_sandbox_accounts",
-              "title": "Document budget limit for sandbox accounts",
+              "id": "document_budget_limit_for_an_account",
+              "title": "Document budget limit for an account",
               "helpfulResource": {
-                "displayText": "Defining and documenting an initial budget limit for Sandbox accounts will allow you to create AWS Budgets for those accounts.  This limit will most likely change over time but this will create the process and document that can be used moving forward.",
+                "displayText": "It is helpful to create and test Account level budgets.  Choose an existing account and define and document an initial budget limit for that account(s).  A Sandbox Account is an excellent account to use and test AWS Budgets, however any account can be used to test AWS Budgets using notifications.",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
               },
               "improvementPlan": {
@@ -1900,7 +1900,7 @@
           ],
           "riskRules": [
             {
-              "condition": "document_budget_limit_for_the_organization && document_budget_limit_sandbox_accounts",
+              "condition": "document_budget_limit_for_the_organization && document_budget_limit_for_an_account",
               "risk": "NO_RISK"
             },
             {
@@ -2061,26 +2061,14 @@
               }
             },
             {
-              "id": "create_sandbox_account",
-              "title": "Create Sandbox account",
-              "helpfulResource": {
-                "displayText": "Sandbox accounts are accounts in which your builders are generally free to explore and experiment with AWS services and other tools and services subject to your acceptable use policies.  It is helpful to create a sandbox account to test out budgets and budget automation.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/sandbox-ou.html"
-              },
-              "improvementPlan": {
-                "displayText": "Create a Sandbox account in the Sandbox OU from Control Tower.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
-              }
-            },
-            {
-              "id": "create_sandbox_budget",
-              "title": "Create Sandbox budget",
+              "id": "create_account_budget",
+              "title": "Create Account budget",
               "helpfulResource": {
                 "displayText": "You can create budgets to member accounts in the organization by applying filters (linked accounts) to a budget.",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
               },
               "improvementPlan": {
-                "displayText": "Create a budget for your Sandbox account(s) by using a Linked account filter  (you can use the template for monthly spend).",
+                "displayText": "Create a budget for your one of the Accounts in your environment by using a Linked account filter to test out the functionality of AWS Budgets (you can use the template for monthly spend).",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-create-filters.html"
               }
             },
@@ -2097,14 +2085,14 @@
               }
             },
             {
-              "id": "create_budget_automation_on_sandbox_budget",
-              "title": "Create budget automation on Sandbox Budget",
+              "id": "create_budget_automation_on_account_budget",
+              "title": "OPTIONAL Create budget automation on Account Budget",
               "helpfulResource": {
                 "displayText": "You can use AWS Budgets to run an action on your behalf when a budget exceeds a certain cost or usage threshold. To do this, after you set a threshold, configure a budget action to run either automatically or after your manual approval.",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-controls.html"
               },
               "improvementPlan": {
-                "displayText": "Follow the guidance to create AWS Budget actions on your Sandbox Budget.",
+                "displayText": "OPTIONAL- Follow the guidance to create AWS Budget actions on your Account Budget.",
                 "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-controls.html"
               }
             },
@@ -2119,7 +2107,7 @@
           ],
           "riskRules": [
             {
-              "condition": "create_organization_budget && create_sandbox_budget && configure_budget_notifications",
+              "condition": "create_organization_budget && create_account_budget && configure_budget_notifications",
               "risk": "NO_RISK"
             },
             {
@@ -2322,6 +2310,18 @@
               }
             },
             {
+              "id": "ensure_only_1_organization_trail_exists",
+              "title": "Ensure only 1 organization Trail exists",
+              "helpfulResource": {
+                "displayText": "You can deliver one copy of your ongoing management events to your Amazon Simple Storage Service (S3) bucket for free.  A second Management-Event Trail within any account costs money per event.  Therefore, you should only have (and only typically need) 1 organization Management-Event Trail to capture Management Events.  If you have an organization Trail (which creates a Trail in each account) and a 2nd organization Trail or a 2nd Account level Trail in an account, you will be charged for the additional delivery of events.",
+                "url": "https://aws.amazon.com/cloudtrail/pricing/"
+              },
+              "improvementPlan": {
+                "displayText": "Delete redundant Management Event CloudTrail Trails.",
+                "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-delete-trails-console.html"
+              }
+            },
+            {
               "id": "query_cloudtrail_management_events",
               "title": "Query CloudTrail management events",
               "helpfulResource": {
@@ -2344,7 +2344,7 @@
           ],
           "riskRules": [
             {
-              "condition": "create_a_cloudtrail_management_event_trail && query_cloudtrail_management_events",
+              "condition": "create_a_cloudtrail_management_event_trail && ensure_only_1_organization_trail_exists && query_cloudtrail_management_events",
               "risk": "NO_RISK"
             },
             {
@@ -2363,26 +2363,14 @@
           "description": "A centralized monitoring account can be used to centrally monitor and query logs, dashboards, metrics, and financial data.  This account should be created in the Infrastructure Organizational Unit (OU).",
           "choices": [
             {
-              "id": "create_infrastructure_ou",
-              "title": "Create Infrastructure OU",
-              "helpfulResource": {
-                "displayText": "The Infrastructure Organizational Unit (OU) is intended to contain shared infrastructure services including the Network account.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
-              },
-              "improvementPlan": {
-                "displayText": "Create Infrastructure OU in Root OU from Control Tower.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-              }
-            },
-            {
               "id": "create_monitoring_account",
               "title": "Create Monitoring account",
               "helpfulResource": {
-                "displayText": "The monitoring account is an Operations tooling account.  Operations tooling accounts can be used for day-to-day operational activities across your organization. The operations tooling account hosts tools, dashboards, and services needed to centralize operations (including traditional syslog tooling, or ITSM) where monitoring operational observability and metric tracking are hosted. These tools help the central operations team to interact with their environment from a central location.",
+                "displayText": "The monitoring account is an Operations tooling account used to centralize the monitoring of your organization, infrastructure, or applications.  Operations tooling accounts can be used for day-to-day operational activities across your organization. The operations tooling account hosts tools, dashboards, and services needed to centralize operations (including traditional syslog tooling, or ITSM) where monitoring operational observability and metric tracking are hosted. These tools help the central operations team to interact with their environment from a central location.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html#:~:text=your%20Networking%20account.-,Operations%20tooling%20account,-Operations%20tooling%20accounts"
               },
               "improvementPlan": {
-                "displayText": "Create a Monitoring account in the Infrastructure OU from Control Tower.",
+                "displayText": "Create a Monitoring account in the Infrastructure OU using Control Tower.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
               }
             },
@@ -2397,11 +2385,11 @@
           ],
           "riskRules": [
             {
-              "condition": "create_infrastructure_ou && create_monitoring_account",
+              "condition": "create_monitoring_account",
               "risk": "NO_RISK"
             },
             {
-              "condition": "create_infrastructure_ou && create_monitoring_account",
+              "condition": "create_monitoring_account",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2612,18 +2600,6 @@
           "description": "The network account serves as the central hub for your network on AWS. You can manage your networking resources and route traffic between accounts in your environment, your on-premises, and egress/ingress traffic to the internet. Within this account, your networking administrators can manage and build security measures to protect outbound and inbound traffic on your environment centralizing AWS Site-to-Site VPN connections, AWS Direct Connect integrations, AWS Transit Gateway configurations, DNS services, Amazon VPC endpoints, and shared VPCs and subnets. More advanced use cases include the use of an ingress/egress or perimeter security account to host network security stacks which provide centralized inbound and outbound internet traffic inspection, proxying, and filtering.",
           "choices": [
             {
-              "id": "create_infrastructure_ou",
-              "title": "Create Infrastructure OU",
-              "helpfulResource": {
-                "displayText": "The Infrastructure Organizational Unit (OU) is intended to contain shared infrastructure services including the Network account.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
-              },
-              "improvementPlan": {
-                "displayText": "Create Infrastructure OU in Root OU from Control Tower.",
-                "url": "https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html"
-              }
-            },
-            {
               "id": "create_network_account",
               "title": "Create Network account",
               "helpfulResource": {
@@ -2646,11 +2622,88 @@
           ],
           "riskRules": [
             {
-              "condition": "create_infrastructure_ou && create_network_account",
+              "condition": "create_network_account",
               "risk": "NO_RISK"
             },
             {
-              "condition": "create_infrastructure_ou && create_network_account",
+              "condition": "create_network_account",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "ip_address_management",
+          "title": "IP Address Management",
+          "description": "IP address management (IPAM) refers to the process of planning, tracking, and managing Internet Protocol (IP) addresses within a network infrastructure. It involves the systematic administration and control of IP addresses to ensure efficient and reliable network communication.",
+          "choices": [
+            {
+              "id": "ip_planning",
+              "title": "IP Planning",
+              "helpfulResource": {
+                "displayText": "As you design your network space, you need to plan for what networks will be publicly accessible, and what components you will be keeping private. This will influence your IP allocation strategy, and it will impact the design of your route tables for each of your subnets. Plan the number of IP addresses that each of your subnets will use, and size the subnets with taking into considerationsubnet sizing limitations, to ensure you have enough IP’s available within each subnet.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html"
+              },
+              "improvementPlan": {
+                "displayText": "Allocate IP CIDR ranges that will be used in AWS.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html"
+              }
+            },
+            {
+              "id": "delegate_amazon_vpc_ip_address_manager_to_network_account",
+              "title": "Delegate Amazon VPC IP Address Manager (IPAM) to Network account",
+              "helpfulResource": {
+                "displayText": "If you plan to use AWS VPC IPAM, it is recommended to delegate IPAM administration to your centralized networking account to provide access to IPAM administration outside of the management account.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/enable-integ-ipam.html"
+              },
+              "improvementPlan": {
+                "displayText": "Delegate AWS VPC IPAM to the centralized networking account.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/enable-integ-ipam.html"
+              }
+            },
+            {
+              "id": "create_an_ipam",
+              "title": "Create an IPAM",
+              "helpfulResource": {
+                "displayText": "When you create an AWS VPC IPAM, you choose the AWS Regions where the IPAM is allowed to manage IP address CIDRs. These AWS Regions are called operating Regions. IPAM discovers and monitors resources only in the AWS Regions that you select as operating Regions. IPAM doesn't store any data outside of the operating Regions that you select.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/create-ipam.html"
+              },
+              "improvementPlan": {
+                "displayText": "Create an Amazon VPC IP Address Manager (IPAM) in your centralized networking account.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/create-ipam.html"
+              }
+            },
+            {
+              "id": "create_ipam_pools",
+              "title": "Create IPAM pools",
+              "helpfulResource": {
+                "displayText": "In AWS VPC IPAM, a pool is a collection of contiguous IP address ranges (or CIDRs). Pools enable you to organize your IP addresses according to your routing and security needs. You can create pools for AWS Regions outside of your IPAM Region. For example, if you have separate routing and security needs for development and production applications, you can create a pool for each.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-ipam.html"
+              },
+              "improvementPlan": {
+                "displayText": "Create an IPAM pool.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-ipam.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "ip_planning && delegate_amazon_vpc_ip_address_manager_to_network_account && create_an_ipam && create_ipam_pools",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "ip_planning && delegate_amazon_vpc_ip_address_manager_to_network_account && create_an_ipam && create_ipam_pools",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2768,83 +2821,6 @@
             },
             {
               "condition": "design_and_document_a_vpc_endpoint_strategy",
-              "risk": "MEDIUM_RISK"
-            },
-            {
-              "condition": "default",
-              "risk": "HIGH_RISK"
-            }
-          ]
-        },
-        {
-          "id": "ip_address_management",
-          "title": "IP Address Management",
-          "description": "IP address management (IPAM) refers to the process of planning, tracking, and managing Internet Protocol (IP) addresses within a network infrastructure. It involves the systematic administration and control of IP addresses to ensure efficient and reliable network communication.",
-          "choices": [
-            {
-              "id": "ip_planning",
-              "title": "IP Planning",
-              "helpfulResource": {
-                "displayText": "As you design your network space, you need to plan for what networks will be publicly accessible, and what components you will be keeping private. This will influence your IP allocation strategy, and it will impact the design of your route tables for each of your subnets. Plan the number of IP addresses that each of your subnets will use, and size the subnets with taking into considerationsubnet sizing limitations, to ensure you have enough IP’s available within each subnet.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html"
-              },
-              "improvementPlan": {
-                "displayText": "Allocate IP CIDR ranges that will be used in AWS.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html"
-              }
-            },
-            {
-              "id": "delegate_amazon_vpc_ip_address_manager_to_network_account",
-              "title": "Delegate Amazon VPC IP Address Manager (IPAM) to Network account",
-              "helpfulResource": {
-                "displayText": "If you plan to use AWS VPC IPAM, it is recommended to delegate IPAM administration to your centralized networking account to provide access to IPAM administration outside of the management account.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/enable-integ-ipam.html"
-              },
-              "improvementPlan": {
-                "displayText": "Delegate AWS VPC IPAM to the centralized networking account.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/enable-integ-ipam.html"
-              }
-            },
-            {
-              "id": "create_an_ipam",
-              "title": "Create an IPAM",
-              "helpfulResource": {
-                "displayText": "When you create an AWS VPC IPAM, you choose the AWS Regions where the IPAM is allowed to manage IP address CIDRs. These AWS Regions are called operating Regions. IPAM discovers and monitors resources only in the AWS Regions that you select as operating Regions. IPAM doesn't store any data outside of the operating Regions that you select.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/create-ipam.html"
-              },
-              "improvementPlan": {
-                "displayText": "Create an Amazon VPC IP Address Manager (IPAM) in your centralized networking account.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/create-ipam.html"
-              }
-            },
-            {
-              "id": "create_ipam_pools",
-              "title": "Create IPAM pools",
-              "helpfulResource": {
-                "displayText": "In AWS VPC IPAM, a pool is a collection of contiguous IP address ranges (or CIDRs). Pools enable you to organize your IP addresses according to your routing and security needs. You can create pools for AWS Regions outside of your IPAM Region. For example, if you have separate routing and security needs for development and production applications, you can create a pool for each.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-ipam.html"
-              },
-              "improvementPlan": {
-                "displayText": "Create an IPAM pool.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-ipam.html"
-              }
-            },
-            {
-              "id": "none_no",
-              "title": "None of these",
-              "helpfulResource": {
-                "displayText": "Chose this if you have not completed any of these tasks.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
-              }
-            }
-          ],
-          "riskRules": [
-            {
-              "condition": "ip_planning && delegate_amazon_vpc_ip_address_manager_to_network_account && create_an_ipam && create_ipam_pools",
-              "risk": "NO_RISK"
-            },
-            {
-              "condition": "ip_planning && delegate_amazon_vpc_ip_address_manager_to_network_account && create_an_ipam && create_ipam_pools",
               "risk": "MEDIUM_RISK"
             },
             {
