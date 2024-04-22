@@ -3,6 +3,12 @@
 **/.terraform/*
 *.terraform.*
 
-# tf state files 
+# tf state files
 *.tfstate
 *.tfstate.*
+
+pathfinder/node_modules
+node_modules/**/*
+pathfinder/build
+pathfinder/Pathfinder.txt
+pathfinder/pathfinder.txt
