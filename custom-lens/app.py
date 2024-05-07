@@ -1,16 +1,16 @@
 import boto3
 import requests
 from botocore.exceptions import ClientError
+import os
 
 client = boto3.client('wellarchitected')
 url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 
 def main():
 
-    region_input = input("Enter AWS Regions - us-east-1,us-west-2,us-east-2 :").strip()
-    AwsRegions = region_input.split(',')
-    OwnerEmail = input("Enter Review Owner Email: ")
-
+    AwsRegions = os.environ['Regions'].split(',')
+    OwnerEmail = os.environ["Email"]
+    if OwnerEmail == "noemail@example.com": raise Exception("Please Update the Email Address!") 
     custom_lens_present = False
     try:
         import_lens = client.import_lens(

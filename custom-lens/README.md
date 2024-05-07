@@ -7,7 +7,7 @@ This directory contains [Well Architected Custom Lenses](https://docs.aws.amazon
 To use the CFA Custom lens in your environment, follow the below steps.
 
 1. Log into an AWS account.  This account will be used to hold the Well-Architected Custom Lens
-2. Run the following command: `curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/custom-lens-install-script/custom-lens/custom-lens.sh | sh`
+2. Run the following command: `curl -sSL https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/custom-lens-install-script/custom-lens/custom-lens.sh | sh`
 3. Answer the questions in the console.
 4. Review the Organization Workload in the Well Architected Tool console.
 
