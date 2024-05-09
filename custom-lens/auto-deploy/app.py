@@ -56,7 +56,7 @@ def main():
               import_lens,
           ],
       )['WorkloadArn']
-      print(f"{create_workload} created.  Navigate to the Well Architected Tool AWS console to review the Workload")
+      print(f"{create_workload} created in Well Architected Tool. \nNavigate to the Well Architected Tool AWS console to review the Workload")
     except ClientError as e:
       if e.response['Error']['Code'] == 'ConflictException':
         print("Workload already exists")
