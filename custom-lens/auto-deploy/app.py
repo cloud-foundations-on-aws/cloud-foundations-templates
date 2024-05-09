@@ -10,9 +10,7 @@ url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundati
 def main():
 
     AwsRegions = os.environ['Regions'].split(',')
-    OwnerEmail = os.environ["Email"]
-    if OwnerEmail == "noemail@example.com": raise Exception("Please Update the Email Address!")
-    custom_lens_present = False
+    ReviewOwner = os.environ["Owner"]
     try:
         import_lens = client.import_lens(
             JSONString=str(requests.get(url).text)
@@ -51,7 +49,7 @@ def main():
           Description='Cloud Foundation Accelerator',
           Environment='PRODUCTION',
           AwsRegions=AwsRegions,
-          ReviewOwner=OwnerEmail,
+          ReviewOwner=ReviewOwner,
           Lenses=[
               import_lens,
           ],
