@@ -4,8 +4,8 @@
   "description": "AWS Cloud Foundations Accelerator",
   "pillars": [
     {
-      "id": "prerequisites",
-      "name": "Prerequisites",
+      "id": "management_account",
+      "name": "Management Account",
       "questions": [
         {
           "id": "create_management_account",
@@ -255,31 +255,31 @@
           ]
         },
         {
-          "id": "identify_owners_and_stakeholders_of_cloud_foundation_accelerator_modules",
+          "id": "identify_owners_and_stakeholders_of_cloud_foundation_areas",
           "title": "Identify Owners and Stakeholders of Cloud Foundation Accelerator modules",
-          "description": "It is important to define owners and stakeholders of the  Cloud Foundations Accelerator modules.",
+          "description": "It is important to define owners and stakeholders of the Cloud Foundations areas.",
           "choices": [
             {
-              "id": "identify_owners_of_cloud_foundation_accelerator_modules",
-              "title": "Identify owners of Cloud Foundation Accelerator modules",
+              "id": "identify_owners_of_cloud_foundation_accelerator_areas",
+              "title": "Identify owners of Cloud Foundation Accelerator areas",
               "helpfulResource": {
                 "displayText": "Owners are the key decision makers made during a module and are responsible for ensuring the execution of implementation steps.",
                 "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#AboutAccountAlias"
               },
               "improvementPlan": {
-                "displayText": "Identify and document owners of Cloud Foundation Accelerator modules.",
+                "displayText": "Identify and document owners of Cloud Foundation areas.",
                 "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#AboutAccountAlias"
               }
             },
             {
-              "id": "identify_stakeholders_of_cloud_foundation_accelerator_modules",
-              "title": "Identify stakeholders of Cloud Foundation Accelerator modules",
+              "id": "identify_stakeholders_of_cloud_foundation_accelerator_areas",
+              "title": "Identify stakeholders of Cloud Foundation Accelerator areas",
               "helpfulResource": {
-                "displayText": "Stakeholders are individuals that should understand the material within a module and will provide input for decisions made during the module.",
+                "displayText": "Stakeholders are individuals that should understand the material within an area and will provide input for decisions made regarding the design.",
                 "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#AboutAccountAlias"
               },
               "improvementPlan": {
-                "displayText": "Identify and document owners of Cloud Foundation Accelerator modules."
+                "displayText": "Identify and document owners of Cloud Foundation Accelerator areas."
               }
             },
             {
@@ -293,11 +293,11 @@
           ],
           "riskRules": [
             {
-              "condition": "identify_owners_of_cloud_foundation_accelerator_modules && identify_stakeholders_of_cloud_foundation_accelerator_modules",
+              "condition": "identify_owners_of_cloud_foundation_accelerator_areas && identify_stakeholders_of_cloud_foundation_accelerator_areas",
               "risk": "NO_RISK"
             },
             {
-              "condition": "identify_owners_of_cloud_foundation_accelerator_modules && identify_stakeholders_of_cloud_foundation_accelerator_modules",
+              "condition": "identify_owners_of_cloud_foundation_accelerator_areas && identify_stakeholders_of_cloud_foundation_accelerator_areas",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -1684,6 +1684,10 @@
                     {
                       "displayText": "Choosing tags for your environment section of the Establishing Your Cloud Foundation on AWS whitepaper.",
                       "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/choosing-tags.html"
+                    },
+                    {
+                      "displayText": "Building your tagging strategy section of the Best Practices for Tagging AWS Resources whitepaper.",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/building-your-tagging-strategy.html"
                     }
                   ]
                 }
@@ -1691,7 +1695,7 @@
             },
             {
               "id": "publish_tagging_dictionary",
-              "title": "Publish tagging dictionary",
+              "title": "Publish a tagging dictionary",
               "helpfulResource": {
                 "displayText": "The tagging dictionary needs to be made available to builders and stakeholders. This helps ensure that tags are applied consistently across the environment. Once an initial tagging dictionary is defined, publish it internally in a shared location.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/tagging-capability.html"
@@ -1751,6 +1755,30 @@
               "improvementPlan": {
                 "displayText": "Create a tag policy based on your mandatory tags.",
                 "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies-create.html"
+              }
+            },
+            {
+              "id": "attach_a_tagging_policy",
+              "title": "Attach the Tag Policy to OUs",
+              "helpfulResource": {
+                "displayText": "Attach the Tag Policy to the Organizational Units (OUs) that you want to evaluate for tag compliance following the Attaching Tag Policy guidance in the AWS Organizations User Guide.",
+                "url": "https://docs.aws.amazon.com/organizations/latest/userguide/attach-tag-policy.html"
+              },
+              "improvementPlan": {
+                "displayText": "Attach a tag policy created before to the OUs you define.",
+                "url": "https://docs.aws.amazon.com/organizations/latest/userguide/attach-tag-policy.html"
+              }
+            },
+            {
+              "id": "validate_tag_compliance",
+              "title": "Evaluate organization-wide compliance with a tag policy.",
+              "helpfulResource": {
+                "displayText": "Start evaluating your organization's compliance with its effective tag policy. Generate a report that lists all tagged resources in accounts across your organization and whether each resource is compliant with the effective tag policy.",
+                "url": "https://docs.aws.amazon.com/tag-editor/latest/userguide/tag-policies-orgs-evaluating-org-wide-compliance.html"
+              },
+              "improvementPlan": {
+                "displayText": "Periodically run and review tag compliance reports",
+                "url": "https://docs.aws.amazon.com/tag-editor/latest/userguide/tag-policies-orgs-evaluating-org-wide-compliance.html"
               }
             },
             {
@@ -1890,6 +1918,18 @@
               }
             },
             {
+              "id": "design_instance_scheduler_deployment",
+              "title": "Design Instance Scheduler Deployment",
+              "helpfulResource": {
+                "displayText": "Instance Scheduler on AWS automates the starting and stopping of Amazon Elastic Compute Cloud (Amazon EC2) and Amazon Relational Database Service (Amazon RDS) instances which can save up to 70% of EC2 and RDS cost.",
+                "url": "https://aws.amazon.com/solutions/implementations/instance-scheduler-on-aws/"
+              },
+              "improvementPlan": {
+                "displayText": "Design Instance Scheduler Deployment",
+                "url": "https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/plan-your-deployment.html"
+              }
+            },
+            {
               "id": "none_no",
               "title": "None of these",
               "helpfulResource": {
@@ -1984,39 +2024,27 @@
               }
             },
             {
-              "id": "enable_cost_and_usage_reports",
-              "title": "Enable Cost and Usage Reports",
+              "id": "enable_and_export_cost_and_usage_reports",
+              "title": "Enable and export Cost and Usage Reports",
               "helpfulResource": {
-                "displayText": "Unless a different format is required, it is recommended to configure the CUR for data integration with Amazon Athena.",
-                "url": "https://docs.aws.amazon.com/cur/latest/userguide/cur-create.html"
+                "displayText": "AWS Data Exports enables you to create exports of the Cost and Usage Report (CUR) 2.0. This is the new and recommended way to receive your detailed cost and usage data from AWS.",
+                "url": "https://docs.aws.amazon.com/cur/latest/userguide/what-is-data-exports.html"
               },
               "improvementPlan": {
-                "displayText": "Create and configure Cost and Usage reports (CURs) following the AWS Cost and Usage Reports User Guide.",
-                "url": "https://docs.aws.amazon.com/cur/latest/userguide/cur-create.html"
-              }
-            },
-            {
-              "id": "querying_cost_and_usage_reports_using_amazon_athena",
-              "title": "Querying Cost and Usage Reports using Amazon Athena",
-              "helpfulResource": {
-                "displayText": "Amazon Athena is a serverless query service that you can use to analyze the data from your AWS Cost and Usage Reports (AWS CUR) in Amazon Simple Storage Service (Amazon S3) using standard SQL.",
-                "url": "https://docs.aws.amazon.com/cur/latest/userguide/use-athena-cf.html"
-              },
-              "improvementPlan": {
-                "displayText": "Follow the Amazon Athena User Guide to setup Athena to query your AWS CUR.",
-                "url": "https://docs.aws.amazon.com/cur/latest/userguide/use-athena-cf.html"
+                "displayText": "Create Data Exports to query and analyze your cost and usage.",
+                "url": "https://docs.aws.amazon.com/cur/latest/userguide/dataexports-create.html"
               }
             },
             {
               "id": "create_cost_visualization_dashboard",
               "title": "Create Cost visualization dashboard",
               "helpfulResource": {
-                "displayText": "To visualize your Cost and Usage Reports data you can deploy Cost Intelligence Dashboards (CIDs).",
-                "url": "https://github.com/aws-samples/aws-cudos-framework-deployment"
+                "displayText": "You can visualize your billing and cost management data by deploying a pre-built Cost and Usage Dashboard powered by Amazon QuickSight.",
+                "url": "https://docs.aws.amazon.com/cur/latest/userguide/dataexports-create-dashboard.html"
               },
               "improvementPlan": {
-                "displayText": "Follow the CID Deployment guidance to create dashboards from AWS Cost and Usage Reports (AWS CUR).",
-                "url": "https://github.com/aws-samples/aws-cudos-framework-deployment"
+                "displayText": "Follow the AWS Data Exports User Guide to create a cost and usage Amazon QuickSight dashboard.",
+                "url": "https://docs.aws.amazon.com/cur/latest/userguide/dataexports-create-dashboard.html"
               }
             },
             {
@@ -2030,11 +2058,11 @@
           ],
           "riskRules": [
             {
-              "condition": "create_s3_bucket_for_cost_and_usage_reports && enable_cost_and_usage_reports",
+              "condition": "create_s3_bucket_for_cost_and_usage_reports && enable_and_export_cost_and_usage_reports",
               "risk": "NO_RISK"
             },
             {
-              "condition": "create_s3_bucket_for_cost_and_usage_reports && enable_cost_and_usage_reports",
+              "condition": "create_s3_bucket_for_cost_and_usage_reports && enable_and_export_cost_and_usage_reports",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2112,6 +2140,58 @@
             },
             {
               "condition": "create_organization_budget && configure_budget_notifications",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "optimize_cost",
+          "title": "Optimize Cost",
+          "description": "Cost optimization in AWS can be achieved by various methods outlined in the Well Architected Cost Optimization Pillar.  Certain areas of Cost Optimization can be built at the Organizational layer so that existing and new workloads within the Organization will automatically be following those best practices.",
+          "additionalResources": [
+            {
+              "type": "HELPFUL_RESOURCE",
+              "content": [
+                {
+                  "displayText": "Reference the Cost Optimization Pillar in the AWS Well-Architected Framework",
+                  "url": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+                }
+              ]
+            }
+          ],
+          "choices": [
+            {
+              "id": "deploy_instance_scheduler_on_aws",
+              "title": "Deploy Instance Scheduler on AWS",
+              "helpfulResource": {
+                "displayText": "The Instance Scheduler on AWS solution automates the starting and stopping of Amazon Elastic Compute Cloud (Amazon EC2) and Amazon Relational Database Service (Amazon RDS) instances.  Deploy Instance Scheduler on AWS Solution to the Organization following the Implementation Guide.",
+                "url": "https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/deployment.html"
+              },
+              "improvementPlan": {
+                "displayText": "Deploy Instance Scheduler on AWS Solution to the Organization following the Implementation Guide.",
+                "url": "https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/deployment.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "deploy_instance_scheduler_on_aws",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "deploy_instance_scheduler_on_aws",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2413,12 +2493,27 @@
               "id": "aws_vpcs_and_subnets",
               "title": "AWS VPCs and Subnets",
               "helpfulResource": {
-                "displayText": "With Amazon Virtual Private Cloud (Amazon VPC), you can launch AWS resources in a logically isolated virtual network that you've defined. This virtual network closely resembles a traditional network that you'd operate in your own data center, with the benefits of using the scalable infrastructure of AWS. A subnet is a range of IP addresses in your VPC. A subnet must reside in a single Availability Zone. After you add subnets, you can deploy AWS resources in your VPC.",
+                "displayText": "With Amazon Virtual Private Cloud (Amazon VPC), you can launch AWS resources in a logically isolated virtual network that you've defined. A subnet is a range of IP addresses in your VPC. After you add subnets, you can deploy AWS resources in your VPC.",
                 "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
               },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Free AWS Skill Builder Course: AWS Networking Basics",
+                      "url": "https://explore.skillbuilder.aws/learn/course/external/view/elearning/12439/aws-networking-basics"
+                    },
+                    {
+                      "displayText": "Free AWS Skill Builder Course: Subnets, Gateways, and Route Tables Explained",
+                      "url": "https://explore.skillbuilder.aws/learn/course/external/view/elearning/206/subnets-gateways-and-route-tables-explained"
+                    }
+                  ]
+                }
+              ],
               "improvementPlan": {
-                "displayText": "Review AWS VPCs and Subnets.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+                "displayText": "Free AWS Skill Builder Course: AWS Networking Basics.",
+                "url": "https://explore.skillbuilder.aws/learn/course/external/view/elearning/12439/aws-networking-basics"
               }
             },
             {
@@ -2434,20 +2529,66 @@
               }
             },
             {
-              "id": "security_groups",
-              "title": "Security Groups",
+              "id": "security_groups_and_nacls",
+              "title": "Security Groups and Network Access Lists",
               "helpfulResource": {
-                "displayText": "A security group acts as a firewall that controls the traffic allowed to and from the resources in your virtual private cloud (VPC). You can choose the ports and protocols to allow for inbound traffic and for outbound traffic. For each security group, you add separate sets of rules for inbound traffic and outbound traffic.",
+                "displayText": "A security group acts as a firewall that controls the traffic allowed to and from the resources in your virtual private cloud (VPC). A network access control list (NACL) is an optional layer of security for your VPC that acts as a firewall for controlling traffic in and out of one or more subnets.",
                 "url": "https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html"
               },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Control traffic to subnets using network ACLs",
+                      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html"
+                    }
+                  ]
+                }
+              ],
               "improvementPlan": {
                 "displayText": "Review Security Groups.",
                 "url": "https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html"
               }
             },
             {
-              "id": "centralized_networking_account",
-              "title": "Centralized Networking Account",
+              "id": "vpc_to_vpc_connectivity",
+              "title": "VPC to VPC Connectivity",
+              "helpfulResource": {
+                "displayText": "Customers can use two different VPC flow patterns to set up multi-VPC environments: many to many, or hub and spoke. In the many-to-many approach, the traffic between each VPC is managed individually between each VPC. In the hub-and-spoke model, all inter-VPC traffic flows through a central resource, which routes traffic based on established rules. ",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/vpc-to-vpc-connectivity.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review VPC to VPC connectivity patterns.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/vpc-to-vpc-connectivity.html"
+              }
+            },
+            {
+              "id": "hybrid_connectivity",
+              "title": "Hybrid Connectivity: AWS VPN and Direct Connect",
+              "helpfulResource": {
+                "displayText": "There are several ways to connect between on-premises equipment and AWS. Materials below provide a brief overview of architectures and the different options (AWS Direct Connect, Site-to-Site Virtual Private Network, ",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-network-connections.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Building a Scalable and Secure Multi-VPC AWS Network Infrastructure: Hybrid Connectivity",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/hybrid-connectivity.html"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Review a Hybrid Connectivity Whitepaper from AWS.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-network-connections.html"
+              }
+            },
+            {
+              "id": "multi_account_networking",
+              "title": "Multi-Account Networking",
               "helpfulResource": {
                 "displayText": "The networking account serves as the central hub for your network on AWS. You can manage your networking resources and route traffic between accounts in your environment, your on-premises, and egress/ingress traffic to the internet. Within this account, your networking administrators can manage and build security measures to protect outbound and inbound traffic on your environment centralizing AWS Site-to-Site VPN connections, AWS Direct Connect integrations, AWS Transit Gateway configurations, DNS services, Amazon VPC endpoints, and shared VPCs and subnets.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/infrastructure-ou-and-accounts.html"
@@ -2470,22 +2611,10 @@
               }
             },
             {
-              "id": "aws_resource_access_manager",
-              "title": "AWS Resource Access Manager (RAM)",
-              "helpfulResource": {
-                "displayText": "AWS Resource Access Manager (RAM) helps you securely share your resources across AWS accounts, within your organization or organizational units (OUs), and with IAM roles and users for supported resource types. You can use AWS Resource Access Manager (RAM) to share a transit gateway for VPC attachments across accounts or across your organization in AWS Organizations.",
-                "url": "https://docs.aws.amazon.com/ram/latest/userguide/working-with.html"
-              },
-              "improvementPlan": {
-                "displayText": "Review AWS Transit Gateway sharing with Resource Access Manager.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-share.html"
-              }
-            },
-            {
               "id": "vpc_flow_logs",
-              "title": "VPC Flow Logs",
+              "title": "Observability: VPC Flow Logs",
               "helpfulResource": {
-                "displayText": "VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network interfaces in your VPC. Flow log data can be published to the following locations- Amazon CloudWatch Logs, Amazon S3, or Amazon Kinesis Data Firehose. After you create a flow log, you can retrieve and view the flow log records in the log group, bucket, or delivery stream that you configured.",
+                "displayText": "VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network interfaces in your VPC. Flow log data can be published to the following locations- Amazon CloudWatch Logs, Amazon S3, or Amazon Kinesis Data Firehose.",
                 "url": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
               },
               "improvementPlan": {
@@ -2500,9 +2629,42 @@
                 "displayText": "A VPC endpoint enables customers to privately connect to supported AWS services and VPC endpoint services powered by AWS PrivateLink. Amazon VPC instances do not require public IP addresses to communicate with resources of the service. Traffic between an Amazon VPC and a service does not leave the Amazon network.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html"
               },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Building a Scalable and Secure Multi-VPC AWS Network Infrastructure: Centralized Access to VPC Private Endpoints",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-access-to-vpc-private-endpoints.html"
+                    }
+                  ]
+                }
+              ],
               "improvementPlan": {
                 "displayText": "Review VPC endpoints.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html"
+              }
+            },
+            {
+              "id": "hybrid_dns",
+              "title": "DNS",
+              "helpfulResource": {
+                "displayText": "Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. You can use Route 53 to perform three main functions in any combination: domain registration, DNS routing, and health checking. ",
+                "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Hybrid Cloud DNS Options for Amazon VPC",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-cloud-dns-options-for-vpc/key-concepts.html"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Review a Hybrid DNS Options whitepaper."
               }
             },
             {
@@ -2540,11 +2702,11 @@
           ],
           "riskRules": [
             {
-              "condition": "aws_vpcs_and_subnets && security_groups && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
+              "condition": "aws_vpcs_and_subnets && security_groups_and_nacls && vpc_to_vpc_connectivity && vpc_endpoints && multi_account_networking && hybrid_dns && hybrid_connectivity",
               "risk": "NO_RISK"
             },
             {
-              "condition": "aws_vpcs_and_subnets && security_groups && aws_transit_gateway && vpc_endpoints && centralized_networking_account && aws_vpn && aws_direct_connect",
+              "condition": "aws_vpcs_and_subnets && security_groups_and_nacls && vpc_to_vpc_connectivity && vpc_endpoints && multi_account_networking && hybrid_dns && hybrid_connectivity",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2559,8 +2721,8 @@
           "description": "It is important to design your network before building to provide unified clarity, increase communication, reduce risk, measure progress, and prevent rework.  Having an initial document also allows you to iterate and add information to the document, as needed, over time.",
           "choices": [
             {
-              "id": "design_network_architecture",
-              "title": "Design Network Architecture",
+              "id": "design_high_level_network_architecture",
+              "title": "Design High-Level Network Architecture",
               "helpfulResource": {
                 "displayText": "It is valuable to create and document an initial network design for your AWS environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
@@ -2568,6 +2730,125 @@
               "improvementPlan": {
                 "displayText": "Document an initial network design for your AWS environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
+              }
+            },
+            {
+              "id": "design_vpcs_and_cidrs",
+              "title": "Plan your IP address space",
+              "helpfulResource": {
+                "displayText": "Network connectivity is typically implemented in the early phases of a cloud journey - it is essential to plan ahead to support future scaling. Create and finalize IP planning scheme for AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/network-designing-and-planning.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Example IPAM pool plans",
+                      "url": "https://docs.aws.amazon.com/vpc/latest/ipam/planning-examples-ipam.html"
+                    },
+                    {
+                      "displayText": "Manage your IP addresses at scale on AWS",
+                      "url": "https://d1.awsstatic.com/events/reinvent/2021/New_Launch_Manage_your_IP_addresses_at_scale_on_AWS_NET326.pdf"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Document an initial network design for your AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
+              }
+            },
+            {
+              "id": "design_tgw",
+              "title": "Design VPC-to-VPC Connectivity",
+              "helpfulResource": {
+                "displayText": "Recommended: Utilize AWS Transit Gateway design for inter-VPC connectivity. Plan VPC segmentation, subnet routing tables, TGW attachment subnets.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-gateway.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "AWS Transit Gateway reference architectures for many VPCs",
+                      "url": "https://www.youtube.com/watch?v=9Nikqn_02Oc"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Document an VPC-to-VPC connectivity design for your AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
+              }
+            },
+            {
+              "id": "design_fw",
+              "title": "Optional - Design ingress, egress and VPC-to-VPC inspection",
+              "helpfulResource": {
+                "displayText": "Optional - Utilize 'Inspection VPC' design for inter-VPC and egress connectivity and use decentralized pattern for ingress inspection. Adjust TGW routing tables and add inspection VPC into a diagram/design document.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-egress-to-internet.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Deployment models for AWS Network Firewall (also applicable for 3d-party Firewalls in GWLB scenarios",
+                      "url": "https://aws.amazon.com/blogs/networking-and-content-delivery/deployment-models-for-aws-network-firewall/"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Document an initial firewall inspection design for your AWS environment.",
+                "url": "https://aws.amazon.com/blogs/networking-and-content-delivery/deployment-models-for-aws-network-firewall/"
+              }
+            },
+            {
+              "id": "design_onprem_connectivity",
+              "title": "Design on-premise connectivity setup",
+              "helpfulResource": {
+                "displayText": "Many organizations need to connect their on-premises data centers, remote sites, and the cloud. A hybrid network connects these different environments. Select a method to connect to on-prem facilities and create an HLD and LLD for the resulting setup",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-connectivity.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "AWS Summit DC 2022 - Connect your network to AWS with hybrid connectivity solutions",
+                      "url": "https://www.youtube.com/watch?v=uq8C-DmrKXc"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Document an initial on-premise connectivity design for your AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/hybrid-connectivity.html"
+              }
+            },
+            {
+              "id": "design_dns",
+              "title": "Select a Primary DNS Service and, optionally, design hybrid DNS resolution",
+              "helpfulResource": {
+                "displayText": "Select a primary DNS resolver design for AWS workloads and, if needed, design inbound/outbound DNS for on-premise connectivity.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/dns.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Scaling DNS management across multiple accounts and VPCs",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-cloud-dns-options-for-vpc/scaling-dns-management-across-multiple-accounts-and-vpcs.html"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Document an native or hybrid DNS design for your AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/hybrid-cloud-dns-options-for-vpc/scaling-dns-management-across-multiple-accounts-and-vpcs.html"
               }
             },
             {
@@ -2581,11 +2862,11 @@
           ],
           "riskRules": [
             {
-              "condition": "design_network_architecture",
+              "condition": "design_high_level_network_architecture",
               "risk": "NO_RISK"
             },
             {
-              "condition": "design_network_architecture",
+              "condition": "design_high_level_network_architecture",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2609,6 +2890,18 @@
               "improvementPlan": {
                 "displayText": "Create a Network account in the Infrastructure OU from Control Tower.",
                 "url": "https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html"
+              }
+            },
+            {
+              "id": "assign_permissions_network_account",
+              "title": "Assign permissions for Network account",
+              "helpfulResource": {
+                "displayText": "Assign appropriate groups/users and associate permission sets to a Network account, for example, for Network, Security and Cloud Infra teams",
+                "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/set-up-single-sign-on-access-to-accounts.html"
+              },
+              "improvementPlan": {
+                "displayText": "Assign permissions for a Network account in the Infrastructure OU from Control Tower.",
+                "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/set-up-single-sign-on-access-to-accounts.html"
               }
             },
             {
@@ -2760,8 +3053,8 @@
                 "url": "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-route-tables.html"
               },
               "improvementPlan": {
-                "displayText": "Configure Transit Gateway Route table.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit-gateways.html"
+                "displayText": "Configure Transit Gateway Route table. For design with an inspection VPC, refer to the document with a guidance on route table configuration (Centralized Inspection) ",
+                "url": "https://aws.amazon.com/blogs/networking-and-content-delivery/deployment-models-for-aws-network-firewall/"
               }
             },
             {
@@ -2789,20 +3082,32 @@
           ]
         },
         {
-          "id": "vpc_endpoints",
-          "title": "VPC Endpoints",
+          "id": "implement_vpc_endpoints",
+          "title": "Create VPC Endpoints - design assumes Centralized Endpoints",
           "description": "A VPC endpoint enables customers to privately connect to supported AWS services and VPC endpoint services powered by AWS PrivateLink. Amazon VPC instances do not require public IP addresses to communicate with resources of the service. Traffic between an Amazon VPC and a service does not leave the Amazon network.",
           "choices": [
             {
-              "id": "design_and_document_a_vpc_endpoint_strategy",
-              "title": "Design and document a VPC endpoint strategy",
+              "id": "create_vpc_for_endpoints",
+              "title": "Create a VPC for VPC Endpoints in a Networking Account",
               "helpfulResource": {
-                "displayText": "It is important to define a VPC endpoint strategy.  Your document should cover which VPC endpoints you will use, will you pre-deploy the endpoints, will you use VPC endpoints or Gateway endpoints (where available), and will you centralize any of the endpoints.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/aws-services-privatelink-support.html"
+                "displayText": "To avoid incurring higher cost per VPC endpoint, it is recommended to create a VPC for VPC endpoints in a networking account. The VPC will be used to host the interface endpoints in a centralized VPC. All the spoke VPCs will use these centralized endpoints via Transit Gateway.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-access-to-vpc-private-endpoints.html"
               },
               "improvementPlan": {
-                "displayText": "Design and document a VPC endpoint strategy.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/aws-services-privatelink-support.html"
+                "displayText": "Implement a documented VPC endpoint strategy.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/centralized-access-to-vpc-private-endpoints.html"
+              }
+            },
+            {
+              "id": "create_vpc_endpoints",
+              "title": "Optional - Create Interface VPC Endpoints",
+              "helpfulResource": {
+                "displayText": "Create Interface VPC Endpoints in a Networking Account and associate resulting PHZ with your spoke workload accounts.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
+              },
+              "improvementPlan": {
+                "displayText": "Create initial interface VPC endpoints.",
+                "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html"
               }
             },
             {
@@ -2816,11 +3121,11 @@
           ],
           "riskRules": [
             {
-              "condition": "design_and_document_a_vpc_endpoint_strategy",
+              "condition": "create_vpc_endpoints",
               "risk": "NO_RISK"
             },
             {
-              "condition": "design_and_document_a_vpc_endpoint_strategy",
+              "condition": "create_vpc_endpoints",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2830,20 +3135,32 @@
           ]
         },
         {
-          "id": "dns_management",
-          "title": "DNS management",
-          "description": "DNS is a fundamental component of the Internet that translates human-readable domain names (e.g., www.example.com) into IP addresses (e.g., 192.0.2.1) that computers use to communicate with each other.",
+          "id": "configure_onprem_conn",
+          "title": "Implement Connectivity to On-Premise",
+          "description": "Implement on-premise connectivity design option selected on the previous stage - provision and test AWS Direct Connect, VPN or 3d-party VPN/SD-WAN connectivity solution",
           "choices": [
             {
-              "id": "review_amazon_route_53",
-              "title": "Review Amazon Route 53",
+              "id": "implement_dx",
+              "title": "Option 1 - Implement On-Premise Connectivity Solution (Direct Connect as example)",
               "helpfulResource": {
-                "displayText": "Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. You can use Route 53 to perform three main functions in any combination- domain registration, DNS routing, and health checking.",
-                "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+                "displayText": "The AWS Direct Connect Resiliency Toolkit provides a connection wizard with multiple resiliency models. These models help you to determine, and then place an order for the number of dedicated connections to achieve your SLA objective. You select a resiliency model, and then the AWS Direct Connect Resiliency Toolkit guides you through the dedicated connection ordering process. ",
+                "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/resiliency_toolkit.html"
               },
               "improvementPlan": {
-                "displayText": "Review the guidance on Amazon Route 53.",
-                "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
+                "displayText": "Implement On-Premise Connectivity Solution (Direct Connect)",
+                "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/resiliency_toolkit.html"
+              }
+            },
+            {
+              "id": "implement_vpn",
+              "title": "Option 2 - Implement On-Premise Connectivity Solution (AWS VPN as example)",
+              "helpfulResource": {
+                "displayText": "Use the following procedure to set up an AWS Site-to-Site VPN connection. During creation, specify a transit gateway as the target gateway type. ",
+                "url": "https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html"
+              },
+              "improvementPlan": {
+                "displayText": "Implement On-Premise Connectivity Solution (VPN).",
+                "url": "https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html"
               }
             },
             {
@@ -2857,11 +3174,76 @@
           ],
           "riskRules": [
             {
-              "condition": "review_amazon_route_53",
+              "condition": "implement_dx",
               "risk": "NO_RISK"
             },
             {
-              "condition": "review_amazon_route_53",
+              "condition": "implement_dx",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "dns_resolution",
+          "title": "DNS resolution",
+          "description": "DNS is a fundamental component of the Internet that translates human-readable domain names (e.g., www.example.com) into IP addresses (e.g., 192.0.2.1) that computers use to communicate with each other.",
+          "choices": [
+            {
+              "id": "configure_outbound_dns_resolver",
+              "title": "Configure Route 53 outbound Resolver endpoints and rules.",
+              "helpfulResource": {
+                "displayText": "Configure Route 53 outbound Resolver endpoints and rules in the Networking account to enable DNS resolution of on-premise resources. Follow the guide below.",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/set-up-dns-resolution-for-hybrid-networks-in-a-multi-account-aws-environment.html"
+              },
+              "improvementPlan": {
+                "displayText": "Configure Route 53 outbound Resolver endpoints and rules in the Networking accounts",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/set-up-dns-resolution-for-hybrid-networks-in-a-multi-account-aws-environment.html"
+              }
+            },
+            {
+              "id": "share_outbound_dns_resolver_rules",
+              "title": "Create and share Route 53 outbound Resolver rules with AWS accounts. ",
+              "helpfulResource": {
+                "displayText": "Share Route 53 outbound Resolver rules with the accounts in your Organization so accounts could associate their VPCs with the resolver rule. Once done, test DNS resolution of on-premise resource from the account.",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/set-up-dns-resolution-for-hybrid-networks-in-a-multi-account-aws-environment.html"
+              },
+              "improvementPlan": {
+                "displayText": "Share Route 53 outbound Resolver rules.",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/set-up-dns-resolution-for-hybrid-networks-in-a-multi-account-aws-environment.html"
+              }
+            },
+            {
+              "id": "configure_inbound_dns",
+              "title": "Configure Route 53 inbound Resolver endpoint.",
+              "helpfulResource": {
+                "displayText": "Configure Route 53 inbound Resolver endpoint in the Networking account to enable DNS resolution from on-premise resources. Follow the guide below and test DNS resolution afterwards.",
+                "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-forwarding-inbound-queries.html"
+              },
+              "improvementPlan": {
+                "displayText": "Configure Route 53 inbound Resolver endpoint in the Networking account.",
+                "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-forwarding-inbound-queries.html"
+              }
+            },
+            {
+              "id": "none_no",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "Chose this if you have not completed any of these tasks.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html"
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "configure_inbound_dns",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "configure_inbound_dns",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -2881,6 +3263,33 @@
           "title": "Review concepts and services",
           "description": "It is important to review and understand the following security concepts, processes, and AWS services.",
           "choices": [
+            {
+              "id": "security_at_aws_overview",
+              "title": "Overview of Security at AWS",
+              "helpfulResource": {
+                "displayText": "This section  is intended to provide an introduction to AWS’ approach to security, including the controls in the AWS environment and some of the products and features that AWS makes available to customers to meet your security objectives. ",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-aws-security/welcome.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "'Best Practices for Security, Identity, & Compliance' Portal",
+                      "url": "https://aws.amazon.com/architecture/security-identity-compliance/?cards-all.sort-by=item.additionalFields.sortDate&cards-all.sort-order=desc&awsf.content-type=*all&awsf.methodology=*all"
+                    },
+                    {
+                      "displayText": "Security Pillar - AWS Well-Architected Framework",
+                      "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Review a Security at AWS whitepaper.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-aws-security/welcome.html"
+              }
+            },
             {
               "id": "security_best_practices_in_iam",
               "title": "Security best practices in IAM",
@@ -2906,6 +3315,18 @@
               }
             },
             {
+              "id": "aws_config",
+              "title": "AWS Config",
+              "helpfulResource": {
+                "displayText": "AWS Config is a configuration management service that helps you to ensure that your AWS resources are properly configured and that your configurations comply with your organizational security strategy.",
+                "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+              },
+              "improvementPlan": {
+                "displayText": "Review AWS Config.",
+                "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+              }
+            },
+            {
               "id": "aws_security_hub",
               "title": "AWS Security Hub",
               "helpfulResource": {
@@ -2915,6 +3336,29 @@
               "improvementPlan": {
                 "displayText": "Review AWS Security Hub.",
                 "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"
+              }
+            },
+            {
+              "id": "security_in_multi_account_environments",
+              "title": "Security in Multi-Account Environments",
+              "helpfulResource": {
+                "displayText": "AWS security services, their controls, and interactions are best employed on a foundation of AWS multi-account strategy and identity and access management guardrails. These guardrails set the ability for your implementation of least privilege, separation of duties, and privacy.",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html"
+              },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "AWS Security Reference Architecture Building Blocks - AWS Organizations, accounts, and guardrails",
+                      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/organizations.html"
+                    }
+                  ]
+                }
+              ],
+              "improvementPlan": {
+                "displayText": "Review AWS SRA for Multi-Account environment.",
+                "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html"
               }
             },
             {
@@ -2950,8 +3394,8 @@
               "id": "delete_default_network_resources_in_management_account",
               "title": "Delete default network resources in management account",
               "helpfulResource": {
-                "displayText": "When you create a new account, a default VPC is available in each AWS Region. A default VPC comes with a public subnet in each Availability Zone, an internet gateway, and settings to enable DNS resolution. AWS Control Tower will remove the default VPC from the AWS Control Tower governed Regions of Control Tower created accounts. However it will not remove resources from your management account. Due to this, we recommend you delete the management account default VPCs yourself.",
-                "url": "https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html"
+                "displayText": "When you create a new account, a default VPC is available in each AWS Region - it comes with a public subnet in each AZ, an internet gateway, and settings to enable DNS resolution. AWS Control Tower will remove the default VPC from the governed Regions of Control Tower created accounts. However it will not remove resources from your management account. Use the guidance from 'Delete default network resources in Management Account' section in 'Foundational Hardening' chapter from the link below.",
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               },
               "improvementPlan": {
                 "displayText": "Delete default network resources in all regions of management account.",
@@ -2962,36 +3406,36 @@
               "id": "configure_management_account_alerting_for_root_user_login",
               "title": "Configure management account alerting for root user login",
               "helpfulResource": {
-                "displayText": "AWS Control Tower configures the organization AWS CloudTrail to send CloudTrail events to an Amazon CloudWatch Log group in the management account. This allows you to create a CloudWatch alarm based on log patterns in a CloudTrail CloudWatch Log group. Because Service Control Policies do not apply to the management account, it is important to configure alerting in the management account on unwanted events. A CloudWatch metric filter and alarm can be created using the CloudTrail log group to alert on root user logins to notify if the root user accesses the management account.",
-                "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateMetricFilterProcedure.html"
+                "displayText": "AWS Control Tower configures the organization AWS CloudTrail to send events to an Amazon CloudWatch Log group in the management account. This allows you to create a CloudWatch alarm based on log patterns in a CloudTrail CloudWatch Log group. Because Service Control Policies do not apply to the management account, it is important to configure alerting in the management account on unwanted events. A CloudWatch metric filter and alarm can be created to alert on root user logins to notify if the root user accesses the management account. Use the guidance from 'Configure management account alerting ' section in 'Foundational Hardening' chapter from the link below.",
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               },
               "improvementPlan": {
                 "displayText": "Create a metric filter and alarm for root user logins.",
-                "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateMetricFilterProcedure.html"
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               }
             },
             {
               "id": "remove_unnecessary_iam_users_in_management_account",
               "title": "Remove unnecessary IAM users in management account",
               "helpfulResource": {
-                "displayText": "To strengthen the security of your AWS account, delete any unnecessary IAM user credentials (passwords and access keys). We strongly recommend that your management account should not have any IAM users and that you use AWS Identity Center users for standard use.",
-                "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_manage.html#:~:text=AWS%20API%3A%20UpdateUser-,Deleting%20an%20IAM%20user,-You%20might%20delete"
+                "displayText": "To strengthen the security of your AWS account, delete any unnecessary IAM user credentials (passwords and access keys). We strongly recommend that your management account should not have any IAM users and that you use AWS Identity Center users for standard use.Use the guidance from 'Remove unnecessary IAM users ' section in 'Foundational Hardening' chapter from the link below.",
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               },
               "improvementPlan": {
                 "displayText": "Delete unnecessary IAM users from management account.",
-                "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_manage.html#:~:text=AWS%20API%3A%20UpdateUser-,Deleting%20an%20IAM%20user,-You%20might%20delete"
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               }
             },
             {
               "id": "deploy_aws_config_in_all_allowed_regions_of_management_account",
               "title": "Deploy AWS Config in all allowed regions of management account",
               "helpfulResource": {
-                "displayText": "AWS Control Tower deploys AWS Config (an AWS Config Recorder and AWS Config Delivery Channel) in each Control Tower managed region of each member account but it does not deploy AWS Config to the management account.  Although it is recommended to not deploy workload resources in the management account, due to the critical nature of the management account, we recommend deploying AWS Config in each region of the management account to track resources and allow alerting on those resources.",
-                "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+                "displayText": "AWS Control Tower deploys AWS Config in each Control Tower managed region of each member account but it does not deploy AWS Config to the management account.  Due to the critical nature of the management account, we recommend deploying AWS Config in each region of the management account to track resources and allow alerting on those resources. Use the guidance from 'Deploy AWS Config in management account ' section in 'Deploying and Configuring AWS Config' chapter from the link below.",
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               },
               "improvementPlan": {
                 "displayText": "Deploy AWS Config to all enabled regions of the management account",
-                "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+                "url": "https://aws.amazon.com/solutions/guidance/establishing-an-initial-foundation-using-aws-organizations/"
               }
             },
             {
