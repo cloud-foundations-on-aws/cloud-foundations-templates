@@ -5,7 +5,7 @@ import os
 
 client = boto3.client('wellarchitected')
 #url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
-url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/custom-lens-install-script/custom-lens/cloud-foundations-accelerator-custom-lens.json"
+url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 
 def main():
 
@@ -54,7 +54,7 @@ def main():
               import_lens,
           ],
       )['WorkloadArn']
-      print(f"{create_workload} created in Well Architected Tool. \nNavigate to the Well Architected Tool AWS console to review the Workload")
+      print(f"{create_workload} created in Well Architected Tool. \n\nNavigate to the Well Architected Tool AWS console to review the Workload")
     except ClientError as e:
       if e.response['Error']['Code'] == 'ConflictException':
         print("Workload already exists")
