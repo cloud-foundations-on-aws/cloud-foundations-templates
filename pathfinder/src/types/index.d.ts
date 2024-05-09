@@ -1,5 +1,13 @@
 import { DelegatedServices } from "@aws-sdk/client-organizations";
 
+export interface CfatCheck {
+  title:string;
+  description:string;
+  pass:boolean;
+  required:boolean;
+  weight:number 
+}
+
 export interface AccountType {
   isInOrganization: boolean;
   isManagementAccount?: boolean;

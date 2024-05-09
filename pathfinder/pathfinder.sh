@@ -17,5 +17,5 @@ for i in \
    ; do npm install "$i" --silent; done
 
 echo "installation complete, starting pathfinder..."
-download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/pathfinder/dist/pathfinder.js"
+download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/cfat/pathfinder/dist/pathfinder.js"
 curl -sS $download_url | node

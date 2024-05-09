@@ -16,32 +16,70 @@ import getOrgMemberAccounts from './src/actions/get-org-member-accounts.js';
 import getControlTower from './src/actions/check-control-tower.js';
 import checkLegacyCur from './src/actions/check-legacy-cur.js';
 import * as tasks from './src/actions/tasks.js';
+import { CfatCheck } from './src/types/index.js';
 import * as fs from 'fs';
 
 const main = async (): Promise<void> => {
+  let CfatChecks:CfatCheck[] = [];
 	const reportFile = "./Pathfinder.txt"
 	let dateTime = new Date()
 	const region =  process.env.AWS_REGION || 'us-east-1';
 	const allRegions = await getAllRegions();
 	console.log("Discovering your AWS environment....")
 	const accountType = await defineAccountType(region);
+	let transitionalFound,suspendedFound,infrastructureFound:boolean = false;
+	let workloadsFound:boolean = false;
+	let securityFound:boolean = false;
+	let cfatIamUserPass:boolean = false;
+	let cfatIamIdPOrgServicePass:boolean = true;
+	let cfatIamIdcConfiguredPass:boolean = false;
+	let cfatCloudTrailPass:boolean = false;
+	let cfatCloudTrailOrgTrailPass:boolean = false;
+	let cfatVpcPass:boolean = true;
+	let cfatEc2Pass:boolean = false;
+	let cfatConfigManagementAccountPass:boolean = false;
+	let cfatConfigRecorderManagementAccountPass:boolean = false;
+	let cfatCloudTrailOrgServiceEnabledPass:boolean = false;
+	let cfatTagPoliciesEnabledPass:boolean = false;
+	let cfatScpEnabledPass:boolean = false;
+	let cfatBackupPoliciesEnabledPass:boolean = false;
+	let cfatOrgCloudFormationEnabledPass:boolean = false;
+	let cfatOrgCloudFormationStatusPass:boolean = false;
+	let cfatOrgServiceGuardDutyEnabledPass:boolean = false;
+	let cfatOrgServiceSecurityHubEnabledPass:boolean = false;
+	let cfatOrgServiceIamAccessAnalyzerEnabledPass:boolean = false;
+	let cfatOrgServiceAwsConfigEnabledPass:boolean = false;
+	let cfatOrgServiceRamEnabledPass:boolean = false;
+	let cfatControlTowerDeployedPass:boolean = false;
+	let cfatControlTowerNotDriftedPass:boolean = false;
+	let cfatControlTowerLatestVersionPass:boolean = false;
+	let cfatLogArchiveAccountPass:boolean = false;
+	let cfatAuditAccountPass:boolean = false;
 
-	fs.writeFileSync(reportFile, "Cloud Foundations - Pathfinder")
+	fs.writeFileSync(reportFile, "Cloud Foundations - Assessment Tool")
 	fs.appendFileSync(reportFile, `\nGenerated on: ${dateTime.toUTCString()} \n\n`);
 	fs.appendFileSync(reportFile, `\n*********************************************************`);
 	fs.appendFileSync(reportFile, `\n                   MANAGEMENT ACCOUNT`);
 	fs.appendFileSync(reportFile, `\n*********************************************************`);
-
 	fs.appendFileSync(reportFile, `\n\nAWS ACCOUNT TYPE\n`);
+
+	let cfatManagementAccountPass:boolean = true;
 	if (accountType) {
 		console.dir(accountType, {depth: null, colors: true})
 		fs.appendFileSync(reportFile, `\n  Is in AWS Organization: ${accountType.isInOrganization}`);
 		fs.appendFileSync(reportFile, `\n  Assessing AWS Management Account: ${accountType.isManagementAccount}`);
+
+		if(accountType.isManagementAccount === undefined){
+			accountType.isManagementAccount = false
+		}
+		cfatManagementAccountPass = accountType.isManagementAccount;
 	}
+
 	console.log("Discovering IAM Users....")
 	const iamUserResult = await checkIamUsers();
 	fs.appendFileSync(reportFile, `\n\nIAM USERS CHECK\n`);
 	if (iamUserResult && iamUserResult.length > 0) {
+
 		console.dir(iamUserResult, {depth: null, colors: true});
 		for(const iamUser of iamUserResult){
 			fs.appendFileSync(reportFile, `\n  IAM User: ${iamUser.userName}`);
@@ -52,13 +90,16 @@ const main = async (): Promise<void> => {
 		}
 	} else {
 		fs.appendFileSync(reportFile, `\n  No IAM Users found.`);
+		cfatIamUserPass = true
 	}
+
 	console.log("Discovering EC2 instances across all AWS Regions....")
 	const ec2Check = await checkEc2Exists(allRegions);
 	fs.appendFileSync(reportFile, `\n\nEC2 INSTANCE CHECK\n`);
 	if(ec2Check && ec2Check.find(param => param.ec2Found === true)){
 		console.dir(ec2Check, {depth: null, colors: true});
 		for ( const ec2 of ec2Check ){
+			cfatEc2Pass = false;
 			if(ec2.ec2Found){
 				fs.appendFileSync(reportFile, `\n  ${ec2.region} - found EC2 Instance(s).`);
 			}
@@ -67,9 +108,11 @@ const main = async (): Promise<void> => {
 		fs.appendFileSync(reportFile, `\n  No EC2 instances found.`);
 	}
 	console.log("Discovering VPCs across all AWS Regions....")
+
 	const vpcCheck = await checkVpcExists(allRegions);
 	fs.appendFileSync(reportFile, `\n\nVPC CHECK\n`);
 	if(vpcCheck && vpcCheck.length >0){
+		cfatVpcPass = false;
 		console.dir(vpcCheck, {depth: null, colors: true});
 		for(const vpcFind of vpcCheck){
 			if(vpcFind.vpcFound){
@@ -87,9 +130,11 @@ const main = async (): Promise<void> => {
 		console.dir(configCheck, {depth: null, colors: true});
 		for (const configFind of configCheck){
 			if(configFind.configRecorderFound){
+				cfatConfigManagementAccountPass = true
 				fs.appendFileSync(reportFile, `\n  ${configFind.region} - Config Recorder found`);
 			}
 			if(configFind.configDeliveryChannelFound){
+				cfatConfigRecorderManagementAccountPass = true
 				fs.appendFileSync(reportFile, `\n  ${configFind.region} - Config Delivery Channel found`);
 			}
 		}
@@ -115,6 +160,10 @@ const main = async (): Promise<void> => {
 		console.dir(orgDelAdminDetails, {depth: null, colors: true});
 		const orgMemberAccountDetails = await getOrgMemberAccounts();
 		console.dir(orgMemberAccountDetails, {depth: null, colors: true});
+
+		if(idcInformation.arn){
+			cfatIamIdcConfiguredPass = true;
+		}
 
 		///// SET THE BACKLOG TASK FOR MANAGEMENT ACCOUNT ////
 		fs.appendFileSync(reportFile, `\n\nMANAGEMENT ACCOUNT RECOMMENDED TASKS:`);
@@ -162,9 +211,11 @@ const main = async (): Promise<void> => {
 
 		fs.appendFileSync(reportFile, `\n\nAWS ORGANIZATION CLOUDFORMATION\n`);
 		fs.appendFileSync(reportFile, `\n  AWS CloudFormation Organization stack sets status : ${cfnOrgStatus.status}`);
-
+		if(cfnOrgStatus){cfatOrgCloudFormationEnabledPass = true}
 		fs.appendFileSync(reportFile, `\n\nCLOUDTRAIL CHECK\n`);
+
 		if(cloudTrailCheck && cloudTrailCheck.length > 0) {
+			cfatCloudTrailPass = true;
 			console.dir(cloudTrailCheck, {depth: null, colors: true});
 			for(const ctFind of cloudTrailCheck){
 				if(ctFind.trailFound){
@@ -172,6 +223,7 @@ const main = async (): Promise<void> => {
 					fs.appendFileSync(reportFile, `\n    Is Organization Trail: ${ctFind.isOrgTrail}`);
 					fs.appendFileSync(reportFile, `\n    Is MultiRegion: ${ctFind.isMultiRegion}`);
 					fs.appendFileSync(reportFile, `\n`);
+					if(ctFind.isOrgTrail){cfatCloudTrailOrgTrailPass = true}
 				}
 			}
 		}else {
@@ -179,11 +231,15 @@ const main = async (): Promise<void> => {
 		}
 
 		fs.appendFileSync(reportFile, `\n\nGOVERNANCE SERVICES ENABLED IN AWS ORGANIZATION:\n`);
+
 		if(orgEnabledServices.find(param=> param.service === 'cloudtrail.amazonaws.com')){
 			fs.appendFileSync(reportFile, `\n  AWS CloudTrail`);
+			cfatCloudTrailOrgServiceEnabledPass = true;
 		}
+		let cfatConfigOrgServiceEnabledPass:boolean = false
 		if(orgEnabledServices.find(param=> param.service === 'config.amazonaws.com')){
 			fs.appendFileSync(reportFile, `\n  AWS Config`);
+			cfatConfigOrgServiceEnabledPass = true;
 		}
 
 		///// SET THE BACKLOG TASK FOR GOVERNANCE /////
@@ -194,26 +250,37 @@ const main = async (): Promise<void> => {
 			const message:string = await tasks.enableAwsOrganizationService(govTaskNumber, govWaypoint, "AWS CloudTrail");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			govTaskNumber++
+		}else {
+			cfatCloudTrailOrgServiceEnabledPass = true;
 		}
 		if(!orgEnabledServices.find(param=> param.service === 'config.amazonaws.com')){
 			const message:string = await tasks.enableAwsOrganizationService(govTaskNumber, govWaypoint, "AWS Config");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			govTaskNumber++
+		} else {
+			cfatConfigOrgServiceEnabledPass = true;
 		}
 		if(!enableOrgPoliciesCheck.scpEnabled) {
 			const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Service Control Policy");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			govTaskNumber++
+		} else{
+			cfatScpEnabledPass = true;
 		}
 		if(!enableOrgPoliciesCheck.tagPolicyEnabled) {
 			const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Tag Policy");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			govTaskNumber++
 		}
+		else {
+			cfatTagPoliciesEnabledPass = true;
+		}
 		if(!enableOrgPoliciesCheck.backupPolicyEnabled) {
 			const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Backup Policy");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			govTaskNumber++
+		} else {
+			cfatBackupPoliciesEnabledPass = true;
 		}
 
 		fs.appendFileSync(reportFile, `\n\n*********************************************************`);
@@ -243,7 +310,7 @@ const main = async (): Promise<void> => {
 
 		fs.appendFileSync(reportFile, `\n\nAWS ORGANIZATION CLOUDFORMATION\n`);
 		fs.appendFileSync(reportFile, `\n  AWS CloudFormation Organization stack sets status : ${cfnOrgStatus.status}`);
-		let transitionalFound,suspendedFound,workloadsFound,securityFound: boolean = false;
+
 		if(orgDetails.rootOuId){
 			const orgOus = await getOrgTopLevelOus('us-east-1', orgDetails.rootOuId);
 			console.dir(orgOus, {depth: null, colors: true});
@@ -255,6 +322,7 @@ const main = async (): Promise<void> => {
 					if(ou.name?.toLowerCase() === 'transitional'){transitionalFound = true}
 					if(ou.name?.toLowerCase() === 'workloads'){workloadsFound=true}
 					if(ou.name?.toLowerCase() === 'security'){securityFound=true}
+					if(ou.name?.toLowerCase() === 'infrastructure'){infrastructureFound=true}
 					fs.appendFileSync(reportFile, `\n    Organizational Unit: ${ou.name}`);
 					fs.appendFileSync(reportFile, `\n      Organizational Unit Id: ${ou.id}`);
 					if(ou.accounts && ou.accounts.length > 0){
@@ -278,6 +346,11 @@ const main = async (): Promise<void> => {
 
 		if(orgMemberAccountDetails && orgMemberAccountDetails.length > 0){
 			for (const memberAccount of orgMemberAccountDetails){
+				if(memberAccount.accountName){
+					if(memberAccount.accountName.toLowerCase() === 'log archive'){cfatLogArchiveAccountPass = true;}
+					if(memberAccount.accountName.toLowerCase() === 'audit'){cfatAuditAccountPass = true;}
+					if(memberAccount.accountName.toLowerCase() === 'security tooling'){cfatAuditAccountPass = true;}
+				}
 				fs.appendFileSync(reportFile, `\n  Account: ${memberAccount.accountName}`);
 				fs.appendFileSync(reportFile, `\n  Account Email: ${memberAccount.accountEmail}\n`);
 			}
@@ -359,6 +432,11 @@ const main = async (): Promise<void> => {
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			masTaskNumber++
 		}
+		if(!infrastructureFound){
+			const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Infrastructure");
+			fs.appendFileSync(reportFile, `\n  ${message}`);
+			masTaskNumber++
+		}
 
 		fs.appendFileSync(reportFile, `\n\n*********************************************************`);
 		fs.appendFileSync(reportFile, `\n                  LANDING ZONE`);
@@ -366,6 +444,7 @@ const main = async (): Promise<void> => {
 
 		fs.appendFileSync(reportFile, `\n\nAWS CONTROL TOWER\n`);
 		if(controlTowerDetails.controlTowerRegion){
+			cfatControlTowerDeployedPass = true;
 			console.dir(controlTowerDetails, {depth: null, colors: true});
 			fs.appendFileSync(reportFile, `\n  Control Tower home region: ${controlTowerDetails.controlTowerRegion}`);
 			fs.appendFileSync(reportFile, `\n  Control Tower status: ${controlTowerDetails.status}`);
@@ -389,6 +468,8 @@ const main = async (): Promise<void> => {
 			const message:string = await tasks.fixLzDrift(lzTaskNumber, lzWaypoint);
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			lzTaskNumber++
+		} else{
+			cfatControlTowerNotDriftedPass = true;
 		}
 		if(controlTowerDetails.deployedVersion !== controlTowerDetails.latestAvailableVersion){
 			const currentVersion:string = controlTowerDetails.deployedVersion ?? ""
@@ -396,8 +477,11 @@ const main = async (): Promise<void> => {
 			const message:string = await tasks.updateLzControlTowerTask(lzTaskNumber, lzWaypoint, currentVersion, latestVersion);
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			lzTaskNumber++
+		}else{
+			cfatControlTowerLatestVersionPass = true;
 		}
 		if(!orgEnabledServices.find(param=> param.service === 'member.org.stacksets.cloudformation.amazonaws.com')){
+			cfatOrgCloudFormationStatusPass = true
 			const message:string = await tasks.enableAwsOrganizationService(lzTaskNumber, lzWaypoint, "AWS CloudFormation");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			lzTaskNumber++
@@ -416,8 +500,10 @@ const main = async (): Promise<void> => {
 		fs.appendFileSync(reportFile, `\n\nIDENTITY RECOMMENDED TASKS:`);
 		let ssoTaskNumber: number = 1
 		const ssoWaypoint:string = 'Identity'
+
 		if(!orgEnabledServices.find(param=> param.service === 'sso.amazonaws.com')){
 			const message:string = await tasks.enableAwsOrganizationService(ssoTaskNumber, ssoWaypoint, "AWS IAM Identity Center");
+			cfatIamIdPOrgServicePass = false;
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			ssoTaskNumber++
 		}
@@ -437,13 +523,16 @@ const main = async (): Promise<void> => {
 		fs.appendFileSync(reportFile, `\n*********************************************************`);
 		fs.appendFileSync(reportFile, `\n\nAWS SECURITY SERVICES ENABLED IN AWS ORGANIZATION:\n`);
 		if(orgEnabledServices.find(param=> param.service === 'guardduty.amazonaws.com')){
+			cfatOrgServiceGuardDutyEnabledPass = true;
 			fs.appendFileSync(reportFile, `\n  AWS GuardDuty`);
 		}
 		if(orgEnabledServices.find(param=> param.service === 'securityhub.amazonaws.com')){
+			cfatOrgServiceSecurityHubEnabledPass = true;
 			fs.appendFileSync(reportFile, `\n  AWS Security Hub`);
 		}
 		if(orgEnabledServices.find(param=> param.service === 'access-analyzer.amazonaws.com')){
 			fs.appendFileSync(reportFile, `\n  IAM Access Analyzer`);
+			cfatOrgServiceIamAccessAnalyzerEnabledPass = true;
 		}
 		if(orgEnabledServices.find(param=> param.service === 'macie.amazonaws.com')){
 			fs.appendFileSync(reportFile, `\n  Macie`);
@@ -541,6 +630,7 @@ const main = async (): Promise<void> => {
 			netTaskNumber++
 		}
 		if(!orgEnabledServices.find(param=> param.service === 'ram.amazonaws.com')){
+			cfatOrgServiceRamEnabledPass = true;
 			const message:string = await tasks.enableAwsOrganizationService(netTaskNumber, networkWaypoint, "AWS Resource Access Manager");
 			fs.appendFileSync(reportFile, `\n  ${message}`);
 			netTaskNumber++
@@ -617,6 +707,298 @@ const main = async (): Promise<void> => {
 	}
 
 	fs.appendFileSync(reportFile, `\n\n\n  END REVIEW`);
-};
 
+	////SCORING
+	let OrgCheck:CfatCheck = {
+		title: "AWS Organization Exists",
+		description: "AWS Organization is enabled.",
+		pass: accountType.isInOrganization,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(OrgCheck);
+
+	let MACheck:CfatCheck = {
+		title: "Management account",
+		description: "AWS Management account exists.",
+		pass: cfatManagementAccountPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(MACheck);
+
+	const cfatIamUserCheck:CfatCheck = {
+		title: "IAM Users",
+		description: "IAM Users should not exist in Management Account.",
+		pass: cfatIamUserPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatIamUserCheck);
+
+	const cfatEc2Check:CfatCheck = {
+		title: "EC2 Instances",
+		description: "EC2 Instances should not exist in Management Account.",
+		pass: cfatEc2Pass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatEc2Check);
+
+	const cfatVpcCheck:CfatCheck = {
+		title: "Management Account VPCs",
+		description: "Management Account should not have any VPCs.",
+		pass: cfatVpcPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatVpcCheck);
+
+	const cfatCloudTrailCheck:CfatCheck = {
+		title: "CloudTrail Trail",
+		description: "CloudTrail should be enabled.",
+		pass: cfatCloudTrailPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatCloudTrailCheck);
+
+	const cfatCloudTrailOrgServiceEnabledCheck:CfatCheck = {
+		title: "CloudTrail Organization Service",
+		description: "CloudTrail Organization Services should be enabled.",
+		pass: cfatCloudTrailOrgServiceEnabledPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatCloudTrailOrgServiceEnabledCheck);
+
+	const cfatCloudTrailOrgTrailCheck:CfatCheck = {
+		title: "CloudTrail Organization Trail",
+		description: "At least one CloudTrail Organization Trail should be enabled.",
+		pass: cfatCloudTrailOrgTrailPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatCloudTrailOrgTrailCheck);
+
+	const cfatConfigManagementAccountCheck:CfatCheck = {
+		title: "Config Recorder Management Account",
+		description: "Config Management Account should be enabled.",
+		pass: cfatConfigManagementAccountPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatConfigManagementAccountCheck);
+
+	const cfatConfigRecorderManagementAccountCheck:CfatCheck= {
+		title: "Config Delivery Management Account",
+		description: "Config Delivery Channel Management Account should be enabled.",
+		pass: cfatConfigRecorderManagementAccountPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatConfigRecorderManagementAccountCheck);
+
+	const cfatCloudFormationEnableCheck:CfatCheck = {
+		title: "CloudFormation StackSets active",
+		description: "CloudFormation StackSets should be activated in the CloudFormation console.",
+		pass: cfatOrgCloudFormationEnabledPass,
+		required: false,
+		weight: 5
+	}
+	CfatChecks.push(cfatCloudFormationEnableCheck);
+
+	const cfatOrgServiceGuardDutyCheck:CfatCheck = {
+		title: "GuardDuty Organization Service",
+		description: "GuardDuty Organization Services should be enabled.",
+		pass: cfatOrgServiceGuardDutyEnabledPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatOrgServiceGuardDutyCheck);
+
+	const cfatOrgServiceRamCheck:CfatCheck = {
+		title: "Resource Access Manager Organization Service",
+		description: "Resource Access Manager Organization Services should be enabled.",
+		pass: cfatOrgServiceRamEnabledPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatOrgServiceRamCheck);
+
+	const cfatOrgServiceSecurityHubCheck:CfatCheck = {
+		title: "Security Hub Organization Service",
+		description: "SecurityHub Organization Services should be enabled.",
+		pass: cfatOrgServiceSecurityHubEnabledPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatOrgServiceSecurityHubCheck);
+
+	const cfatOrgServiceIamAccessAnalyzerCheck:CfatCheck = {
+		title: "IAM Access Analyzer Organization Service",
+		description: "IAM Access Analyzer Organization Services should be enabled.",
+		pass: cfatOrgServiceIamAccessAnalyzerEnabledPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatOrgServiceIamAccessAnalyzerCheck);
+
+	const cfatOrgServiceConfigCheck:CfatCheck = {
+		title: "Config Organization Service",
+		description: "Config Organization Services should be enabled.",
+		pass: cfatOrgServiceAwsConfigEnabledPass,
+		required: false,
+		weight: 4
+	}
+	CfatChecks.push(cfatOrgServiceConfigCheck);
+
+	const cfatOrgServiceCloudFormationCheck:CfatCheck = {
+		title: "CloudFormation Organization Service",
+		description: "CloudFormation Organization Services should be enabled.",
+		pass: cfatBackupPoliciesEnabledPass,
+		required: false,
+		weight: 5
+	}
+
+	const cfatInfraOuCheck:CfatCheck = {
+		title: "Top-level Infrastructure OU",
+		description: "Top-level Infrastructure OU should exist.",
+		pass: infrastructureFound,
+		required: false,
+		weight: 5
+	}
+	CfatChecks.push(cfatInfraOuCheck);
+
+	const cfatSecurityOuCheck:CfatCheck = {
+		title: "Top-level Security OU",
+		description: "Top-level Security OU should exist.",
+		pass: securityFound,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatSecurityOuCheck);
+
+	const cfatWorkloadOuCheck:CfatCheck = {
+		title: "Top-level Workloads OU",
+		description: "Top-level Workloads OU should exist.",
+		pass: workloadsFound,
+		required: false,
+		weight: 5
+	}
+	CfatChecks.push(cfatWorkloadOuCheck);
+
+	const cfatIamIdCOrgServiceCheck:CfatCheck = {
+		title: "IAM IdC Organization Service",
+		description: "IAM Identity Center Organization Services should be enabled.",
+		pass: cfatIamIdPOrgServicePass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatIamIdCOrgServiceCheck);
+
+	const cfatIamIdcConfiguredCheck:CfatCheck = {
+		title: "IAM IdC Configured",
+		description: "IAM Identity Center should be configured.",
+		pass: cfatIamIdcConfiguredPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatIamIdcConfiguredCheck);
+
+	const cfatOrgPolicyScpEnabled:CfatCheck = {
+		title: "Service Control Policies Enabled",
+		description: "Service Control Policy should be enabled.",
+		pass: cfatScpEnabledPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatOrgPolicyScpEnabled);
+
+	const cfatOrgPolicyTagPolicyCheck:CfatCheck = {
+		title: "Organization Tag Policy Enabled",
+		description: "Tag Policy should be enabled.",
+		pass: cfatTagPoliciesEnabledPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatOrgPolicyTagPolicyCheck);
+
+	const cfatBackupPoliciesEnabledCheck:CfatCheck = {
+		title: "Organization Backup Policy Enabled",
+		description: "Backup Policy should be enabled.",
+		pass: cfatBackupPoliciesEnabledPass,
+		required: false,
+		weight: 5
+	}
+	CfatChecks.push(cfatBackupPoliciesEnabledCheck);
+
+	const cfatControlTowerDeployedCheck:CfatCheck= {
+		title: "Control Tower Deployed",
+		description: "Control Tower should be deployed.",
+		pass: cfatControlTowerDeployedPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatControlTowerDeployedCheck);
+
+	const cfatControlTowerLatestVersionCheck:CfatCheck = {
+		title: "Control Tower Latest Version",
+		description: "Control Tower should be the latest version.",
+		pass: cfatControlTowerLatestVersionPass,
+		required: false,
+		weight: 5
+	}
+	CfatChecks.push(cfatControlTowerLatestVersionCheck);
+
+	const cfatControlTowerNotDriftedCheck:CfatCheck = {
+		title: "Control Tower Not Drifted",
+		description: "Control Tower should not be drifted.",
+		pass: cfatControlTowerNotDriftedPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatControlTowerNotDriftedCheck);
+
+	const cfatLogArchiveAccountCheck:CfatCheck = {
+		title: "Log Archive Account",
+		description: "Log Archive Account should exist.",
+		pass: cfatLogArchiveAccountPass,
+		required: true,
+		weight: 6
+	}
+	CfatChecks.push(cfatLogArchiveAccountCheck);
+
+	const cfatAuditAccountCheck:CfatCheck = {
+		title: "Audit Account",
+		description: "Audit Account should exist.",
+		pass: cfatAuditAccountPass,
+		required: true,
+		weight: 6
+	}
+
+	let score:number = 0;
+	let totalScore:number= 0;
+	let cfatStatus:string = "PASS";
+	console.log("-----------------------------")
+	console.log("cloud foundation assessment complete.")
+	console.log("-----------------------------")
+	console.log("Failed Requirements:")
+	for (const check of CfatChecks) {
+		totalScore += check.weight;
+		if (check.required === true && check.pass === false) {
+			console.log(`FAILED: ${check.title}`);
+			cfatStatus = "FAILED";
+		}
+		if(check.pass === true){
+			score += check.weight;
+		}
+	}
+	console.log(`Result: ${cfatStatus}`)
+	console.log(`Score: ${score} out of ${totalScore}`)
+	console.log(`-----------------------------`)
+	console.table(CfatChecks);
+
+};
 main();
+
