@@ -3,6 +3,37 @@ import requests
 from botocore.exceptions import ClientError
 import os
 
+"""
+This module interacts with the AWS Well-Architected Tool to manage custom lenses and workloads.
+
+Functions:
+    main():
+        The main function of the module, responsible for the following tasks:
+        1. Import a custom lens from a GitHub repository URL.
+        2. Create a new version of the imported lens if it already exists.
+        3. Create a new workload in the Well-Architected Tool, associating it with the imported lens.
+
+Environment Variables:
+    Regions (str): A comma-separated list of AWS regions where the workload should be created.
+    Owner (str): The owner of the workload being created.
+
+Usage:
+
+    Example:
+        $ export Regions="us-east-1,us-west-2"
+        $ export Owner="example@company.com"
+        $ python app.py
+
+Dependencies:
+    - boto3 (AWS SDK for Python)
+    - requests (Python library for making HTTP requests)
+    - os (Python built-in module for operating system operations)
+
+Note:
+    This module assumes that the AWS credentials are properly configured and available in the environment.
+    It also assumes that the user has the necessary permissions to interact with the Well-Architected Tool.
+"""
+
 client = boto3.client('wellarchitected')
 #url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
