@@ -756,7 +756,7 @@ const main = async (): Promise<void> => {
 
 	const cfatCloudTrailCheck:CfatCheck = {
 		title: "CloudTrail Trail",
-		description: "CloudTrail should be enabled.",
+		description: "CloudTrail should be enabled within the account.",
 		pass: cfatCloudTrailPass,
 		required: true,
 		weight: 6
@@ -765,7 +765,7 @@ const main = async (): Promise<void> => {
 
 	const cfatCloudTrailOrgServiceEnabledCheck:CfatCheck = {
 		title: "CloudTrail Organization Service",
-		description: "CloudTrail Organization Services should be enabled.",
+		description: "CloudTrail should be enabled on the Organization.",
 		pass: cfatCloudTrailOrgServiceEnabledPass,
 		required: true,
 		weight: 6
@@ -782,8 +782,8 @@ const main = async (): Promise<void> => {
 	CfatChecks.push(cfatCloudTrailOrgTrailCheck);
 
 	const cfatConfigManagementAccountCheck:CfatCheck = {
-		title: "Config Recorder Management Account",
-		description: "Config Management Account should be enabled.",
+		title: "Config Recorder in Management Account",
+		description: "Config Recorder in the Management Account should be enabled.",
 		pass: cfatConfigManagementAccountPass,
 		required: true,
 		weight: 6
@@ -791,8 +791,8 @@ const main = async (): Promise<void> => {
 	CfatChecks.push(cfatConfigManagementAccountCheck);
 
 	const cfatConfigRecorderManagementAccountCheck:CfatCheck= {
-		title: "Config Delivery Management Account",
-		description: "Config Delivery Channel Management Account should be enabled.",
+		title: "Config Delivery Channel in Management Account",
+		description: "Config Delivery Channel in Management Account should be enabled.",
 		pass: cfatConfigRecorderManagementAccountPass,
 		required: true,
 		weight: 6
@@ -800,7 +800,7 @@ const main = async (): Promise<void> => {
 	CfatChecks.push(cfatConfigRecorderManagementAccountCheck);
 
 	const cfatCloudFormationEnableCheck:CfatCheck = {
-		title: "CloudFormation StackSets active",
+		title: "CloudFormation StackSets set to active",
 		description: "CloudFormation StackSets should be activated in the CloudFormation console.",
 		pass: cfatOrgCloudFormationEnabledPass,
 		required: false,
@@ -810,7 +810,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceGuardDutyCheck:CfatCheck = {
 		title: "GuardDuty Organization Service",
-		description: "GuardDuty Organization Services should be enabled.",
+		description: "GuardDuty Organization services should be enabled.",
 		pass: cfatOrgServiceGuardDutyEnabledPass,
 		required: false,
 		weight: 4
@@ -819,7 +819,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceRamCheck:CfatCheck = {
 		title: "Resource Access Manager Organization Service",
-		description: "Resource Access Manager Organization Services should be enabled.",
+		description: "RAM trusted access should be enabled in the AWS Organization.",
 		pass: cfatOrgServiceRamEnabledPass,
 		required: false,
 		weight: 4
@@ -828,7 +828,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceSecurityHubCheck:CfatCheck = {
 		title: "Security Hub Organization Service",
-		description: "SecurityHub Organization Services should be enabled.",
+		description: "Security Hub trusted access should be enabled in the AWS Organization.",
 		pass: cfatOrgServiceSecurityHubEnabledPass,
 		required: false,
 		weight: 4
@@ -837,7 +837,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceIamAccessAnalyzerCheck:CfatCheck = {
 		title: "IAM Access Analyzer Organization Service",
-		description: "IAM Access Analyzer Organization Services should be enabled.",
+		description: "IAM Access Analyzer trusted access should be enabled in the AWS Organization.",
 		pass: cfatOrgServiceIamAccessAnalyzerEnabledPass,
 		required: false,
 		weight: 4
@@ -846,7 +846,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceConfigCheck:CfatCheck = {
 		title: "Config Organization Service",
-		description: "Config Organization Services should be enabled.",
+		description: "AWS Config trusted access should be enabled in the AWS Organization.",
 		pass: cfatOrgServiceAwsConfigEnabledPass,
 		required: false,
 		weight: 4
@@ -855,7 +855,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgServiceCloudFormationCheck:CfatCheck = {
 		title: "CloudFormation Organization Service",
-		description: "CloudFormation Organization Services should be enabled.",
+		description: "CloudFormation trusted access should be enabled in the AWS Organization.",
 		pass: cfatBackupPoliciesEnabledPass,
 		required: false,
 		weight: 5
@@ -890,7 +890,7 @@ const main = async (): Promise<void> => {
 
 	const cfatIamIdCOrgServiceCheck:CfatCheck = {
 		title: "IAM IdC Organization Service",
-		description: "IAM Identity Center Organization Services should be enabled.",
+		description: "IAM Identity Center trusted access should be enabled in the AWS Organization",
 		pass: cfatIamIdPOrgServicePass,
 		required: true,
 		weight: 6
@@ -908,7 +908,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgPolicyScpEnabled:CfatCheck = {
 		title: "Service Control Policies Enabled",
-		description: "Service Control Policy should be enabled.",
+		description: "Service Control Policy should be enabled within the AWS Organization.",
 		pass: cfatScpEnabledPass,
 		required: true,
 		weight: 6
@@ -917,7 +917,7 @@ const main = async (): Promise<void> => {
 
 	const cfatOrgPolicyTagPolicyCheck:CfatCheck = {
 		title: "Organization Tag Policy Enabled",
-		description: "Tag Policy should be enabled.",
+		description: "Tag Policy should be enabled within the AWS Organization.",
 		pass: cfatTagPoliciesEnabledPass,
 		required: true,
 		weight: 6
@@ -926,7 +926,7 @@ const main = async (): Promise<void> => {
 
 	const cfatBackupPoliciesEnabledCheck:CfatCheck = {
 		title: "Organization Backup Policy Enabled",
-		description: "Backup Policy should be enabled.",
+		description: "Backup Policy should be enabled within the AWS Organization.",
 		pass: cfatBackupPoliciesEnabledPass,
 		required: false,
 		weight: 5
@@ -977,6 +977,9 @@ const main = async (): Promise<void> => {
 		weight: 6
 	}
 
+	fs.appendFileSync(reportFile, `\n\n====================================\n`);
+	fs.appendFileSync(reportFile, `\ncloud foundation assessment complete.`);
+	fs.appendFileSync(reportFile, `\nFailed Requirements:`);
 	let score:number = 0;
 	let totalScore:number= 0;
 	let cfatStatus:string = "PASS";
@@ -988,17 +991,19 @@ const main = async (): Promise<void> => {
 		totalScore += check.weight;
 		if (check.required === true && check.pass === false) {
 			console.log(`FAILED: ${check.title}`);
+			fs.appendFileSync(reportFile, `\n    FAILED: ${check.title}`);
 			cfatStatus = "FAILED";
 		}
 		if(check.pass === true){
 			score += check.weight;
 		}
 	}
-	console.log(`Result: ${cfatStatus}`)
-	console.log(`Score: ${score} out of ${totalScore}`)
+	console.log(`CFAT Result: ${cfatStatus}`)
+	console.log(`CFAT Score: ${score} out of ${totalScore}`)
 	console.log(`-----------------------------`)
 	console.table(CfatChecks);
+	fs.appendFileSync(reportFile, `CFAT Result: ${cfatStatus}`);
+	fs.appendFileSync(reportFile, `\nCFAT Score: ${score} out of ${totalScore}`);
 
 };
 main();
-
