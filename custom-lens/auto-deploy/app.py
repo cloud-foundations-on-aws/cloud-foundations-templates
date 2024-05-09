@@ -34,64 +34,75 @@ Note:
     It also assumes that the user has the necessary permissions to interact with the Well-Architected Tool.
 """
 
+LENS_URL = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
+LENS_NAME = "AWS Cloud Foundations Accelerator"
+
 client = boto3.client('wellarchitected')
-#url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
-url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 
-def main():
 
-    AwsRegions = os.environ['Regions'].split(',')
-    ReviewOwner = os.environ["Owner"]
+def import_custom_lens(lens_url):
     try:
-        import_lens = client.import_lens(
-            JSONString=str(requests.get(url).text)
-        )['LensArn']
-        print(import_lens)
+        lens_arn = client.import_lens(JSONString=str(requests.get(lens_url).text))['LensArn']
+        print(f"Imported lens: {lens_arn}")
+        return lens_arn
     except ClientError as e:
         if e.response['Error']['Code'] == 'ValidationException':
-            print("awscloudfoundationsaccelerator already exists")
-            custom_lens_present = True
-            custom_lens = client.list_lenses(
-                LensType='CUSTOM_SELF',
-                LensStatus='PUBLISHED',
-                LensName='AWS Cloud Foundations Accelerator'
-            )['LensSummaries'][0]
-            import_lens = custom_lens['LensArn']
-            current_version = custom_lens['LensVersion']
+            print(f"{LENS_NAME} lens already exists.")
+            existing_lens = get_existing_lens(LENS_NAME)
+            return existing_lens['LensArn']
         else:
-            print("Unexpected error: %s" % e)
+            raise e
 
-    try:
-      create_version = client.create_lens_version(
-          LensAlias=import_lens,
-          LensVersion='1',
-          IsMajorVersion=True
-      )
-      print(create_version)
-    except ClientError as e:
-      if e.response['Error']['Code'] == 'ConflictException':
-        print("Version already exists")
-      else:
-        print("Unexpected error: %s" % e)
 
+def get_existing_lens(lens_name):
     try:
-      create_workload = client.create_workload(
-          WorkloadName='Organization',
-          Description='Cloud Foundation Accelerator',
-          Environment='PRODUCTION',
-          AwsRegions=AwsRegions,
-          ReviewOwner=ReviewOwner,
-          Lenses=[
-              import_lens,
-          ],
-      )['WorkloadArn']
-      print(f"{create_workload} created in Well Architected Tool. \n\nNavigate to the Well Architected Tool AWS console to review the Workload")
+        lens_summaries = client.list_lenses(LensType='CUSTOM_SELF', LensStatus='PUBLISHED', LensName=lens_name)['LensSummaries']
+        if lens_summaries:
+            return lens_summaries[0]
+        else:
+            raise ValueError(f"No lens found with the name '{lens_name}'")
     except ClientError as e:
-      if e.response['Error']['Code'] == 'ConflictException':
-        print("Workload already exists")
-      else:
-        print("Unexpected error: %s" % e)
+        raise e
+
+
+def create_lens_version(lens_arn):
+    try:
+        response = client.create_lens_version(LensAlias=lens_arn, LensVersion='1', IsMajorVersion=True)
+        print(f"Created lens version: {response['LensVersionArn']}")
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ConflictException':
+            print("Lens version already exists.")
+        else:
+            raise e
+
+
+def create_workload(lens_arn, regions, owner):
+    try:
+        workload_arn = client.create_workload(
+            WorkloadName='Organization',
+            Description='Cloud Foundation Accelerator',
+            Environment='PRODUCTION',
+            AwsRegions=regions,
+            ReviewOwner=owner,
+            Lenses=[lens_arn]
+        )['WorkloadArn']
+        print(f"Workload created: {workload_arn}\n\nNavigate to the Well Architected Tool AWS console to review the Workload")
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ConflictException':
+            print("Workload already exists.")
+        else:
+            raise e
+
+
+def main():
+    regions = os.environ['Regions'].split(',')
+    owner = os.environ["Owner"]
+
+    lens_arn = import_custom_lens(LENS_URL)
+    create_lens_version(lens_arn)
+    create_workload(lens_arn, regions, owner)
 
 
 if __name__ == "__main__":
     main()
+    
