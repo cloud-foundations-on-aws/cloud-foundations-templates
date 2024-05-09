@@ -47,7 +47,7 @@ def main():
 
     try:
       create_workload = client.create_workload(
-          WorkloadName='Organizations',
+          WorkloadName='Organization',
           Description='Cloud Foundation Accelerator',
           Environment='PRODUCTION',
           AwsRegions=AwsRegions,
@@ -56,7 +56,7 @@ def main():
               import_lens,
           ],
       )['WorkloadArn']
-      print(create_workload)
+      print(f"{create_workload} created.  Navigate to the Well Architected Tool AWS console to review the Workload")
     except ClientError as e:
       if e.response['Error']['Code'] == 'ConflictException':
         print("Workload already exists")
