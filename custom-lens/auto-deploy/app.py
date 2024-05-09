@@ -4,13 +4,14 @@ from botocore.exceptions import ClientError
 import os
 
 client = boto3.client('wellarchitected')
-url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
+#url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
+url = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/custom-lens-install-script/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 
 def main():
 
     AwsRegions = os.environ['Regions'].split(',')
     OwnerEmail = os.environ["Email"]
-    if OwnerEmail == "noemail@example.com": raise Exception("Please Update the Email Address!") 
+    if OwnerEmail == "noemail@example.com": raise Exception("Please Update the Email Address!")
     custom_lens_present = False
     try:
         import_lens = client.import_lens(
@@ -30,13 +31,13 @@ def main():
             current_version = custom_lens['LensVersion']
         else:
             print("Unexpected error: %s" % e)
-    
+
     try:
       create_version = client.create_lens_version(
           LensAlias=import_lens,
           LensVersion='1',
           IsMajorVersion=True
-      ) 
+      )
       print(create_version)
     except ClientError as e:
       if e.response['Error']['Code'] == 'ConflictException':
