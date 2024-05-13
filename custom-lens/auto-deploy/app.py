@@ -68,7 +68,7 @@ def get_existing_lens(lens_name):
 def create_lens_version(lens_arn):
     try:
         response = client.create_lens_version(LensAlias=lens_arn, LensVersion='1', IsMajorVersion=True)
-        print(f"Created lens version: {response['LensVersionArn']}")
+        print(f"Created lens version")
     except ClientError as e:
         if e.response['Error']['Code'] == 'ConflictException':
             print("Lens version already exists.")
@@ -105,4 +105,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

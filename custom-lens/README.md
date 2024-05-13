@@ -6,8 +6,8 @@ This directory contains [Well Architected Custom Lenses](https://docs.aws.amazon
 
 To automatically publish the Lens for use in your account follow the below steps.  Alternatively, you can manually deploy the Custom Lens json following the [Well Architected Custom Lenses](https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses-custom.html) guidance.
 
-1. Log into an AWS account.  This account will be used to hold the Well-Architected Custom Lens
-2. Run the following command adding in the regions you plan to operate in: `export Regions=[AWS Region list] Owner="CFA"; curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/auto-deploy/app.py | python3`
+1. Log into an AWS account.  This account will be used to hold the Well-Architected Custom Lens where you can track the progress of your cloud foundation.
+2. Open the CloudShell console. Copy this command and paste into the CloudShell console.  Ensure that you add in the regions that you plan to operate in: `export Regions=[AWS Region list] Owner="CFA"; curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/auto-deploy/app.py | python3`
 
     Example: `export Regions="us-east-1,us-west-2" Owner="CFA"; curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/auto-deploy/app.py | python3`
 
