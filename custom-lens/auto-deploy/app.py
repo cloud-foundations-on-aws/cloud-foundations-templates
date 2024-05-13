@@ -34,7 +34,7 @@ Note:
     It also assumes that the user has the necessary permissions to interact with the Well-Architected Tool.
 """
 
-LENS_URL = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/custom-lens/custom-lens/cloud-foundations-accelerator-custom-lens.json"
+LENS_URL = "https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/custom-lens/cloud-foundations-accelerator-custom-lens.json"
 LENS_NAME = "AWS Cloud Foundations Accelerator"
 
 client = boto3.client('wellarchitected')
