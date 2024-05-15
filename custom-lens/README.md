@@ -13,6 +13,11 @@ To automatically publish the Lens for use in your account follow the below steps
 
 3. Navigate to the Well Architected Tool console in AWS.  Choose Workloads and select 'Organization' and then click Continue Reviewing and choose AWS Cloud Foundations Accelerator.
 
+## Exporting CFA Lens to a Microsoft Excel Workbook
+
+"Tools" folder contains a [Microsoft Excel File](cloud-foundations-accelerator-workbook.xlsx), which is automatically generated out of CFA Lens JSON on each update. This file is formatted as a Project Workbook and can be used to track activities and CFA module completion instead/on top of CFA Lens execution using a Well-Architected Tool Console. 
+
+
 ## Content
 
 | Custom Lens | Description | Type |

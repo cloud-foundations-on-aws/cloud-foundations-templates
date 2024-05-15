@@ -1694,6 +1694,17 @@
               ]
             },
             {
+              "id": "document_tagging_dictionary",
+              "title": "Document a tagging dictionary",
+              "helpfulResource": {
+                "displayText": "Use an Excel template below to document list of tags defined for the environment.",
+                "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/tagging-accelerator.xlsx"
+              },
+              "improvementPlan": {
+                "displayText": "Publish the tagging dictionary internally so that all relevant stakeholders are aware of required tags"
+              }
+            },
+            {
               "id": "publish_tagging_dictionary",
               "title": "Publish a tagging dictionary",
               "helpfulResource": {
@@ -2727,6 +2738,17 @@
                 "displayText": "It is valuable to create and document an initial network design for your AWS environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
               },
+              "additionalResources": [
+                {
+                  "type": "HELPFUL_RESOURCE",
+                  "content": [
+                    {
+                      "displayText": "Document an initial network design for your AWS environment. Download a Draw.IO template file below and update it based on the selected network architecture",
+                      "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/networking_accel_reference.drawio"
+                    }
+                  ]
+                }
+              ],
               "improvementPlan": {
                 "displayText": "Document an initial network design for your AWS environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
