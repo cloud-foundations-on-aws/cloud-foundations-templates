@@ -16,6 +16,6 @@ for i in \
   '@aws-sdk/client-sso-admin' \
    ; do npm install "$i" --silent; done
 
-echo "installation complete, starting pathfinder..."
-download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/cfat/pathfinder/dist/pathfinder.js"
+echo "installation complete, starting CFAT..."
+download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/cfat/cfat/dist/cfat.js"
 curl -sS $download_url | node

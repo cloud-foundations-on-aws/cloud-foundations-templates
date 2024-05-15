@@ -7,8 +7,11 @@
 *.tfstate
 *.tfstate.*
 
-pathfinder/node_modules
+cfat/node_modules
 node_modules/**/*
-pathfinder/build
-pathfinder/Pathfinder.txt
-pathfinder/pathfinder.txt
+cfat/build
+cfat/Pathfinder.txt
+cfat/pathfinder.txt
+cfat/cfat.txt
+cfat/node_modules/*
+cfat/build/*

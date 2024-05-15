@@ -1,11 +1,13 @@
 import { DelegatedServices } from "@aws-sdk/client-organizations";
 
 export interface CfatCheck {
-  title:string;
+  task:string;
   description:string;
-  pass:boolean;
+  status:string;
   required:boolean;
-  weight:number 
+  weight:number
+  loe:number
+  remediationLink?: string;
 }
 
 export interface AccountType {
@@ -79,7 +81,7 @@ export interface PolicyTypesEnabled {
   backupPolicyEnabled: boolean;
 };
 
-export interface OrgDelegatedAdminAccounts {
+export interface OrgDelegatedAdminAccount {
   accountName?: string;
   services?: DelegatedServices[];
 }
@@ -93,4 +95,33 @@ export interface ConfigInfo {
 export interface OrgMemberAccount {
   accountName?: string;
   accountEmail?: string;
+}
+
+export interface CloudFoundationAssessment {
+  organizationDeploy?: Boolean;
+  managementAccount?: Boolean;
+  isLegacyCurSetup?: Boolean;
+  vpcChecks?: VpcCheck[];
+  ec2Checks?: Ec2Check[];
+  iamUserChecks?: IamUserInfo[];
+  orgArn?: string,
+  orgId?: string,
+  orgRootOuId?: string;
+  orgServices?: OrgService[]
+  orgCloudFormationStatus?: string;
+  orgMemberAccounts?: OrgMemberAccount[];
+  orgDelegatedAdminAccounts?: OrgDelegatedAdminAccount[];
+  orgOuInfo?: OUInfo[];
+  controlTowerRegion?: string;
+  controlTowerLatestAvailableVersion?: string;
+  controlTowerDeployedVersion?: string
+  controlTowerDriftStatus?: string;
+  controlTowerStatus?: string;
+  scpEnabled?: boolean;
+  tagPolicyEnabled?: boolean;
+  backupPolicyEnabled?: boolean;
+  configDetails?: ConfigInfo[];
+  cloudTrailDetails?: CloudTrailInfo[];
+  idcInfo?: IdCInfo;
+  cfatChecks?: CfatCheck[];
 }
