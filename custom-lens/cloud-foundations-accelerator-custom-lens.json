@@ -1667,10 +1667,10 @@
           "description": "A tag is a key-value pair applied to a resource to hold metadata about that resource. Each tag is a label consisting of a key and an optional value. Not all services and resource types currently support tags. It is essential to define a strategy to tag your resources as soon as possible during your cloud journey. As your overall environment expands and matures, this will enable you to identify resources or groups of resources quickly. When defining your tagging strategy, you need to determine the right tags that will help you gather all of the information across your environment.",
           "choices": [
             {
-              "id": "define_initial_tagging_dictionary",
-              "title": "Define initial tagging dictionary",
+              "id": "document_initial_tagging_dictionary",
+              "title": "Document initial tagging dictionary",
               "helpfulResource": {
-                "displayText": "A tag dictionary is a documented set of tags that you will use.  As part of your initial tagging dictionary, define a minimum set of mandatory or optional tags for all supported resources.  Reference the Choosing tags for your environment section of the Establishing Your Cloud Foundation on AWS whitepaper to choose an initial set of tags to start your tagging dictionary.",
+                "displayText": "A tag dictionary is a documented set of tags that you will use.  As part of your initial tagging dictionary, define a minimum set of mandatory or optional tags for all supported resources.  You can use the linked Excel template to document the tags defined for the environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/tagging-capability.html"
               },
               "improvementPlan": {
@@ -1682,27 +1682,16 @@
                   "type": "HELPFUL_RESOURCE",
                   "content": [
                     {
-                      "displayText": "Choosing tags for your environment section of the Establishing Your Cloud Foundation on AWS whitepaper.",
-                      "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/choosing-tags.html"
+                      "displayText": "Tagging spreadhsheet template for defining your tags.",
+                      "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/tagging-accelerator.xlsx"
                     },
                     {
-                      "displayText": "Building your tagging strategy section of the Best Practices for Tagging AWS Resources whitepaper.",
-                      "url": "https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/building-your-tagging-strategy.html"
+                      "displayText": "Choosing tags for your environment section of the Establishing Your Cloud Foundation on AWS whitepaper.",
+                      "url": "https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/choosing-tags.html"
                     }
                   ]
                 }
               ]
-            },
-            {
-              "id": "document_tagging_dictionary",
-              "title": "Document a tagging dictionary",
-              "helpfulResource": {
-                "displayText": "Use an Excel template below to document list of tags defined for the environment.",
-                "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/tagging-accelerator.xlsx"
-              },
-              "improvementPlan": {
-                "displayText": "Publish the tagging dictionary internally so that all relevant stakeholders are aware of required tags"
-              }
             },
             {
               "id": "publish_tagging_dictionary",
@@ -1726,11 +1715,11 @@
           ],
           "riskRules": [
             {
-              "condition": "define_initial_tagging_dictionary && publish_tagging_dictionary",
+              "condition": "document_initial_tagging_dictionary && publish_tagging_dictionary",
               "risk": "NO_RISK"
             },
             {
-              "condition": "define_initial_tagging_dictionary && publish_tagging_dictionary",
+              "condition": "document_initial_tagging_dictionary && publish_tagging_dictionary",
               "risk": "MEDIUM_RISK"
             },
             {
@@ -1782,7 +1771,7 @@
             },
             {
               "id": "validate_tag_compliance",
-              "title": "Evaluate organization-wide compliance with a tag policy.",
+              "title": "Evaluate organization-wide compliance with a tag policy",
               "helpfulResource": {
                 "displayText": "Start evaluating your organization's compliance with its effective tag policy. Generate a report that lists all tagged resources in accounts across your organization and whether each resource is compliant with the effective tag policy.",
                 "url": "https://docs.aws.amazon.com/tag-editor/latest/userguide/tag-policies-orgs-evaluating-org-wide-compliance.html"
@@ -2179,7 +2168,7 @@
               "id": "deploy_instance_scheduler_on_aws",
               "title": "Deploy Instance Scheduler on AWS",
               "helpfulResource": {
-                "displayText": "The Instance Scheduler on AWS solution automates the starting and stopping of Amazon Elastic Compute Cloud (Amazon EC2) and Amazon Relational Database Service (Amazon RDS) instances.  Deploy Instance Scheduler on AWS Solution to the Organization following the Implementation Guide.",
+                "displayText": "The Instance Scheduler on AWS solution automates the starting and stopping of Amazon Elastic Compute Cloud (Amazon EC2) and Amazon Relational Database Service (Amazon RDS) instances in accounts you define using AWS Tags.  Deploy Instance Scheduler on AWS Solution to the Organization following the Implementation Guide.",
                 "url": "https://docs.aws.amazon.com/solutions/latest/instance-scheduler-on-aws/deployment.html"
               },
               "improvementPlan": {
@@ -2679,30 +2668,6 @@
               }
             },
             {
-              "id": "aws_vpn",
-              "title": "AWS VPN",
-              "helpfulResource": {
-                "displayText": "AWS Client VPN is used by your remote workforce to securely access resources both on AWS and within your on-premises networks. AWS Site-to-Site VPN creates encrypted connections between your locations (such as data centers and remote offices) and your AWS resources.",
-                "url": "https://aws.amazon.com/vpn/"
-              },
-              "improvementPlan": {
-                "displayText": "Review AWS Client VPN and AWS site-to-site VPN.",
-                "url": "https://aws.amazon.com/vpn/"
-              }
-            },
-            {
-              "id": "aws_direct_connect",
-              "title": "AWS Direct Connect",
-              "helpfulResource": {
-                "displayText": "AWS Direct Connect links your internal network to an AWS Direct Connect location over a standard Ethernet fiber-optic cable. One end of the cable is connected to your router, the other to an AWS Direct Connect router. With this connection, you can create virtual interfaces directly to public AWS services (for example, to Amazon S3) or to Amazon VPC, bypassing internet service providers in your network path. An AWS Direct Connect location provides access to AWS in the Region with which it is associated. You can use a single connection in a public Region or AWS GovCloud (US) to access public AWS services in all other public Regions.",
-                "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
-              },
-              "improvementPlan": {
-                "displayText": "Review the guidance for AWS Direct Connect.",
-                "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
-              }
-            },
-            {
               "id": "none_no",
               "title": "None of these",
               "helpfulResource": {
@@ -2738,21 +2703,21 @@
                 "displayText": "It is valuable to create and document an initial network design for your AWS environment.",
                 "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
               },
+              "improvementPlan": {
+                "displayText": "Document an initial network design for your AWS environment.",
+                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
+              },
               "additionalResources": [
                 {
                   "type": "HELPFUL_RESOURCE",
                   "content": [
                     {
-                      "displayText": "Document an initial network design for your AWS environment. Download a Draw.IO template file below and update it based on the selected network architecture",
+                      "displayText": "Download the linked Draw.IO template file and update it based on the selected network architecture",
                       "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/networking_accel_reference.drawio"
                     }
                   ]
                 }
-              ],
-              "improvementPlan": {
-                "displayText": "Document an initial network design for your AWS environment.",
-                "url": "https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html"
-              }
+              ]
             },
             {
               "id": "design_vpcs_and_cidrs",
