@@ -1,8 +1,8 @@
 name: Generate XLS Workbook from CFA Lens
 
 on: 
-  merge_group:
-
+  push:
+    
 jobs:
   run-script:
     runs-on: ubuntu-latest
