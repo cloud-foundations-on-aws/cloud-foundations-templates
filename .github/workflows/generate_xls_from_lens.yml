@@ -19,7 +19,7 @@ jobs:
         if [ -f custom-lens/tools/python/requirements.txt ]; then pip install -r custom-lens/tools/python/requirements.txt; fi
         
     - name: Generate XLS from a JSON
-      run: python custom-lens/tools/python/json-2-xls.py -s ../../cloud-foundations-accelerator-custom-lens.json -d cloud-foundations-accelerator-workbook.xlsx
+      run: python custom-lens/tools/python/json-2-xls.py -s custom-lens/cloud-foundations-accelerator-custom-lens.json -d custom-lens/cloud-foundations-accelerator-workbook.xlsx
         
     - name: Commit and push changes
       run: |
