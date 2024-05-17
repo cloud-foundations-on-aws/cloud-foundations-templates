@@ -1,6 +1,7 @@
 name: Generate XLS Workbook from CFA Lens
 
-on: [push]
+on: 
+  merge_group:
 
 jobs:
   run-script:
@@ -18,6 +19,10 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f custom-lens/tools/python/requirements.txt ]; then pip install -r custom-lens/tools/python/requirements.txt; fi
         
+    - name: Convert YAML to JSON
+      run: |
+        yq -p json -o yaml custom-lens/yaml/cloud-foundations-accelerator-custom-lens.yaml > custom-lens/cloud-foundations-accelerator-custom-lens.json
+    
     - name: Generate XLS from a JSON
       run: python custom-lens/tools/python/json-2-xls.py -s custom-lens/cloud-foundations-accelerator-custom-lens.json -d custom-lens/cloud-foundations-accelerator-workbook.xlsx
         
