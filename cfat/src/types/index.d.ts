@@ -97,6 +97,12 @@ export interface OrgMemberAccount {
   accountEmail?: string;
 }
 
+export interface Task {
+  title: string,
+  category?: string,
+  detail?:string
+}
+
 export interface CloudFoundationAssessment {
   organizationDeploy?: Boolean;
   managementAccount?: Boolean;
@@ -124,4 +130,17 @@ export interface CloudFoundationAssessment {
   cloudTrailDetails?: CloudTrailInfo[];
   idcInfo?: IdCInfo;
   cfatChecks?: CfatCheck[];
+}
+
+interface JiraCSVData {
+  [key: string]: {
+    Summary: string;
+    Description: string;
+    Status: string;
+  };
+}
+
+interface CSVOptions {
+  headers?: { [key: string]: string };
+  filename?: string;
 }

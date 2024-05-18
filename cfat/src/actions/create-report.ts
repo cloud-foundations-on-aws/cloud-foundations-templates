@@ -1,7 +1,8 @@
-import { CloudFoundationAssessment } from '../types';
-import * as tasks from './tasks.js';
+import { DetachClassicLinkVpcCommand } from '@aws-sdk/client-ec2';
+import { CloudFoundationAssessment, Task } from '../types';
 import { Console } from 'node:console'
 import { Transform } from 'node:stream'
+import * as fs from 'fs';
 
 const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
 const logger = new Console({ stdout: ts })
@@ -11,7 +12,8 @@ function getTable (data:any) {
   return (ts.read() || '').toString()
 }
 
-async function createReport(assessment:CloudFoundationAssessment): Promise<string> {
+async function createReport(assessment:CloudFoundationAssessment): Promise<Task[]> {
+  let tasks:Task[] = [];
   let dateTime = new Date()
   const reportFile = "./cfat.txt"
   let report:string = "Cloud Foundation Assessment Tool"
@@ -100,35 +102,38 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
 		report+=`\n  No AWS Config resource discovered`;
 	}
   report+=`\n\nMANAGEMENT ACCOUNT RECOMMENDED TASKS:`;
-  let mgtTaskNumber:number = 1
-  const managementAccountWaypoint:string = "Management Account"
+  const maCategory:string = "Management Account"
   if (assessment.iamUserChecks && assessment.iamUserChecks.length > 0) {
     for(const iamUser of assessment.iamUserChecks){
-      const message:string = await tasks.removeIamUserTask(mgtTaskNumber, managementAccountWaypoint, iamUser.userName)
+      let iamTask:Task={title:'Remove IAM user', category: maCategory, detail: `Remove IAM user ${iamUser.userName}`}
+      const message:string = `${iamTask.title} - ${iamTask.category} - ${iamTask.detail}`
+      tasks.push(iamTask);
       report+=`\n  ${ message }`;
-      mgtTaskNumber++
       if(iamUser.accessKeyId){
-        const message:string = await tasks.removeIamUserApiKeyTask(mgtTaskNumber, managementAccountWaypoint, iamUser.userName, iamUser.accessKeyId)
+        let iamApiTask:Task={title:'Remove IAM user', category: maCategory, detail: `Remove IAM user API key ${iamUser.accessKeyId} for ${iamUser.userName}`}
+        const message:string = `${iamApiTask.title} - ${iamApiTask.category} - ${iamApiTask.detail}`
         report+=`\n  ${ message }`;
-        mgtTaskNumber++
+        tasks.push(iamApiTask);
       }
     }
   }
   if(assessment.ec2Checks && assessment.ec2Checks.find(param => param.ec2Found === true)){
     for (const ec2 of assessment.ec2Checks){
       if(ec2.ec2Found && ec2.region){
-        const message:string = await tasks.deleteEc2(mgtTaskNumber, managementAccountWaypoint, ec2.region );
+        let ec2Task:Task={title:'Delete EC2 instance', category: maCategory, detail: `Delete EC2 instance in ${ec2.region}`}
+        const message:string = `${ec2Task.title} - ${ec2Task.category} - ${ec2Task.detail}`
         report+=`\n  ${ message }`;
-        mgtTaskNumber++
+        tasks.push(ec2Task);
       }
     }
   }
   if(assessment.vpcChecks && assessment.vpcChecks.length >0){
     for(const vpcFind of assessment.vpcChecks){
       if(vpcFind.vpcFound && vpcFind.region){
-        const message:string = await tasks.deleteVpc(mgtTaskNumber, managementAccountWaypoint, vpcFind.region)
+        let vpcTask:Task={title:'Delete VPC', category: maCategory, detail: `Delete VPC in ${vpcFind.region}`}
+        const message:string = `${vpcTask.title} - ${vpcTask.category} - ${vpcTask.detail}`
         report+=`\n  ${ message }`;
-        mgtTaskNumber++
+        tasks.push(vpcTask);
       }
     }
   }
@@ -168,32 +173,37 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
 
   ///// SET THE BACKLOG TASK FOR GOVERNANCE /////
   report+=`\n\nGOVERNANCE RECOMMENDED TASKS:`;
-  const govWaypoint:string = "Governance"
-  let govTaskNumber: number = 1
+  const govCategory:string = "Governance"
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'cloudtrail.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(govTaskNumber, govWaypoint, "AWS CloudTrail");
+    const ctOrgServiceTask:Task = {title:'Enable AWS CloudTrail', category: govCategory, detail: `Enable AWS CloudTrail in AWS Organization`}
+    tasks.push(ctOrgServiceTask);
+    const message:string = `${ctOrgServiceTask.title} - ${ctOrgServiceTask.category} - ${ctOrgServiceTask.detail}`
     report+=`\n  ${message}`;
-    govTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'config.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(govTaskNumber, govWaypoint, "AWS Config");
+    const configOrgServiceTask:Task = {title: 'Enable AWS Config', category: govCategory, detail: `Enable AWS Config in AWS Organization`}
+    tasks.push(configOrgServiceTask);
+    const message:string = `${configOrgServiceTask.title} - ${configOrgServiceTask.category} - ${configOrgServiceTask.detail}`
     report+=`\n  ${message}`;
-    govTaskNumber++
   }
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Service Control Policy");
+    const scpEnabledTask:Task = {title: 'Enable SCP', category: govCategory, detail: `Enable SCP in AWS Organization`}
+    tasks.push(scpEnabledTask);
+    const message:string = `${scpEnabledTask.title} - ${scpEnabledTask.category} - ${scpEnabledTask.detail}`
     report+=`\n  ${message}`;
-    govTaskNumber++
+
   }
   if(!assessment.tagPolicyEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Tag Policy");
+    let tagPolicyEnabledTask:Task = {title: 'Enable Tag Policy', category: govCategory, detail: `Enable Tag Policy in AWS Organization`}
+    tasks.push(tagPolicyEnabledTask);
+    const message:string = `${tagPolicyEnabledTask.title} - ${tagPolicyEnabledTask.category} - ${tagPolicyEnabledTask.detail}`
     report+=`\n  ${message}`;
-    govTaskNumber++
   }
   if(!assessment.backupPolicyEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(govTaskNumber, govWaypoint, "Backup Policy");
+    let backupPolicyEnabledTask:Task = {title: 'Enable Backup Policy', category: govCategory, detail: `Enable Backup Policy in AWS Organization`}
+    tasks.push(backupPolicyEnabledTask);
+    const message:string = `${backupPolicyEnabledTask.title} - ${backupPolicyEnabledTask.category} - ${backupPolicyEnabledTask.detail}`
     report+=`\n  ${message}`;
-    govTaskNumber++
   }
   report+=`\n\n*********************************************************`;
   report+=`\n                FINANCIAL MANAGEMENT`;
@@ -201,10 +211,11 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
   report+=`\n\nLegacy CUR`;
   report+=`\n  Is legacy CUR setup: ${assessment.isLegacyCurSetup}`;
   report+=`\n\nCLOUD FINANCIAL MANAGEMENT RECOMMENDED TASKS:`;
-  let finTaskNumber: number = 1
-  const finWaypoint:string = "Cloud Financial Management"
+  const finCategory:string = "Cloud Financial Management"
   if(!assessment.isLegacyCurSetup){
-    const message:string = await tasks.enableAwsCur(finTaskNumber, finWaypoint);
+    const legacyCurSetupTask:Task={title:'Setup legacy CUR', category: finCategory, detail: `Setup legacy CUR in AWS Organization`}
+    tasks.push(legacyCurSetupTask);
+    const message:string = `${legacyCurSetupTask.title} - ${legacyCurSetupTask.category} - ${legacyCurSetupTask.detail}`
     report+=`\n  ${message}`;
   }
   report+=`\n\n*********************************************************`;
@@ -300,40 +311,45 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
     report+=`\n  No delegated admin accounts in AWS Organization`;
   }
   report+=`\n\nMULTI-ACCOUNT STRATEGY RECOMMENDED TASKS:`;
-  let masTaskNumber: number = 1;
-  let masWaypoint:string = 'Multi-Account Strategy';
-  const message:string = await tasks.reviewAccountEmailAddresses(masTaskNumber, masWaypoint);
+  let masCategory:string = 'Multi-Account Strategy';
+  const accountEmailReviewTask:Task = {title: 'Review Account Email Addresses', category: masCategory, detail: `Review Account Email Addresses in AWS Organization`}
+  const message:string = `${accountEmailReviewTask.title} - ${accountEmailReviewTask.category} - ${accountEmailReviewTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(masTaskNumber, masWaypoint, "Service Control Policy");
+    const scpEnabledTask:Task = {title: 'Enable Service Control Policy', category: masCategory, detail: `Enable Service Control Policy in AWS Organization`}
+    tasks.push(scpEnabledTask);
+    const message:string = `${scpEnabledTask.title} - ${scpEnabledTask.category} - ${scpEnabledTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
   if(!transitionalFound){
-    const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Transitional");
+    const transitionalTask:Task = {title: 'Deploy Transitional OU', category: masCategory, detail: `Deploy Transitional OU in AWS Organization`}
+    tasks.push(transitionalTask);
+    const message:string = `${transitionalTask.title} - ${transitionalTask.category} - ${transitionalTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
   if(!suspendedFound){
-    const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Suspended");
+    const suspendedTask:Task = {title: 'Deploy Suspended OU', category: masCategory, detail: `Deploy Suspended OU in AWS Organization`}
+    tasks.push(suspendedTask);
+    const message:string = `${suspendedTask.title} - ${suspendedTask.category} - ${suspendedTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
   if(!workloadsFound){
-    const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Workloads");
+    const workloadsTask:Task = {title: 'Deploy Workloads OU', category: masCategory, detail: `Deploy Workloads OU in AWS Organization`}
+    tasks.push(workloadsTask);
+    const message:string = `${workloadsTask.title} - ${workloadsTask.category} - ${workloadsTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
   if(!securityFound){
-    const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Security");
+    const securityTask:Task = {title: 'Deploy Security OU', category: masCategory, detail: `Deploy Security OU in AWS Organization`}
+    tasks.push(securityTask);
+    const message:string = `${securityTask.title} - ${securityTask.category} - ${securityTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
   if(!infrastructureFound){
-    const message:string = await tasks.deployOuTask(masTaskNumber, masWaypoint, "Infrastructure");
+    const infrastructureTask:Task = {title: 'Deploy Infrastructure OU', category: masCategory, detail: `Deploy Infrastructure OU in AWS Organization`}
+    tasks.push(infrastructureTask);
+    const message:string = `${infrastructureTask.title} - ${infrastructureTask.category} - ${infrastructureTask.detail}`
     report+=`\n  ${message}`;
-    masTaskNumber++
   }
 
   report+=`\n\n*********************************************************`;
@@ -353,26 +369,28 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
   let lzTaskNumber: number = 1
   const lzWaypoint:string = "Landing Zone"
   if(assessment.controlTowerRegion === undefined){
-    const message:string = await tasks.deployControlTowerTask(lzTaskNumber, lzWaypoint);
+    const deployControlTowerTask:Task = {title: 'Deploy AWS Control Tower', category: lzWaypoint, detail: `Deploy AWS Control Tower in AWS Organization`}
+    tasks.push(deployControlTowerTask);
+    const message:string = `${deployControlTowerTask.title} - ${deployControlTowerTask.category} - ${deployControlTowerTask.detail}`
     report+=`\n  ${message}`;
-    lzTaskNumber++
   }
   if(assessment.controlTowerDriftStatus === 'DRIFTED'){
-    const message:string = await tasks.fixLzDrift(lzTaskNumber, lzWaypoint);
+    const fixLzDriftTask:Task = {title: 'Fix drift in deployed landing zone', category: lzWaypoint, detail: `Fix drift in deployed landing zone`}
+    tasks.push(fixLzDriftTask);
+    const message:string = `${fixLzDriftTask.title} - ${fixLzDriftTask.category} - ${fixLzDriftTask.detail}`
     report+=`\n  ${message}`;
-    lzTaskNumber++
   }
   if(assessment.controlTowerDeployedVersion !== assessment.controlTowerLatestAvailableVersion){
-    const currentVersion:string = assessment.controlTowerDeployedVersion ?? ""
-    const latestVersion:string = assessment.controlTowerLatestAvailableVersion ?? ""
-    const message:string = await tasks.updateLzControlTowerTask(lzTaskNumber, lzWaypoint, currentVersion, latestVersion);
+    const updateControlTowerTask:Task = {title: `Update AWS Control Tower to latest version`, category: lzWaypoint, detail: `Update AWS Control Tower to version ${assessment.controlTowerLatestAvailableVersion}`}
+    tasks.push(updateControlTowerTask);
+    const message:string = `${updateControlTowerTask.title} - ${updateControlTowerTask.category} - ${updateControlTowerTask.detail}`
     report+=`\n  ${message}`;
-    lzTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'member.org.stacksets.cloudformation.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(lzTaskNumber, lzWaypoint, "AWS CloudFormation");
+    const orgServiceCfnEnableTask:Task = {title: 'Enable AWS CloudFormation', category: lzWaypoint, detail: `Enable AWS CloudFormation in AWS Organization`}
+    tasks.push(orgServiceCfnEnableTask);
+    const message:string = `${orgServiceCfnEnableTask.title} - ${orgServiceCfnEnableTask.category} - ${orgServiceCfnEnableTask.detail}`
     report+=`\n  ${message}`;
-    lzTaskNumber++
   }
   report+=`\n\n*********************************************************`;
   report+=`\n                    IDENTITY`;
@@ -386,23 +404,25 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
     report+=`\n\nAWS IAM IDENTITY CENTER NOT FOUND\n`;
   }
   report+=`\n\nIDENTITY RECOMMENDED TASKS:`;
-  let ssoTaskNumber: number = 1
-  const ssoWaypoint:string = 'Identity'
+  const ssoCategory:string = 'Identity'
 
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'sso.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(ssoTaskNumber, ssoWaypoint, "AWS IAM Identity Center");
+    const ssoTask:Task = {title: 'Enable AWS Single Sign-On', category: ssoCategory, detail: `Enable AWS Single Sign-On in AWS Organization`}
+    tasks.push(ssoTask);
+    const message:string = `${ssoTask.title} - ${ssoTask.category} - ${ssoTask.detail}`
     report+=`\n  ${message}`;
-    ssoTaskNumber++
   }
   if(!identityDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(ssoTaskNumber, ssoWaypoint, "AWS IAM Identity Center");
+    const identityDelegatedTask:Task = {title: 'Delegate administration to AWS IAM Identity Center', category: ssoCategory, detail: `Delegate administration to AWS IAM Identity Center`}
+    tasks.push(identityDelegatedTask);
+    const message:string = `${identityDelegatedTask.title} - ${identityDelegatedTask.category} - ${identityDelegatedTask.detail}`
     report+=`\n  ${message}`;
-    ssoTaskNumber++
   }
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(ssoTaskNumber, ssoWaypoint, "Service Control Policy");
+    const ssoTask:Task = {title: 'Enable AWS Single Sign-On', category: ssoCategory, detail: `Enable AWS Single Sign-On in AWS Organization`}
+    tasks.push(ssoTask);
+    const message:string = `${ssoTask.title} - ${ssoTask.category} - ${ssoTask.detail}`
     report+=`\n  ${message}`;
-    ssoTaskNumber++
   }
   report+=`\n\n*********************************************************`;
   report+=`\n                    SECURITY`;
@@ -432,141 +452,165 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<strin
   if(assessment.orgServices && assessment.orgServices.find(param=> param.service === 'config.amazonaws.com')){
     report+=`\n  AWS Config`;
   }
-  report+=`\n\nSECURITY RECOMMENDED TASKS:`;
-  let secTaskNumber: number = 1
-  const secWaypoint:string = "Security"
+  report+=`\n\nSECURITY TASKS:`;
+  const secCategory:string = "Security"
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(secTaskNumber, secWaypoint, "Service Control Policy");
+    const ssoTask:Task = {title: 'Enable AWS Single Sign-On', category: secCategory, detail: `Enable AWS Single Sign-On in AWS Organization`}
+    tasks.push(ssoTask);
+    const message:string = `${ssoTask.title} - ${ssoTask.category} - ${ssoTask.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'guardduty.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(secTaskNumber, secWaypoint, "AWS GuardDuty");
+    const taskGuardDutyDelegated:Task = {title: 'Delegate administration to AWS GuardDuty', category: secCategory, detail: `Delegate administration to AWS GuardDuty`}
+    tasks.push(taskGuardDutyDelegated);
+    const message:string = `${taskGuardDutyDelegated.title} - ${taskGuardDutyDelegated.category} - ${taskGuardDutyDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'securityhub.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(secTaskNumber, secWaypoint, "AWS SecurityHub");
+    const taskSecurityHubDelegated:Task = {title: 'Delegate administration to AWS Security Hub', category: secCategory, detail: `Delegate administration to AWS Security Hub`}
+    tasks.push(taskSecurityHubDelegated);
+    const message:string = `${taskSecurityHubDelegated.title} - ${taskSecurityHubDelegated.category} - ${taskSecurityHubDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
+
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'access-analyzer.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(secTaskNumber, secWaypoint, "AWS IAM Access Analyzer");
+    const taskIamAccessAnalyzerDelegated:Task = {title: 'Delegate administration to AWS IAM Access Analyzer', category: secCategory, detail: `Delegate administration to AWS IAM Access Analyzer`}
+    tasks.push(taskIamAccessAnalyzerDelegated);
+    const message:string = `${taskIamAccessAnalyzerDelegated.title} - ${taskIamAccessAnalyzerDelegated.category} - ${taskIamAccessAnalyzerDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'cloudtrail.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(secTaskNumber, secWaypoint, "AWS CloudTrail");
+    const taskCloudTrailDelegated:Task = {title: 'Delegate administration to AWS CloudTrail', category: secCategory, detail: `Delegate administration to AWS CloudTrail`}
+    tasks.push(taskCloudTrailDelegated);
+    const message:string = `${taskCloudTrailDelegated.title} - ${taskCloudTrailDelegated.category} - ${taskCloudTrailDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'config.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(secTaskNumber, secWaypoint, "AWS Config");
+    const taskConfigDelegated:Task = {title: 'Delegate administration to AWS Config', category: secCategory, detail: `Delegate administration to AWS Config`}
+    tasks.push(taskConfigDelegated);
+    const message:string = `${taskConfigDelegated.title} - ${taskConfigDelegated.category} - ${taskConfigDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!securityHubDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(secTaskNumber, secWaypoint, "Security Hub");
+    const taskSecurityHubDelegated:Task = {title: 'Delegate administration of AWS Security Hub', category: secCategory, detail: `Delegate administration to AWS Security Hub`}
+    tasks.push(taskSecurityHubDelegated);
+    const message:string = `${taskSecurityHubDelegated.title} - ${taskSecurityHubDelegated.category} - ${taskSecurityHubDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!guardDutyDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(secTaskNumber, secWaypoint, "GuardDuty");
+    const taskGuardDutyDelegated:Task = {title: 'Delegate administration of AWS GuardDuty', category: secCategory, detail: `Delegate administration to AWS GuardDuty`}
+    tasks.push(taskGuardDutyDelegated);
+    const message:string = `${taskGuardDutyDelegated.title} - ${taskGuardDutyDelegated.category} - ${taskGuardDutyDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!configDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(secTaskNumber, secWaypoint, "AWS Config");
+    const taskConfigDelegated:Task = {title: 'Delegate administration of AWS Config', category: secCategory, detail: `Delegate administration to AWS Config`}
+    tasks.push(taskConfigDelegated);
+    const message:string = `${taskConfigDelegated.title} - ${taskConfigDelegated.category} - ${taskConfigDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!iamAccessAnalyzerDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(secTaskNumber, secWaypoint, "AWS IAM Access Analyzer");
+    const taskIamAccessAnalyzerDelegated:Task = {title: 'Delegate administration of AWS IAM Access Analyzer', category: secCategory, detail: `Delegate administration to AWS IAM Access Analyzer`}
+    tasks.push(taskIamAccessAnalyzerDelegated);
+    const message:string = `${taskIamAccessAnalyzerDelegated.title} - ${taskIamAccessAnalyzerDelegated.category} - ${taskIamAccessAnalyzerDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   if(!s3StorageLensDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(secTaskNumber, secWaypoint, "S3 Storage Lens");
+    const taskS3StorageLensDelegated:Task = {title: 'Delegate administration of Amazon S3 Storage Lens', category: secCategory, detail: `Delegate administration to Amazon S3 Storage Lens`}
+    tasks.push(taskS3StorageLensDelegated);
+    const message:string = `${taskS3StorageLensDelegated.title} - ${taskS3StorageLensDelegated.category} - ${taskS3StorageLensDelegated.detail}`
     report+=`\n  ${message}`;
-    secTaskNumber++
   }
   report+=`\n\n*********************************************************`;
   report+=`\n                    NETWORK`;
   report+=`\n*********************************************************`;
 
   report+=`\n\nNETWORK RECOMMENDED TASKS:`;
-  let netTaskNumber: number = 1
-  const networkWaypoint:string = 'Network'
+  const networkCategory:string = 'Network'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'guardduty.amazonaws.com')){
-    const netGuardDutyEnableMessage:string = await tasks.enableAwsOrganizationService(netTaskNumber, networkWaypoint, "AWS GuardDuty");
-    report+=`\n  ${netGuardDutyEnableMessage}`;
-    netTaskNumber++
+    const taskGuardDutyDelegated:Task = {title: 'Enable AWS GuardDuty', category: networkCategory, detail: `Enable AWS GuardDuty in AWS Organization`}
+    tasks.push(taskGuardDutyDelegated);
+    const message:string = `${taskGuardDutyDelegated.title} - ${taskGuardDutyDelegated.category} - ${taskGuardDutyDelegated.detail}`
+    report+=`\n  ${message}`;
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'ipam.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(netTaskNumber, networkWaypoint, "AWS IPAM");
+    const orgServiceIpamTask:Task={title: 'Enable AWS IPAM', category: networkCategory, detail: `Enable AWS IPAM in AWS Organization`}
+    tasks.push(orgServiceIpamTask);
+    const message:string = `${orgServiceIpamTask.title} - ${orgServiceIpamTask.category} - ${orgServiceIpamTask.detail}`
     report+=`\n  ${message}`;
-    netTaskNumber++
   }
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'ram.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(netTaskNumber, networkWaypoint, "AWS Resource Access Manager");
+    const orgServiceRamTask:Task={title: 'Enable AWS Resource Access Manager', category: networkCategory, detail: `Enable AWS Resource Access Manager in AWS Organization`}
+    tasks.push(orgServiceRamTask);
+    const message:string = `${orgServiceRamTask.title} - ${orgServiceRamTask.category} - ${orgServiceRamTask.detail}`
     report+=`\n  ${message}`;
-    netTaskNumber++
   }
   if(!ipamDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(netTaskNumber, networkWaypoint, "AWS IPAM");
+    const taskIpamDelegated:Task = {title: 'Delegate administration of AWS IPAM', category: networkCategory, detail: `Delegate administration to AWS IPAM`}
+    tasks.push(taskIpamDelegated);
+    const message:string = `${taskIpamDelegated.title} - ${taskIpamDelegated.category} - ${taskIpamDelegated.detail}`
     report+=`\n  ${message}`;
-    netTaskNumber++
   }
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(netTaskNumber, networkWaypoint, "Service Control Policy");
+    const taskScpDelegated:Task = {title: 'Enable AWS Service Control Policy', category: networkCategory, detail: `Enable AWS Service Control Policy in AWS Organization`}
+    tasks.push(taskScpDelegated);
+    const message:string = `${taskScpDelegated.title} - ${taskScpDelegated.category} - ${taskScpDelegated.detail}`
     report+=`\n  ${message}`;
-    netTaskNumber++
-	}
+  }
   report+=`\n\n*********************************************************`;
   report+=`\n                  OBSERVABILITY`;
   report+=`\n*********************************************************`;
-  
+
   report+=`\n\nOBSERVABILITY RECOMMENDED TASKS:`;
-  let obTaskNumber: number = 1
-  const obWaypoint:string = 'Observability'
+  const obCategory:string = 'Observability'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'account.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(obTaskNumber, obWaypoint, "Account Manager");
+    const orgServiceAccountTask:Task={title: 'Enable AWS Account', category: obCategory, detail: `Enable AWS Account in AWS Organization`}
+    tasks.push(orgServiceAccountTask);
+    const message:string = `${orgServiceAccountTask.title} - ${orgServiceAccountTask.category} - ${orgServiceAccountTask.detail}`
     report+=`\n  ${message}`;
-    obTaskNumber++
   }
   if(!accountDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(obTaskNumber, obWaypoint, "Account Manager");
+    const taskAccountDelegated:Task = {title: 'Delegate administration of AWS Account', category: obCategory, detail: `Delegate administration to AWS Account`}
+    tasks.push(taskAccountDelegated);
+    const message:string = `${taskAccountDelegated.title} - ${taskAccountDelegated.category} - ${taskAccountDelegated.detail}`
     report+=`\n  ${message}`;
-    obTaskNumber++
   }
   report+=`\n\n*********************************************************`;
   report+=`\n               BACKUP AND RECOVERY`;
   report+=`\n*********************************************************`;
   report+=`\n\nBACKUP AND RECOVERY RECOMMENDED TASKS:`;
-  let backTaskNumber: number = 1
   const backupWaypoint:string = 'Backup and Recovery'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'backup.amazonaws.com')){
-    const message:string = await tasks.enableAwsOrganizationService(backTaskNumber, backupWaypoint, "AWS Backup");
+    const orgServiceBackupTask:Task={title: 'Enable AWS Backup', category: backupWaypoint, detail: `Enable AWS Backup in AWS Organization`}
+    tasks.push(orgServiceBackupTask);
+    const message:string = `${orgServiceBackupTask.title} - ${orgServiceBackupTask.category} - ${orgServiceBackupTask.detail}`
     report+=`\n  ${message}`;
-    backTaskNumber++
   }
   if(!backupDelegated){
-    const message:string = await tasks.delegateAdministrationAwsService(backTaskNumber, backupWaypoint, "AWS Backup");
+    const taskBackupDelegated:Task = {title: 'Delegate administration of AWS Backup', category: backupWaypoint, detail: `Delegate administration to AWS Backup`}
+    tasks.push(taskBackupDelegated);
+    const message:string = `${taskBackupDelegated.title} - ${taskBackupDelegated.category} - ${taskBackupDelegated.detail}`
     report+=`\n  ${message}`;
-    backTaskNumber++
   }
   if(!assessment.backupPolicyEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(backTaskNumber, backupWaypoint, "Backup Policy");
+    const backupPolicyEnabledTask:Task = {title: 'Enable AWS Backup Policy', category: backupWaypoint, detail: `Enable AWS Backup Policy in AWS Organization`}
+    tasks.push(backupPolicyEnabledTask);
+    const message:string = `${backupPolicyEnabledTask.title} - ${backupPolicyEnabledTask.category} - ${backupPolicyEnabledTask.detail}`
     report+=`\n  ${message}`;
-    backTaskNumber++
   }
   if(!assessment.scpEnabled) {
-    const message:string = await tasks.enablePolicyTypeTask(backTaskNumber, backupWaypoint, "Service Control Policy");
+    const enablePolicyTypeTask:Task = {title: 'Enable AWS Service Control Policy', category: backupWaypoint, detail: `Enable AWS Service Control Policy in AWS Organization`}
+    tasks.push(enablePolicyTypeTask);
+    const message:string = `${enablePolicyTypeTask.title} - ${enablePolicyTypeTask.category} - ${enablePolicyTypeTask.detail}`
     report+=`\n  ${message}`;
-    backTaskNumber++
   }
   report+=`\n\n\n  END REVIEW`;
-  return report
+  const reportFilePath:string = "./cfat.txt"
+	console.log(`compiling report...`)
+	console.log(`saving report to ./cfat/cfat.txt...`)
+  fs.appendFileSync(reportFilePath, report);
+
+  return tasks
 }
 
 export default createReport;

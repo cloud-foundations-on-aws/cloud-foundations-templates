@@ -16,13 +16,29 @@ import getOrgMemberAccounts from './src/actions/get-org-member-accounts.js';
 import getControlTower from './src/actions/check-control-tower.js';
 import checkLegacyCur from './src/actions/check-legacy-cur.js';
 import createReport from './src/actions/create-report.js'
-import * as tasks from './src/actions/tasks.js';
-import { CfatCheck, CloudFoundationAssessment } from './src/types/index.js';
+import createJiraImport from './src/actions/create-jiraimport.js'
+import { CfatCheck, CloudFoundationAssessment, Task } from './src/types/index.js';
+import zipAssessmentFiles from './src/actions/zip-assessment.js'
 import * as fs from 'fs';
+import createAsanaImport from './src/actions/create-asanaimport.js';
+
+function objectToCSV(data: Record<string, any> | Record<string, any>[]): string {
+  const dataArray = Array.isArray(data) ? data : [data];
+  const keys = dataArray.length > 0 ? Object.keys(dataArray[0]) : [];
+  const rows = [keys.join(',')];
+  for (const obj of dataArray) {
+    const values = keys.map(key => {
+      const value = obj[key];
+      return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value;
+    });
+    rows.push(values.join(','));
+  }
+  return rows.join('\n');
+}
 
 const main = async (): Promise<void> => {
 	let report:CloudFoundationAssessment = {};
-  let CfatChecks:CfatCheck[] = [];
+  let cfatChecks:CfatCheck[] = [];
 	const region =  process.env.AWS_REGION || 'us-east-1';
 	const allRegions = await getAllRegions();
 	console.log("discovering your AWS environment...")
@@ -252,16 +268,16 @@ const main = async (): Promise<void> => {
 		console.warn(message);
 	}
 
-	////SCORING
 	let OrgCheck:CfatCheck = {
 		task: "AWS Organization created",
 		description: "AWS Organization is enabled.",
 		status: accountType.isInOrganization ? "complete": "incomplete",
 		required: true,
 		weight: 6,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(OrgCheck);
+	cfatChecks.push(OrgCheck);
 
 	let MACheck:CfatCheck = {
 		task: "Management Account created",
@@ -269,9 +285,10 @@ const main = async (): Promise<void> => {
 		status: cfatManagementAccountPass ? "complete": "incomplete",
 		required: true,
 		weight: 6,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(MACheck);
+	cfatChecks.push(MACheck);
 
 	const cfatIamUserCheck:CfatCheck = {
 		task: "Management Account IAM Users removed",
@@ -279,9 +296,10 @@ const main = async (): Promise<void> => {
 		status: cfatIamUserPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatIamUserCheck);
+	cfatChecks.push(cfatIamUserCheck);
 
 	const cfatEc2Check:CfatCheck = {
 		task: "Management Account EC2 instances removed",
@@ -289,9 +307,10 @@ const main = async (): Promise<void> => {
 		status: cfatEc2Pass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatEc2Check);
+	cfatChecks.push(cfatEc2Check);
 
 	const cfatVpcCheck:CfatCheck = {
 		task: "Management Account VPCs removed",
@@ -302,7 +321,17 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/network/network-default-vpc-deletion/README.md"
 	}
-	CfatChecks.push(cfatVpcCheck);
+	cfatChecks.push(cfatVpcCheck);
+
+	const cfatLegacyCurCheck:CfatCheck = {
+		task: "Legacy CUR setup",
+		description: "Legacy Cost and Usage Report (CUR) should be setup or data exports.",
+		status: report.isLegacyCurSetup  ? "complete": "incomplete",
+		required: false,
+		weight: 4,
+		loe: 1,
+		remediationLink: " "
+	}
 
 	const cfatCloudTrailCheck:CfatCheck = {
 		task: "CloudTrail Trail created",
@@ -313,7 +342,7 @@ const main = async (): Promise<void> => {
 		loe: 3,
 		remediationLink: "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html"
 	}
-	CfatChecks.push(cfatCloudTrailCheck);
+	cfatChecks.push(cfatCloudTrailCheck);
 
 	const cfatCloudTrailOrgServiceEnabledCheck:CfatCheck = {
 		task: "CloudTrail Organization Service enabled",
@@ -324,7 +353,7 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink:"https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-cloudtrail.html"
 	}
-	CfatChecks.push(cfatCloudTrailOrgServiceEnabledCheck);
+	cfatChecks.push(cfatCloudTrailOrgServiceEnabledCheck);
 
 	const cfatCloudTrailOrgTrailCheck:CfatCheck = {
 		task: "CloudTrail Org Trail deployed",
@@ -335,7 +364,7 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink:"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html"
 	}
-	CfatChecks.push(cfatCloudTrailOrgTrailCheck);
+	cfatChecks.push(cfatCloudTrailOrgTrailCheck);
 
 	const cfatConfigManagementAccountCheck:CfatCheck = {
 		task: "Config Recorder in Management Account configured",
@@ -346,7 +375,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://aws.amazon.com/blogs/mt/managing-aws-organizations-accounts-using-aws-config-and-aws-cloudformation-stacksets/"
 	}
-	CfatChecks.push(cfatConfigManagementAccountCheck);
+	cfatChecks.push(cfatConfigManagementAccountCheck);
 
 	const cfatConfigRecorderManagementAccountCheck:CfatCheck= {
 		task: "Config Delivery Channel in Management Account configured",
@@ -357,7 +386,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://aws.amazon.com/blogs/mt/managing-aws-organizations-accounts-using-aws-config-and-aws-cloudformation-stacksets/"
 	}
-	CfatChecks.push(cfatConfigRecorderManagementAccountCheck);
+	cfatChecks.push(cfatConfigRecorderManagementAccountCheck);
 
 	const cfatCloudFormationEnableCheck:CfatCheck = {
 		task: "CloudFormation StackSets activated",
@@ -368,7 +397,7 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-cloudformation.html#integrate-enable-ta-cloudformation"
 	}
-	CfatChecks.push(cfatCloudFormationEnableCheck);
+	cfatChecks.push(cfatCloudFormationEnableCheck);
 
 	const cfatOrgServiceGuardDutyCheck:CfatCheck = {
 		task: "GuardDuty Organization service enabled",
@@ -376,9 +405,10 @@ const main = async (): Promise<void> => {
 		status: cfatOrgServiceGuardDutyEnabledPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatOrgServiceGuardDutyCheck);
+	cfatChecks.push(cfatOrgServiceGuardDutyCheck);
 
 	const cfatOrgServiceRamCheck:CfatCheck = {
 		task: "RAM Organization service enabled",
@@ -386,9 +416,10 @@ const main = async (): Promise<void> => {
 		status: cfatOrgServiceRamEnabledPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatOrgServiceRamCheck);
+	cfatChecks.push(cfatOrgServiceRamCheck);
 
 	const cfatOrgServiceSecurityHubCheck:CfatCheck = {
 		task: "Security Hub Organization service enabled",
@@ -396,9 +427,10 @@ const main = async (): Promise<void> => {
 		status: cfatOrgServiceSecurityHubEnabledPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatOrgServiceSecurityHubCheck);
+	cfatChecks.push(cfatOrgServiceSecurityHubCheck);
 
 	const cfatOrgServiceIamAccessAnalyzerCheck:CfatCheck = {
 		task: "IAM Access Analyzer Organization service enabled",
@@ -406,9 +438,10 @@ const main = async (): Promise<void> => {
 		status: cfatOrgServiceIamAccessAnalyzerEnabledPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatOrgServiceIamAccessAnalyzerCheck);
+	cfatChecks.push(cfatOrgServiceIamAccessAnalyzerCheck);
 
 	const cfatOrgServiceConfigCheck:CfatCheck = {
 		task: "Config Organization service enabled",
@@ -416,20 +449,31 @@ const main = async (): Promise<void> => {
 		status: cfatOrgServiceAwsConfigEnabledPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
-		loe: 1
+		loe: 1,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatOrgServiceConfigCheck);
+	cfatChecks.push(cfatOrgServiceConfigCheck);
 
 	const cfatOrgServiceCloudFormationCheck:CfatCheck = {
 		task: "CloudFormation Organization service enabled",
 		description: "CloudFormation trusted access should be enabled in the AWS Organization.",
-		status: cfatBackupPoliciesEnabledPass ? "complete": "incomplete",
+		status: cfatOrgCloudFormationStatusPass ? "complete": "incomplete",
 		required: false,
 		weight: 5,
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-orgs-activate-trusted-access.html"
 	}
-	CfatChecks.push(cfatOrgServiceCloudFormationCheck)
+	cfatChecks.push(cfatOrgServiceCloudFormationCheck)
+
+	const cfatOrgServiceBackupCheck:CfatCheck = {
+		task: "Backup Organization service enabled",
+		description: "Backup trusted access should be enabled in the AWS Organization.",
+		status: cfatOrgServiceBackupEnabledPass ? "complete": "incomplete",
+		required: false,
+		weight: 4,
+		loe: 1,
+		remediationLink: " "
+	}
 
 	const cfatInfraOuCheck:CfatCheck = {
 		task: "Top-level Infrastructure OU deployed",
@@ -440,7 +484,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou"
 	}
-	CfatChecks.push(cfatInfraOuCheck);
+	cfatChecks.push(cfatInfraOuCheck);
 
 	const cfatSecurityOuCheck:CfatCheck = {
 		task: "Top-level Security OU deployed",
@@ -451,7 +495,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou"
 	}
-	CfatChecks.push(cfatSecurityOuCheck);
+	cfatChecks.push(cfatSecurityOuCheck);
 
 	const cfatWorkloadOuCheck:CfatCheck = {
 		task: "Top-level Workloads OU deployed",
@@ -462,7 +506,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou"
 	}
-	CfatChecks.push(cfatWorkloadOuCheck);
+	cfatChecks.push(cfatWorkloadOuCheck);
 
 	const cfatIamIdCOrgServiceCheck:CfatCheck = {
 		task: "IAM IdC Organization service enabled",
@@ -473,7 +517,7 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html"
 	}
-	CfatChecks.push(cfatIamIdCOrgServiceCheck);
+	cfatChecks.push(cfatIamIdCOrgServiceCheck);
 
 	const cfatIamIdcConfiguredCheck:CfatCheck = {
 		task: "IAM IdC configured",
@@ -484,10 +528,10 @@ const main = async (): Promise<void> => {
 		loe: 3,
 		remediationLink: "https://docs.aws.amazon.com/singlesignon/latest/userguide/tutorials.html"
 	}
-	CfatChecks.push(cfatIamIdcConfiguredCheck);
+	cfatChecks.push(cfatIamIdcConfiguredCheck);
 
 	const cfatOrgPolicyScpEnabled:CfatCheck = {
-		task: "Service Control Policies Enabled",
+		task: "Service Control Policies enabled",
 		description: "Service Control Policy should be enabled within the AWS Organization.",
 		status: cfatScpEnabledPass ? "complete": "incomplete",
 		required: true,
@@ -495,10 +539,10 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html"
 	}
-	CfatChecks.push(cfatOrgPolicyScpEnabled);
+	cfatChecks.push(cfatOrgPolicyScpEnabled);
 
 	const cfatOrgPolicyTagPolicyCheck:CfatCheck = {
-		task: "Organization Tag Policy Enabled",
+		task: "Organization Tag Policy enabled",
 		description: "Tag Policy should be enabled within the AWS Organization.",
 		status: cfatTagPoliciesEnabledPass ? "complete": "incomplete",
 		required: true,
@@ -506,10 +550,10 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html"
 	}
-	CfatChecks.push(cfatOrgPolicyTagPolicyCheck);
+	cfatChecks.push(cfatOrgPolicyTagPolicyCheck);
 
 	const cfatBackupPoliciesEnabledCheck:CfatCheck = {
-		task: "Organization Backup Policy Enabled",
+		task: "Organization Backup Policy enabled",
 		description: "Backup Policy should be enabled within the AWS Organization.",
 		status: cfatBackupPoliciesEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -517,10 +561,10 @@ const main = async (): Promise<void> => {
 		loe: 1,
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html"
 	}
-	CfatChecks.push(cfatBackupPoliciesEnabledCheck);
+	cfatChecks.push(cfatBackupPoliciesEnabledCheck);
 
 	const cfatControlTowerDeployedCheck:CfatCheck= {
-		task: "Control Tower Deployed",
+		task: "Control Tower deployed",
 		description: "Control Tower should be deployed.",
 		status: cfatControlTowerDeployedPass ? "complete": "incomplete",
 		required: true,
@@ -528,10 +572,10 @@ const main = async (): Promise<void> => {
 		loe: 6,
 		remediationLink: "https://catalog.workshops.aws/control-tower/en-US/prerequisites/deploying"
 	}
-	CfatChecks.push(cfatControlTowerDeployedCheck);
+	cfatChecks.push(cfatControlTowerDeployedCheck);
 
 	const cfatControlTowerLatestVersionCheck:CfatCheck = {
-		task: "Control Tower Latest Version",
+		task: "Control Tower latest version",
 		description: "Control Tower should be the latest version.",
 		status: cfatControlTowerLatestVersionPass ? "complete": "incomplete",
 		required: false,
@@ -539,7 +583,7 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink: "https://docs.aws.amazon.com/controltower/latest/userguide/update-controltower.html"
 	}
-	CfatChecks.push(cfatControlTowerLatestVersionCheck);
+	cfatChecks.push(cfatControlTowerLatestVersionCheck);
 
 	const cfatControlTowerNotDriftedCheck:CfatCheck = {
 		task: "Control Tower not drifted",
@@ -550,36 +594,48 @@ const main = async (): Promise<void> => {
 		loe: 2,
 		remediationLink:"https://docs.aws.amazon.com/controltower/latest/userguide/resolve-drift.html"
 	}
-	CfatChecks.push(cfatControlTowerNotDriftedCheck);
+	cfatChecks.push(cfatControlTowerNotDriftedCheck);
 
 	const cfatLogArchiveAccountCheck:CfatCheck = {
 		task: "Log Archive account deployed",
-		description: "Log Archive Account should exist.",
+		description: "Log Archive account should exist.",
 		status: cfatLogArchiveAccountPass ? "complete": "incomplete",
 		required: true,
 		weight: 6,
-		loe: 2
+		loe: 2,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatLogArchiveAccountCheck);
+	cfatChecks.push(cfatLogArchiveAccountCheck);
 
 	const cfatAuditAccountCheck:CfatCheck = {
 		task: "Audit account deployed",
-		description: "Audit account should exist.",
+		description: "Audit/Security Tooling account should exist.",
 		status: cfatAuditAccountPass ? "complete": "incomplete",
 		required: true,
 		weight: 6,
-		loe: 2
+		loe: 2,
+		remediationLink: " "
 	}
-	CfatChecks.push(cfatAuditAccountCheck);
+	cfatChecks.push(cfatAuditAccountCheck);
 
-	report.cfatChecks = CfatChecks
+	report.cfatChecks = cfatChecks
 
-	console.table(CfatChecks, ["task", "status","required", "loe"]);
+	console.table(cfatChecks, ["task", "status","required", "loe"]);
+	// write CFAT checks to CSV file for use in the CFAT report
+	const cfatChecksCsvFile = "./cfat-checks.csv"
+	console.log(`writing assessment summary checks to ./cfat/cfat-checks.csv...`)
+	const objectArrayCSV = objectToCSV(cfatChecks);
+	fs.writeFileSync(cfatChecksCsvFile, objectArrayCSV);
+
 	const reportFile = "./cfat.txt"
-	console.log(`compiling report...`)
-	const assessment:string = await createReport(report)
-	console.log(`saving report to ./cfat/cfat.txt...`)
-	fs.appendFileSync(reportFile, assessment);
+	const tasks:Task[] = await createReport(report)
 	console.log(`cloud foundation assessment complete. Access your report at ./cfat/cfat.txt`)
+	console.log(`assessment summary checks written to ./cfat/cfat-checks.csv`)
+	createJiraImport(tasks)
+	// create csv jira import file
+	await createJiraImport(tasks);
+	await createAsanaImport(tasks);
+	await zipAssessmentFiles();
+	console.log(`assessment files zipped to ./cfat/assessment.zip`)
 };
 main();
