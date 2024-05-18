@@ -620,7 +620,7 @@ const main = async (): Promise<void> => {
 
 	report.cfatChecks = cfatChecks
 
-	console.table(cfatChecks, ["task", "status","required", "loe"]);
+	console.table(cfatChecks, ["check", "status","required", "loe"]);
 	// write CFAT checks to CSV file for use in the CFAT report
 	const cfatChecksCsvFile = "./cfat-checks.csv"
 	console.log(`writing assessment summary checks to ./cfat/cfat-checks.csv...`)
