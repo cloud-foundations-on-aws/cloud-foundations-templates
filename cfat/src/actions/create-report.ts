@@ -27,7 +27,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
     for (const check of assessment.cfatChecks) {
       totalScore += check.weight;
       if (check.required === true && check.status === 'incomplete') {
-        report+=`\n    INCOMPLETE: ${check.task}`;
+        report+=`\n    INCOMPLETE: ${check.check}`;
         totalRequiredLoe += check.loe
         cfatStatus = "INCOMPLETE";
       }

@@ -269,7 +269,7 @@ const main = async (): Promise<void> => {
 	}
 
 	let OrgCheck:CfatCheck = {
-		task: "AWS Organization created",
+		check: "AWS Organization created",
 		description: "AWS Organization is enabled.",
 		status: accountType.isInOrganization ? "complete": "incomplete",
 		required: true,
@@ -280,7 +280,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(OrgCheck);
 
 	let MACheck:CfatCheck = {
-		task: "Management Account created",
+		check: "Management Account created",
 		description: "AWS Management account exists.",
 		status: cfatManagementAccountPass ? "complete": "incomplete",
 		required: true,
@@ -291,7 +291,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(MACheck);
 
 	const cfatIamUserCheck:CfatCheck = {
-		task: "Management Account IAM Users removed",
+		check: "Management Account IAM Users removed",
 		description: "IAM Users should not exist in Management Account.",
 		status: cfatIamUserPass ? "complete": "incomplete",
 		required: false,
@@ -302,7 +302,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatIamUserCheck);
 
 	const cfatEc2Check:CfatCheck = {
-		task: "Management Account EC2 instances removed",
+		check: "Management Account EC2 instances removed",
 		description: "EC2 Instances should not exist in Management Account.",
 		status: cfatEc2Pass ? "complete": "incomplete",
 		required: false,
@@ -313,7 +313,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatEc2Check);
 
 	const cfatVpcCheck:CfatCheck = {
-		task: "Management Account VPCs removed",
+		check: "Management Account VPCs removed",
 		description: "Management Account should not have any VPCs.",
 		status: cfatVpcPass ? "complete": "incomplete",
 		required: false,
@@ -324,7 +324,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatVpcCheck);
 
 	const cfatLegacyCurCheck:CfatCheck = {
-		task: "Legacy CUR setup",
+		check: "Legacy CUR setup",
 		description: "Legacy Cost and Usage Report (CUR) should be setup or data exports.",
 		status: report.isLegacyCurSetup  ? "complete": "incomplete",
 		required: false,
@@ -334,7 +334,7 @@ const main = async (): Promise<void> => {
 	}
 
 	const cfatCloudTrailCheck:CfatCheck = {
-		task: "CloudTrail Trail created",
+		check: "CloudTrail Trail created",
 		description: "CloudTrail should be enabled within the account.",
 		status: cfatCloudTrailPass ? "complete": "incomplete",
 		required: true,
@@ -345,7 +345,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatCloudTrailCheck);
 
 	const cfatCloudTrailOrgServiceEnabledCheck:CfatCheck = {
-		task: "CloudTrail Organization Service enabled",
+		check: "CloudTrail Organization Service enabled",
 		description: "CloudTrail should be enabled on the Organization.",
 		status: cfatCloudTrailOrgServiceEnabledPass ? "complete": "incomplete",
 		required: true,
@@ -356,7 +356,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatCloudTrailOrgServiceEnabledCheck);
 
 	const cfatCloudTrailOrgTrailCheck:CfatCheck = {
-		task: "CloudTrail Org Trail deployed",
+		check: "CloudTrail Org Trail deployed",
 		description: "At least one CloudTrail Organization Trail should be enabled.",
 		status: cfatCloudTrailOrgTrailPass ? "complete": "incomplete",
 		required: true,
@@ -367,7 +367,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatCloudTrailOrgTrailCheck);
 
 	const cfatConfigManagementAccountCheck:CfatCheck = {
-		task: "Config Recorder in Management Account configured",
+		check: "Config Recorder in Management Account configured",
 		description: "Config Recorder in the Management Account should be enabled.",
 		status: cfatConfigManagementAccountPass ? "complete": "incomplete",
 		required: true,
@@ -378,7 +378,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatConfigManagementAccountCheck);
 
 	const cfatConfigRecorderManagementAccountCheck:CfatCheck= {
-		task: "Config Delivery Channel in Management Account configured",
+		check: "Config Delivery Channel in Management Account configured",
 		description: "Config Delivery Channel in Management Account should be enabled.",
 		status: cfatConfigRecorderManagementAccountPass ? "complete": "incomplete",
 		required: true,
@@ -389,7 +389,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatConfigRecorderManagementAccountCheck);
 
 	const cfatCloudFormationEnableCheck:CfatCheck = {
-		task: "CloudFormation StackSets activated",
+		check: "CloudFormation StackSets activated",
 		description: "CloudFormation StackSets should be activated in the CloudFormation console.",
 		status: cfatOrgCloudFormationEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -400,7 +400,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatCloudFormationEnableCheck);
 
 	const cfatOrgServiceGuardDutyCheck:CfatCheck = {
-		task: "GuardDuty Organization service enabled",
+		check: "GuardDuty Organization service enabled",
 		description: "GuardDuty Organization services should be enabled.",
 		status: cfatOrgServiceGuardDutyEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -411,7 +411,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceGuardDutyCheck);
 
 	const cfatOrgServiceRamCheck:CfatCheck = {
-		task: "RAM Organization service enabled",
+		check: "RAM Organization service enabled",
 		description: "Resource Access Manager (RAM) trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgServiceRamEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -422,7 +422,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceRamCheck);
 
 	const cfatOrgServiceSecurityHubCheck:CfatCheck = {
-		task: "Security Hub Organization service enabled",
+		check: "Security Hub Organization service enabled",
 		description: "Security Hub trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgServiceSecurityHubEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -433,7 +433,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceSecurityHubCheck);
 
 	const cfatOrgServiceIamAccessAnalyzerCheck:CfatCheck = {
-		task: "IAM Access Analyzer Organization service enabled",
+		check: "IAM Access Analyzer Organization service enabled",
 		description: "IAM Access Analyzer trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgServiceIamAccessAnalyzerEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -444,7 +444,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceIamAccessAnalyzerCheck);
 
 	const cfatOrgServiceConfigCheck:CfatCheck = {
-		task: "Config Organization service enabled",
+		check: "Config Organization service enabled",
 		description: "AWS Config trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgServiceAwsConfigEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -455,7 +455,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceConfigCheck);
 
 	const cfatOrgServiceCloudFormationCheck:CfatCheck = {
-		task: "CloudFormation Organization service enabled",
+		check: "CloudFormation Organization service enabled",
 		description: "CloudFormation trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgCloudFormationStatusPass ? "complete": "incomplete",
 		required: false,
@@ -466,7 +466,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgServiceCloudFormationCheck)
 
 	const cfatOrgServiceBackupCheck:CfatCheck = {
-		task: "Backup Organization service enabled",
+		check: "Backup Organization service enabled",
 		description: "Backup trusted access should be enabled in the AWS Organization.",
 		status: cfatOrgServiceBackupEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -476,7 +476,7 @@ const main = async (): Promise<void> => {
 	}
 
 	const cfatInfraOuCheck:CfatCheck = {
-		task: "Top-level Infrastructure OU deployed",
+		check: "Top-level Infrastructure OU deployed",
 		description: "Top-level Infrastructure OU should exist.",
 		status: infrastructureFound ? "complete": "incomplete",
 		required: false,
@@ -487,7 +487,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatInfraOuCheck);
 
 	const cfatSecurityOuCheck:CfatCheck = {
-		task: "Top-level Security OU deployed",
+		check: "Top-level Security OU deployed",
 		description: "Top-level Security OU should exist.",
 		status: securityFound ? "complete": "incomplete",
 		required: true,
@@ -498,7 +498,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatSecurityOuCheck);
 
 	const cfatWorkloadOuCheck:CfatCheck = {
-		task: "Top-level Workloads OU deployed",
+		check: "Top-level Workloads OU deployed",
 		description: "Top-level Workloads OU should exist.",
 		status: workloadsFound ? "complete": "incomplete",
 		required: false,
@@ -509,7 +509,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatWorkloadOuCheck);
 
 	const cfatIamIdCOrgServiceCheck:CfatCheck = {
-		task: "IAM IdC Organization service enabled",
+		check: "IAM IdC Organization service enabled",
 		description: "IAM Identity Center trusted access should be enabled in the AWS Organization",
 		status: cfatIamIdPOrgServicePass ? "complete": "incomplete",
 		required: true,
@@ -520,7 +520,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatIamIdCOrgServiceCheck);
 
 	const cfatIamIdcConfiguredCheck:CfatCheck = {
-		task: "IAM IdC configured",
+		check: "IAM IdC configured",
 		description: "IAM Identity Center should be configured.",
 		status: cfatIamIdcConfiguredPass ? "complete": "incomplete",
 		required: true,
@@ -531,7 +531,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatIamIdcConfiguredCheck);
 
 	const cfatOrgPolicyScpEnabled:CfatCheck = {
-		task: "Service Control Policies enabled",
+		check: "Service Control Policies enabled",
 		description: "Service Control Policy should be enabled within the AWS Organization.",
 		status: cfatScpEnabledPass ? "complete": "incomplete",
 		required: true,
@@ -542,7 +542,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgPolicyScpEnabled);
 
 	const cfatOrgPolicyTagPolicyCheck:CfatCheck = {
-		task: "Organization Tag Policy enabled",
+		check: "Organization Tag Policy enabled",
 		description: "Tag Policy should be enabled within the AWS Organization.",
 		status: cfatTagPoliciesEnabledPass ? "complete": "incomplete",
 		required: true,
@@ -553,7 +553,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatOrgPolicyTagPolicyCheck);
 
 	const cfatBackupPoliciesEnabledCheck:CfatCheck = {
-		task: "Organization Backup Policy enabled",
+		check: "Organization Backup Policy enabled",
 		description: "Backup Policy should be enabled within the AWS Organization.",
 		status: cfatBackupPoliciesEnabledPass ? "complete": "incomplete",
 		required: false,
@@ -564,7 +564,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatBackupPoliciesEnabledCheck);
 
 	const cfatControlTowerDeployedCheck:CfatCheck= {
-		task: "Control Tower deployed",
+		check: "Control Tower deployed",
 		description: "Control Tower should be deployed.",
 		status: cfatControlTowerDeployedPass ? "complete": "incomplete",
 		required: true,
@@ -575,7 +575,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatControlTowerDeployedCheck);
 
 	const cfatControlTowerLatestVersionCheck:CfatCheck = {
-		task: "Control Tower latest version",
+		check: "Control Tower latest version",
 		description: "Control Tower should be the latest version.",
 		status: cfatControlTowerLatestVersionPass ? "complete": "incomplete",
 		required: false,
@@ -586,7 +586,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatControlTowerLatestVersionCheck);
 
 	const cfatControlTowerNotDriftedCheck:CfatCheck = {
-		task: "Control Tower not drifted",
+		check: "Control Tower not drifted",
 		description: "Control Tower should not be drifted.",
 		status: cfatControlTowerNotDriftedPass ? "complete": "incomplete",
 		required: true,
@@ -597,7 +597,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatControlTowerNotDriftedCheck);
 
 	const cfatLogArchiveAccountCheck:CfatCheck = {
-		task: "Log Archive account deployed",
+		check: "Log Archive account deployed",
 		description: "Log Archive account should exist.",
 		status: cfatLogArchiveAccountPass ? "complete": "incomplete",
 		required: true,
@@ -608,7 +608,7 @@ const main = async (): Promise<void> => {
 	cfatChecks.push(cfatLogArchiveAccountCheck);
 
 	const cfatAuditAccountCheck:CfatCheck = {
-		task: "Audit account deployed",
+		check: "Audit account deployed",
 		description: "Audit/Security Tooling account should exist.",
 		status: cfatAuditAccountPass ? "complete": "incomplete",
 		required: true,

@@ -1,7 +1,7 @@
 import { DelegatedServices } from "@aws-sdk/client-organizations";
 
 export interface CfatCheck {
-  task:string;
+  check:string;
   description:string;
   status:string;
   required:boolean;
