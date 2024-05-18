@@ -101,16 +101,16 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
 	} else{
 		report+=`\n  No AWS Config resource discovered`;
 	}
-  report+=`\n\nMANAGEMENT ACCOUNT RECOMMENDED TASKS:`;
+  report+=`\n\nMANAGEMENT ACCOUNT TASKS:`;
   const maCategory:string = "Management Account"
   if (assessment.iamUserChecks && assessment.iamUserChecks.length > 0) {
     for(const iamUser of assessment.iamUserChecks){
-      let iamTask:Task={title:'Remove IAM user', category: maCategory, detail: `Remove IAM user ${iamUser.userName}`}
+      let iamTask:Task={title:`Remove IAM user ${iamUser.userName}`, category: maCategory, detail: `Review and determine if IAM user ${iamUser.userName} can be deleted.`}
       const message:string = `${iamTask.title} - ${iamTask.category} - ${iamTask.detail}`
       tasks.push(iamTask);
       report+=`\n  ${ message }`;
       if(iamUser.accessKeyId){
-        let iamApiTask:Task={title:'Remove IAM user', category: maCategory, detail: `Remove IAM user API key ${iamUser.accessKeyId} for ${iamUser.userName}`}
+        let iamApiTask:Task={title:`Remove IAM user ${iamUser.userName} API key ${iamUser.accessKeyId} `, category: maCategory, detail: `Review and determine if IAM user API key ${iamUser.accessKeyId} for ${iamUser.userName} can be removed.`}
         const message:string = `${iamApiTask.title} - ${iamApiTask.category} - ${iamApiTask.detail}`
         report+=`\n  ${ message }`;
         tasks.push(iamApiTask);
@@ -120,7 +120,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   if(assessment.ec2Checks && assessment.ec2Checks.find(param => param.ec2Found === true)){
     for (const ec2 of assessment.ec2Checks){
       if(ec2.ec2Found && ec2.region){
-        let ec2Task:Task={title:'Delete EC2 instance', category: maCategory, detail: `Delete EC2 instance in ${ec2.region}`}
+        let ec2Task:Task={title:`Delete EC2 instance in ${ec2.region}`, category: maCategory, detail: `Delete any unnecessary EC2 instance in ${ec2.region}`}
         const message:string = `${ec2Task.title} - ${ec2Task.category} - ${ec2Task.detail}`
         report+=`\n  ${ message }`;
         tasks.push(ec2Task);
@@ -130,7 +130,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   if(assessment.vpcChecks && assessment.vpcChecks.length >0){
     for(const vpcFind of assessment.vpcChecks){
       if(vpcFind.vpcFound && vpcFind.region){
-        let vpcTask:Task={title:'Delete VPC', category: maCategory, detail: `Delete VPC in ${vpcFind.region}`}
+        let vpcTask:Task={title:`Delete VPC in ${vpcFind.region}`, category: maCategory, detail: `Delete any unnecessary VPC in ${vpcFind.region} to include the default VPC.`}
         const message:string = `${vpcTask.title} - ${vpcTask.category} - ${vpcTask.detail}`
         report+=`\n  ${ message }`;
         tasks.push(vpcTask);
@@ -172,7 +172,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   }
 
   ///// SET THE BACKLOG TASK FOR GOVERNANCE /////
-  report+=`\n\nGOVERNANCE RECOMMENDED TASKS:`;
+  report+=`\n\nGOVERNANCE TASKS:`;
   const govCategory:string = "Governance"
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'cloudtrail.amazonaws.com')){
     const ctOrgServiceTask:Task = {title:'Enable AWS CloudTrail', category: govCategory, detail: `Enable AWS CloudTrail in AWS Organization`}
@@ -210,7 +210,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   report+=`\n*********************************************************`;
   report+=`\n\nLegacy CUR`;
   report+=`\n  Is legacy CUR setup: ${assessment.isLegacyCurSetup}`;
-  report+=`\n\nCLOUD FINANCIAL MANAGEMENT RECOMMENDED TASKS:`;
+  report+=`\n\nCLOUD FINANCIAL MANAGEMENT TASKS:`;
   const finCategory:string = "Cloud Financial Management"
   if(!assessment.isLegacyCurSetup){
     const legacyCurSetupTask:Task={title:'Setup legacy CUR', category: finCategory, detail: `Setup legacy CUR in AWS Organization`}
@@ -310,7 +310,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   } else {
     report+=`\n  No delegated admin accounts in AWS Organization`;
   }
-  report+=`\n\nMULTI-ACCOUNT STRATEGY RECOMMENDED TASKS:`;
+  report+=`\n\nMULTI-ACCOUNT STRATEGY TASKS:`;
   let masCategory:string = 'Multi-Account Strategy';
   const accountEmailReviewTask:Task = {title: 'Review Account Email Addresses', category: masCategory, detail: `Review Account Email Addresses in AWS Organization`}
   const message:string = `${accountEmailReviewTask.title} - ${accountEmailReviewTask.category} - ${accountEmailReviewTask.detail}`
@@ -365,7 +365,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   }else {
     report+=`\n  AWS Control Tower is not deployed in the AWS Organization`;
   }
-  report+=`\n\nLANDING ZONE RECOMMENDED TASKS:`;
+  report+=`\n\nLANDING ZONE TASKS:`;
   let lzTaskNumber: number = 1
   const lzWaypoint:string = "Landing Zone"
   if(assessment.controlTowerRegion === undefined){
@@ -403,7 +403,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   }else{
     report+=`\n\nAWS IAM IDENTITY CENTER NOT FOUND\n`;
   }
-  report+=`\n\nIDENTITY RECOMMENDED TASKS:`;
+  report+=`\n\nIDENTITY TASKS:`;
   const ssoCategory:string = 'Identity'
 
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'sso.amazonaws.com')){
@@ -525,7 +525,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   report+=`\n                    NETWORK`;
   report+=`\n*********************************************************`;
 
-  report+=`\n\nNETWORK RECOMMENDED TASKS:`;
+  report+=`\n\nNETWORK TASKS:`;
   const networkCategory:string = 'Network'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'guardduty.amazonaws.com')){
     const taskGuardDutyDelegated:Task = {title: 'Enable AWS GuardDuty', category: networkCategory, detail: `Enable AWS GuardDuty in AWS Organization`}
@@ -561,7 +561,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   report+=`\n                  OBSERVABILITY`;
   report+=`\n*********************************************************`;
 
-  report+=`\n\nOBSERVABILITY RECOMMENDED TASKS:`;
+  report+=`\n\nOBSERVABILITY TASKS:`;
   const obCategory:string = 'Observability'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'account.amazonaws.com')){
     const orgServiceAccountTask:Task={title: 'Enable AWS Account', category: obCategory, detail: `Enable AWS Account in AWS Organization`}
@@ -578,7 +578,7 @@ async function createReport(assessment:CloudFoundationAssessment): Promise<Task[
   report+=`\n\n*********************************************************`;
   report+=`\n               BACKUP AND RECOVERY`;
   report+=`\n*********************************************************`;
-  report+=`\n\nBACKUP AND RECOVERY RECOMMENDED TASKS:`;
+  report+=`\n\nBACKUP AND RECOVERY TASKS:`;
   const backupWaypoint:string = 'Backup and Recovery'
   if(!assessment.orgServices || !assessment.orgServices.find(param=> param.service === 'backup.amazonaws.com')){
     const orgServiceBackupTask:Task={title: 'Enable AWS Backup', category: backupWaypoint, detail: `Enable AWS Backup in AWS Organization`}
