@@ -14,7 +14,7 @@ for i in \
   '@aws-sdk/client-cloudformation' \
   '@aws-sdk/client-organizations' \
   '@aws-sdk/client-sso-admin' \
-  '@types/archiver' \
+  '@types/archiver' 'archiver' \
    ; do npm install "$i" --silent; done
 
 echo "installation complete, starting cloud foundation assessment..."
