@@ -10,7 +10,6 @@ async function checkVpcExists(regions: string[]): Promise<VpcCheck[]> {
       const response = await ec2Client.send(command);
       if(response.Vpcs){
         if (response.Vpcs.length > 0) {
-          //console.log(`WARNING: VPC(s) exists in region: ${region}`);
           const vpcFound: VpcCheck = {
             region: region,
             vpcFound: true
@@ -32,7 +31,7 @@ async function checkVpcExists(regions: string[]): Promise<VpcCheck[]> {
         vpcValidation.push(vpcFound)
       }
     } catch (error) {
-      console.log(`Error checking instance: ${error}`);
+      console.log(`Error: ${error}`);
     }
     finally {
       ec2Client.destroy();

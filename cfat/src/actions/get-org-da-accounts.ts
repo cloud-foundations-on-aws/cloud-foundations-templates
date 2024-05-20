@@ -1,10 +1,10 @@
 import { OrganizationsClient, ListDelegatedAdministratorsCommand, ListDelegatedServicesForAccountCommand} from "@aws-sdk/client-organizations";
-import { OrgDelegatedAdminAccounts } from '../types';
+import { OrgDelegatedAdminAccount } from '../types';
 
-async function getOrgDaAccounts(): Promise<OrgDelegatedAdminAccounts[]> {
-  let orgDaDetails: OrgDelegatedAdminAccounts[] = []
+async function getOrgDaAccounts(): Promise<OrgDelegatedAdminAccount[]> {
+  let orgDaDetails: OrgDelegatedAdminAccount[] = []
   const orgClient = new OrganizationsClient({ region: 'us-east-1' });
-  let orgDaDetail: OrgDelegatedAdminAccounts = {}
+  let orgDaDetail: OrgDelegatedAdminAccount = {}
   try {
     const command = new ListDelegatedAdministratorsCommand({});
     const response = await orgClient.send(command);

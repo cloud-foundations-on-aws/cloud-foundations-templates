@@ -9,7 +9,7 @@ module.exports = {
    devtool: 'inline-source-map',
    watch: false,
    output: {
-      filename: 'pathfinder.js',
+      filename: 'cfat.js',
       path: path.resolve(__dirname, 'dist'),
    },
    resolve: {
