@@ -18,5 +18,5 @@ for i in \
    ; do npm install "$i" --silent; done
 
 echo "installation complete, starting cloud foundation assessment..."
-download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/cfat-tasks/cfat/dist/cfat.js"
+download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/cfat/dist/cfat.js"
 curl -sS $download_url | node

@@ -11,7 +11,7 @@ CFAT is an open-source solution designed to provide automated discovery of AWS a
     * Leverage the IAM Managed Policies:
         - `arn:aws:iam::aws:policy/ReadOnlyAccess`
         - `arn:aws:iam::aws:policy/AWSCloudShellFullAccess`
-3. Run the following command: `curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/cfat-tasks/cfat/run-assessment.sh | sh`
+3. Run the following command: `curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/cfat/run-assessment.sh | sh`
 4. Watch screen scroll through output looking for any errors.
 5. Once done you will see the tool created a directory called ./cfat
     * verify by running `ls` in the current working directory you are in
