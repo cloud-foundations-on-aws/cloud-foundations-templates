@@ -98,9 +98,10 @@ export interface OrgMemberAccount {
 }
 
 export interface Task {
-  title: string,
-  category?: string,
-  detail?:string
+  title: string;
+  category?: string;
+  detail?:string;
+  remediationLink?: string;
 }
 
 export interface CloudFoundationAssessment {
