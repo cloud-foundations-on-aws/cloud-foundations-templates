@@ -180,7 +180,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const fixLzDriftTask: Task = {
       title: 'Fix drift in deployed landing zone',
       detail: `Fix drift in deployed landing zone`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/controltower/latest/userguide/resolve-drift.html"
     }
     tasks.push(fixLzDriftTask);
   }
@@ -207,7 +207,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskS3StorageLensDelegated: Task = {
       title: 'Delegate administration of Amazon S3 Storage Lens',
       detail: `Delegate administration to Amazon S3 Storage Lens`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-s3lens.html#integrate-enable-da-s3lens"
     }
     tasks.push(taskS3StorageLensDelegated);
   }
@@ -233,7 +233,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const identityDelegatedTask: Task = {
       title: 'Delegate administration to AWS IAM Identity Center',
       detail: `Delegate administration to AWS IAM Identity Center`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/singlesignon/latest/userguide/delegated-admin.html"
     }
     tasks.push(identityDelegatedTask);
   }
@@ -250,7 +250,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskSecurityHubDelegated: Task = {
       title: 'Delegate administration of AWS Security Hub',
       detail: `Delegate administration to AWS Security Hub`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/securityhub/latest/userguide/designate-orgs-admin-account.html"
     }
     tasks.push(taskSecurityHubDelegated);
   }
@@ -267,7 +267,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskIamAccessAnalyzerDelegated: Task = {
       title: 'Delegate administration of AWS IAM Access Analyzer',
       detail: `Delegate administration to AWS IAM Access Analyzer`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-settings.html"
     }
     tasks.push(taskIamAccessAnalyzerDelegated);
   }
@@ -284,7 +284,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskGuardDutyDelegated: Task = {
       title: 'Delegate administration of AWS GuardDuty',
       detail: `Delegate administration to AWS GuardDuty`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-guardduty.html"
     }
     tasks.push(taskGuardDutyDelegated);
   }
@@ -301,7 +301,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskConfigDelegated: Task = {
       title: 'Delegate administration of AWS Config',
       detail: `Delegate administration to AWS Config`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-config.html"
     }
     tasks.push(taskConfigDelegated);
   }
@@ -319,7 +319,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const orgServiceIpamTask: Task = {
       title: 'Enable AWS IPAM',
       detail: `Enable AWS IPAM in AWS Organization`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-ipam.html"
     }
     tasks.push(orgServiceIpamTask);
   }
@@ -327,7 +327,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskIpamDelegated: Task = {
       title: 'Delegate administration of AWS IPAM',
       detail: `Delegate administration to AWS IPAM`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/vpc/latest/ipam/enable-integ-ipam.html"
     }
     tasks.push(taskIpamDelegated);
   }
@@ -336,7 +336,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const orgServiceAccountTask: Task = {
       title: 'Enable AWS Account',
       detail: `Enable AWS Account in AWS Organization`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/accounts/latest/reference/using-orgs-delegated-admin.html"
     }
     tasks.push(orgServiceAccountTask);
   }
@@ -361,7 +361,7 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
     const taskBackupDelegated: Task = {
       title: 'Delegate administration of AWS Backup',
       detail: `Delegate administration to AWS Backup`,
-      remediationLink: ""
+      remediationLink: "https://docs.aws.amazon.com/aws-backup/latest/devguide/manage-cross-account.html#backup-delegatedadmin"
     }
     tasks.push(taskBackupDelegated);
   }
