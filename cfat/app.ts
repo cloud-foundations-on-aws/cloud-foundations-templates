@@ -634,8 +634,8 @@ const main = async (): Promise<void> => {
 	const backlog:Task[] = await createBacklog(report);
 	console.log(`cloud foundation assessment complete. Access your report at ./cfat/cfat.txt`)
 	console.log(`assessment summary checks written to ./cfat/cfat-checks.csv`)
-	createJiraImport(tasks)
-	await createAsanaImport(tasks);
+	createJiraImport(backlog)
+	await createAsanaImport(backlog);
 	await zipAssessmentFiles();
 	console.log(`assessment files zipped to ./cfat/assessment.zip`)
 };
