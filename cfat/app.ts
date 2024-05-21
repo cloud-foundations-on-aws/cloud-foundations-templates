@@ -16,11 +16,13 @@ import getOrgMemberAccounts from './src/actions/get-org-member-accounts.js';
 import getControlTower from './src/actions/check-control-tower.js';
 import checkLegacyCur from './src/actions/check-legacy-cur.js';
 import createReport from './src/actions/create-report.js'
+import createBacklog from './src/actions/create-backlog.js'
 import createJiraImport from './src/actions/create-jiraimport.js'
+import createAsanaImport from './src/actions/create-asanaimport.js';
 import { CfatCheck, CloudFoundationAssessment, Task } from './src/types/index.js';
 import zipAssessmentFiles from './src/actions/zip-assessment.js'
 import * as fs from 'fs';
-import createAsanaImport from './src/actions/create-asanaimport.js';
+
 
 function objectToCSV(data: Record<string, any> | Record<string, any>[]): string {
   const dataArray = Array.isArray(data) ? data : [data];
@@ -275,7 +277,7 @@ const main = async (): Promise<void> => {
 		required: true,
 		weight: 6,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://aws.amazon.com/organizations/getting-started/"
 	}
 	cfatChecks.push(OrgCheck);
 
@@ -286,18 +288,18 @@ const main = async (): Promise<void> => {
 		required: true,
 		weight: 6,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-creating.html"
 	}
 	cfatChecks.push(MACheck);
 
 	const cfatIamUserCheck:CfatCheck = {
-		check: "Management Account IAM Users removed",
+		check: "Management Account IAM users removed",
 		description: "IAM Users should not exist in Management Account.",
 		status: cfatIamUserPass ? "complete": "incomplete",
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_manage.html#id_users_deleting"
 	}
 	cfatChecks.push(cfatIamUserCheck);
 
@@ -308,7 +310,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html"
 	}
 	cfatChecks.push(cfatEc2Check);
 
@@ -330,7 +332,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/cur/latest/userguide/dataexports-create-legacy.html"
 	}
 
 	const cfatCloudTrailCheck:CfatCheck = {
@@ -406,7 +408,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-guardduty.html#integrate-enable-ta-guardduty"
 	}
 	cfatChecks.push(cfatOrgServiceGuardDutyCheck);
 
@@ -417,7 +419,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-ram.html#integrate-enable-ta-ram"
 	}
 	cfatChecks.push(cfatOrgServiceRamCheck);
 
@@ -428,7 +430,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-securityhub.html#integrate-enable-ta-securityhub"
 	}
 	cfatChecks.push(cfatOrgServiceSecurityHubCheck);
 
@@ -439,7 +441,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html#access-analyzer-enabling"
 	}
 	cfatChecks.push(cfatOrgServiceIamAccessAnalyzerCheck);
 
@@ -450,7 +452,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-config.html#integrate-enable-ta-config"
 	}
 	cfatChecks.push(cfatOrgServiceConfigCheck);
 
@@ -472,7 +474,7 @@ const main = async (): Promise<void> => {
 		required: false,
 		weight: 4,
 		loe: 1,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-backup.html#integrate-enable-ta-backup"
 	}
 
 	const cfatInfraOuCheck:CfatCheck = {
@@ -603,7 +605,7 @@ const main = async (): Promise<void> => {
 		required: true,
 		weight: 6,
 		loe: 2,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-from-console.html"
 	}
 	cfatChecks.push(cfatLogArchiveAccountCheck);
 
@@ -614,7 +616,7 @@ const main = async (): Promise<void> => {
 		required: true,
 		weight: 6,
 		loe: 2,
-		remediationLink: " "
+		remediationLink: "https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-from-console.html"
 	}
 	cfatChecks.push(cfatAuditAccountCheck);
 
@@ -629,6 +631,7 @@ const main = async (): Promise<void> => {
 
 	const reportFile = "./cfat.txt"
 	const tasks:Task[] = await createReport(report)
+	const backlog:Task[] = await createBacklog(report);
 	console.log(`cloud foundation assessment complete. Access your report at ./cfat/cfat.txt`)
 	console.log(`assessment summary checks written to ./cfat/cfat-checks.csv`)
 	createJiraImport(tasks)
