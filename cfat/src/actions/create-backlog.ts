@@ -342,9 +342,9 @@ async function createBacklog(assessment: CloudFoundationAssessment): Promise<Tas
   }
   if (!accountDelegated) {
     const taskAccountDelegated: Task = {
-      title: 'Delegate administration of AWS Account',
-      detail: `Delegate administration to AWS Account`,
-      remediationLink: ""
+      title: 'Delegate administration of AWS Account management',
+      detail: `Delegate administration to AWS Account contact management`,
+      remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-account.html#integrate-enable-da-account"
     }
     tasks.push(taskAccountDelegated);
   }
