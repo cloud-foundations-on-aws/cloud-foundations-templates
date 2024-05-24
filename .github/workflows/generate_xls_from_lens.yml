@@ -20,7 +20,9 @@ jobs:
         if [ -f custom-lens/tools/python/requirements.txt ]; then pip install -r custom-lens/tools/python/requirements.txt; fi
         
     - name: Convert YAML to JSON
-      run: yq custom-lens/yaml/cloud-foundations-accelerator-custom-lens.yaml -o=json > custom-lens/cloud-foundations-accelerator-custom-lens-fromyaml.json
+      uses: mikefarah/yq@master
+      with:
+        cmd: yq custom-lens/yaml/cloud-foundations-accelerator-custom-lens.yaml -o=json > custom-lens/cloud-foundations-accelerator-custom-lens-fromyaml.json
     
     - name: Generate XLS from a JSON
       run: python custom-lens/tools/python/json-2-xls.py -s custom-lens/cloud-foundations-accelerator-custom-lens.json -d custom-lens/cloud-foundations-accelerator-workbook.xlsx
