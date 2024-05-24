@@ -1682,7 +1682,7 @@
                   "type": "HELPFUL_RESOURCE",
                   "content": [
                     {
-                      "displayText": "Tagging spreadhsheet template for defining your tags.",
+                      "displayText": "Tagging spreadsheet template for defining your tags.",
                       "url": "https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/custom-lens/tools/tagging-accelerator.xlsx"
                     },
                     {
