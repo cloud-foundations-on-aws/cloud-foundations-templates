@@ -20,7 +20,7 @@ jobs:
         if [ -f custom-lens/tools/python/requirements.txt ]; then pip install -r custom-lens/tools/python/requirements.txt; fi
         
     - name: Convert YAML to JSON
-    working-directory: ./custom-lens/tools/yaml
+      working-directory: ./custom-lens/tools/yaml
       uses: mikefarah/yq@master
       with:
         cmd: yq eval cloud-foundations-accelerator-custom-lens.yaml -o=json > ../../cloud-foundations-accelerator-custom-lens-fromyaml.json 
