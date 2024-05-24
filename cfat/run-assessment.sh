@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir ./pathfinder -p
-cd ./pathfinder
+mkdir ./cfat -p
+cd ./cfat
 echo "installing npm packages..."
 
 for i in \
@@ -14,8 +14,9 @@ for i in \
   '@aws-sdk/client-cloudformation' \
   '@aws-sdk/client-organizations' \
   '@aws-sdk/client-sso-admin' \
+  '@types/archiver' 'archiver' \
    ; do npm install "$i" --silent; done
 
-echo "installation complete, starting pathfinder..."
-download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/pathfinder/dist/pathfinder.js"
+echo "installation complete, starting cloud foundation assessment..."
+download_url="https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/cfat/dist/cfat.js"
 curl -sS $download_url | node

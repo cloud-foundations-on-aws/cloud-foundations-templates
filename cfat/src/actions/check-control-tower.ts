@@ -7,7 +7,6 @@ async function getControlTower(region: string): Promise<ControlTowerInfo> {
   try {
     const command = new ListLandingZonesCommand({});
     const response = await controlTowerClient.send(command);
-    console.log(JSON.stringify(response.landingZones, null, 2))
     if(response.landingZones && response.landingZones.length > 0){
       const input = {
         landingZoneIdentifier: response.landingZones[0].arn,
@@ -19,7 +18,6 @@ async function getControlTower(region: string): Promise<ControlTowerInfo> {
         const command = new GetLandingZoneCommand(input);
         const lzResponse = await controlTowerClientRegion.send(command);
         if(lzResponse.landingZone){
-          console.log(JSON.stringify(lzResponse.landingZone, null, 2))
           controlTowerInfo.status= lzResponse.landingZone.status
           controlTowerInfo.latestAvailableVersion = lzResponse.landingZone.latestAvailableVersion
           controlTowerInfo.deployedVersion = lzResponse.landingZone.version
