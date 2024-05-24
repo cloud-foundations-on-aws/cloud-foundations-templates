@@ -1,4 +1,4 @@
-name: Generate XLS Workbook from CFA Lens
+name: Auto-Generate XLS Workbook and JSON for CFA Lens
 
 on: 
   push:
