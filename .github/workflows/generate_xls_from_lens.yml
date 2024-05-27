@@ -33,7 +33,7 @@ jobs:
         git config --global user.email 'actions@github.com'
         git add .
         git commit -m "Add XLSX file and convert lens to JSON, created by GitHub Action "
-        git push origin HEAD:${{ github.head_ref }}
+        git push
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
