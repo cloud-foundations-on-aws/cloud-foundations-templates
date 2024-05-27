@@ -7,7 +7,7 @@ pillars:
   - id: management_account
     name: Management Account
     questions:
-      # Create management account
+      # Create AWS management account
       - id: create_management_account
         title: Create management account
         description: The management account is the account that will be used to manage your Organization. If you have an existing account that you plan to use as the management account of a Control Tower managed environment, be sure to review the Control Tower pre-launch checks guidance (https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-prereqs.html).  In a multi-account environment, the management account is key to all the mentioned administrative tasks such as account management, policies, integration with other AWS services, consolidated billing, and so on. Therefore, you should restrict and limit access to the management account only to those admin users who need rights to make changes to the organization.
