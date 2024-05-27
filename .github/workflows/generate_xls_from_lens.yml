@@ -10,7 +10,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - name: Fetch latest changes
+    - name: Fetch latest changes now
       run: |
         git fetch --no-tags --prune --depth=1 origin ${{ github.head_ref }}
         git checkout ${{ github.head_ref }}
