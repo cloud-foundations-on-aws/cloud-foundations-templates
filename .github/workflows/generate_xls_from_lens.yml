@@ -1,7 +1,8 @@
 name: Auto-Generate XLS Workbook and JSON for CFA Lens
 
 on: 
-  push:
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   run-script:
@@ -32,4 +33,7 @@ jobs:
         git config --global user.email 'actions@github.com'
         git add .
         git commit -m "Add XLSX file created by GitHub Action"
-        git push
+        git push origin HEAD:${{ github.head_ref }}
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
