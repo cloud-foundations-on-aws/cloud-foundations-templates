@@ -159,7 +159,7 @@ Resources:
       Email: !Ref pLogArchiveAccountEmailAddress
 
   rSecurityAccount:
-    #Type: 'AWS::Organizations::Account'
+    Type: 'AWS::Organizations::Account'
     DependsOn:
          - rOrgWaiter
     Condition: cDeployNewSecurityAccount
