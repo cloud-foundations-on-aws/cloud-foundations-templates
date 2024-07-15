@@ -1,0 +1,304 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloud Foundations on AWS Control Tower deployment
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "AWS Organization"
+        Parameters:
+          - pCreateNewAwsOrg
+          - pSecurityOuName
+          - pSandboxOuName
+      - Label:
+          default: "Security Account"
+        Parameters:
+          - pDeployNewSecurityAccount
+          - pImportedSecurityAccountId
+          - pSecurityAccountAlias
+          - pSecurityAccountEmailAddress
+      - Label:
+          default: "Log Archive Account"
+        Parameters:
+          - pDeployNewLogArchiveAccount
+          - pImportedLogArchiveAccountId
+          - pLogArchiveAccountAlias
+          - pLogArchiveAccountEmailAddress
+      - Label:
+          default: "Control Tower"
+        Parameters:
+          - pVersion
+          - pGovernedRegions
+          - pLoggingBucketRetentionPeriod
+          - pAccessLoggingBucketRetentionPeriod
+    ParameterLabels:
+      pCreateNewAwsOrg:
+        default: "Create new AWS Organization"
+      pSecurityOuName:
+        default: "Security OU Name"
+      pSandboxOuName:
+        default: "Additional Control Tower OU"
+      pImportedSecurityAccountId:
+        default: "Import Security Account ID"
+      pSecurityAccountAlias:
+        default: "Security account alias"
+      pSecurityAccountEmailAddress:
+        default: "Security account email address"
+      pImportedLogArchiveAccountId:
+        default: "Import Log Archive account ID"
+      pLogArchiveAccountAlias:
+        default: "Log Archive account alias"
+      pLogArchiveAccountEmailAddress:
+        default: "Log Archive account email address"
+      pVersion:
+        default: "Landing Zone version"
+      pGovernedRegions:
+        default: "Governed Regions"
+      pLoggingBucketRetentionPeriod:
+        default: "Logging Bucket Retention Period"
+      pAccessLoggingBucketRetentionPeriod:
+        default: "Access Logging Bucket Retention Period"
+      pDeployNewSecurityAccount:
+        default: "Deploy new Security account"
+      pDeployNewLogArchiveAccount:
+        default: "Deploy new Log Archive account"
+Parameters:
+  pCreateNewAwsOrg:
+    Type: String
+    Description: Specify whether to create the AWS Organization or if one already exists. Select no if you already have an AWS Organization.
+    Default: "Yes"
+    AllowedValues:
+      - "Yes"
+      - "No"
+  pDeployNewLogArchiveAccount:
+    Type: String
+    Description: Deploy a NEW Log Archive account or select No and enter an existing AWS account ID to use a pre-existing account
+    Default: "Yes"
+    AllowedValues:
+      - "Yes"
+      - "No"
+  pLogArchiveAccountAlias:
+    Type: String
+    Description: The AWS account alias for the Log Archive account. If importing a pre-existing Log Archive account, leave blank.
+    Default: "Log Archive"
+  pLogArchiveAccountEmailAddress:
+    Type: String
+    Description: The Log Archive email address for any newly created Log Archive account. Leave this blank if importing a pre-existing Log Archive account.
+  pImportedLogArchiveAccountId:
+    Type: String
+    Description: If you selected No for creating a new Log Archive account, enter the existing account ID that will serve as your Log Archive account ID.
+  pDeployNewSecurityAccount:
+    Type: String
+    Description: Deploy a NEW Security account or select No and enter an existing AWS account ID to use a pre-existing account
+    Default: "Yes"
+    AllowedValues:
+      - "Yes"
+      - "No"
+  pSecurityAccountAlias:
+    Type: String
+    Description: The AWS account alias for the Security account. If importing a pre-existing Security account, leave blank.
+    Default: "Audit"
+  pSecurityAccountEmailAddress:
+    Type: String
+    Description: The Security email address for any newly created Security account. Leave this blank if importing a pre-existing Security account.
+  pImportedSecurityAccountId:
+    Type: String
+    Description: If you selected No for creating a new Security account, enter the existing account ID that will serve as your Security account ID.
+  pVersion:
+    Type: String
+    Description: The version number of Landing Zone
+    Default: "3.3"
+  pGovernedRegions:
+    Type: CommaDelimitedList
+    Description: List of governed regions
+    Default: "us-east-1, us-west-2"
+  pSecurityOuName:
+    Type: String
+    Description: The security Organizational Unit name
+    Default: "Security"
+  pSandboxOuName:
+    Type: String
+    Description: Name of additional OU to be created and registered in Control Tower
+    Default: "Sandbox"
+  pLoggingBucketRetentionPeriod:
+    Type: Number
+    Description: Retention period for centralized logging bucket
+    Default: 365
+  pAccessLoggingBucketRetentionPeriod:
+    Type: Number
+    Description: Retention period for access logging bucket
+    Default: 90
+
+Conditions:
+  pCreateNewAwsOrg: !Equals ["Yes", !Ref pCreateNewAwsOrg]
+  cDeployNewLogArchiveAccount: !Equals ["Yes", !Ref pDeployNewLogArchiveAccount]
+  cDeployNewSecurityAccount: !Equals ["Yes", !Ref pDeployNewSecurityAccount]
+
+Resources:
+  rOrganization:
+    Type: 'AWS::Organizations::Organization'
+    Condition: pCreateNewAwsOrg
+    Properties:
+      FeatureSet: ALL
+
+  rOrgWaiter:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      WaitOn: !If [pCreateNewAwsOrg, !Ref rOrganization, !Ref AWS::NoValue ]
+
+  rLoggingAccount:
+    Type: 'AWS::Organizations::Account'
+    DependsOn:
+         - rOrgWaiter
+    Condition: cDeployNewLogArchiveAccount
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      AccountName: !Ref pLogArchiveAccountAlias
+      Email: !Ref pLogArchiveAccountEmailAddress
+
+  rSecurityAccount:
+    Type: 'AWS::Organizations::Account'
+    DependsOn:
+         - rOrgWaiter
+    Condition: cDeployNewSecurityAccount
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      AccountName: !Ref pSecurityAccountAlias
+      Email: !Ref pSecurityAccountEmailAddress
+
+  AWSControlTowerAdmin:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: AWSControlTowerAdmin
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: controltower.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/service-role/'
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSControlTowerServiceRolePolicy
+
+  AWSControlTowerAdminPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AWSControlTowerAdminPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 'ec2:DescribeAvailabilityZones'
+            Resource: '*'
+      Roles:
+        - !Ref AWSControlTowerAdmin
+
+  AWSControlTowerCloudTrailRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: AWSControlTowerCloudTrailRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/service-role/'
+
+  AWSControlTowerCloudTrailRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AWSControlTowerCloudTrailRolePolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource: !Sub arn:${AWS::Partition}:logs:*:*:log-group:aws-controltower/CloudTrailLogs:*
+            Effect: Allow
+      Roles:
+        - !Ref AWSControlTowerCloudTrailRole
+
+  AWSControlTowerConfigAggregatorRoleForOrganizations:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: AWSControlTowerConfigAggregatorRoleForOrganizations
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/service-role/'
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSConfigRoleForOrganizations
+
+  AWSControlTowerStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: AWSControlTowerStackSetRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/service-role/'
+
+  AWSControlTowerStackSetRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: AWSControlTowerStackSetRolePolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Resource: !Sub 'arn:${AWS::Partition}:iam::*:role/AWSControlTowerExecution'
+            Effect: Allow
+      Roles:
+        - !Ref AWSControlTowerStackSetRole
+
+  rSecurityAccountWaiter:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      WaitOn: !If [cDeployNewSecurityAccount, !Ref rSecurityAccount, !Ref AWS::NoValue ]
+
+  rLogArchiveAccountWaiter:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Metadata:
+      WaitOn: !If [cDeployNewLogArchiveAccount, !Ref rLoggingAccount, !Ref AWS::NoValue ]
+
+  rLandingZone:
+    DependsOn:
+       - rSecurityAccountWaiter
+       - rLogArchiveAccountWaiter
+    Type: 'AWS::ControlTower::LandingZone'
+    Properties:
+      Version: !Ref pVersion
+      Manifest:
+        governedRegions: !Ref pGovernedRegions
+        organizationStructure:
+          security:
+            name: !Ref pSecurityOuName
+          sandbox:
+            name: !Ref pSandboxOuName
+        centralizedLogging:
+          accountId: !If [cDeployNewLogArchiveAccount, !Ref rLoggingAccount, !Ref pImportedLogArchiveAccountId ]
+          configurations:
+            loggingBucket:
+              retentionDays: !Ref pLoggingBucketRetentionPeriod
+            accessLoggingBucket:
+              retentionDays: !Ref pAccessLoggingBucketRetentionPeriod
+          enabled: true
+        securityRoles: # specify your Audit/Security Tooling account
+          accountId: !If [cDeployNewSecurityAccount, !Ref rSecurityAccount, !Ref pImportedSecurityAccountId ]
+        accessManagement: # enable identity center or not
+          enabled: true
