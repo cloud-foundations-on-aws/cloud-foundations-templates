@@ -211,28 +211,57 @@ def check_accounts_for_security_groups(fCredentialList, fFragment: list = None, 
 # 	for sec_grp in f_sec_grps:
 # 		# Find all enis associated with each security group
 #
-def save_data_to_file(f_AllSecurityGroups:list, f_Filename:str, f_NoEmpty:bool) -> str:
+def save_data_to_file(f_AllSecurityGroups:list, f_Filename:str, f_References: bool = False, f_Rules: bool = False, f_NoEmpty:bool = False) -> str:
 	"""
 	Description: Saves the data to a file
 	@param f_AllSecurityGroups: The security groups and associated data that were found
 	@param f_Filename: The file to save the data to
 	@return: The filename that was saved
 	"""
+	# Save the header to the file
+	Heading = f"AccountId|Region|SG Group Name|SG Group ID|VPC ID|Default(T/F)|Description"
+	reference_Heading = f"|Resource Type|Resource ID|Resource Status|Attachment ID|Instance Name Tag|IP Address|Description"
+	rules_Heading = f"|InboundRule|Port From|Port To|From"
+	if f_References:
+		Heading += reference_Heading
+	if f_Rules:
+		Heading += rules_Heading
 	# Save the data to a file
-	Heading = f"AccountId | Region | SG Group Name | SG Group ID | VPC ID | Default(T/F) | Description | ResourceType | Resource ID | Resource Status | Attachment ID | Instance Name | IP Address | Description \n"
 	with open(f_Filename, 'w') as f:
-		f.write(Heading)
+		f.write(Heading + '\n')
 		for sg in f_AllSecurityGroups:
-			sg_line = f"{sg['AccountId']} | {sg['Region']} | {sg['GroupName']} | {sg['GroupId']} | {sg['VpcId']} | {sg['Default']} | {sg['Description']}"
-			if sg['NumOfReferences'] == 0 and f_NoEmpty:
-				continue
-			elif sg['NumOfReferences'] == 0:
-				sg_line += f"{' | None' * 7}\n"
-				f.write(sg_line)
-			elif sg['NumOfReferences'] > 0:
-				for reference in sg['ReferencedResources']:
-					reference_line = f" | {reference['ResourceType']} | {reference['Id']} | {reference['Status']} | {reference['AttachmentId']} | {reference['InstanceNameTag']} | {reference['IpAddress']} | {reference['Description']}\n"
-					f.write(sg_line + reference_line)
+			sg_line = f"{sg['AccountId']}|{sg['Region']}|{sg['GroupName']}|{sg['GroupId']}|{sg['VpcId']}|{sg['Default']}|{sg['Description']}"
+			if pReferences:
+				if sg['NumOfReferences'] == 0 and f_NoEmpty:
+					# This means that the SG had no references, and the "NoEmpty" means we don't want non-referenced SGs, so it skips ahead
+					continue
+				elif sg['NumOfReferences'] == 0:
+					sg_line_with_references = sg_line + f"{'|None' * 7}"
+					# f.write(sg_line)
+				elif sg['NumOfReferences'] > 0:
+					for reference in sg['ReferencedResources']:
+						reference_line = f"|{reference['ResourceType']}|{reference['Id']}|{reference['Status']}|{reference['AttachmentId']}|{reference['InstanceNameTag']}|{reference['IpAddress']}|{reference['Description']}"
+						sg_line_with_references = sg_line + reference_line
+						# f.write(sg_line + reference_line)
+			if pRules:
+				if sg['NumOfRules'] == 0:
+					sg_line_with_rules = sg_line + f"{'|None' * 4}\n"
+					# f.write(sg_line)
+				else:
+					for inbound_permission in sg['IpPermissions']:
+						inbound_permission_line = f"|{inbound_permission['Protocol']}|{inbound_permission['FromPort']}|{inbound_permission['ToPort']}|{inbound_permission['From']}"
+						row = sg_line + inbound_permission_line + '\n'
+						f.write(row)
+					for outbound_permission in sg['IpPermissionsEgress']:
+						outbound_permission_line = f"|{outbound_permission['Protocol']}|{outbound_permission['FromPort']}|{outbound_permission['ToPort']}|{outbound_permission['To']}"
+						row = sg_line + outbound_permission_line + '\n'
+						f.write(row)
+			elif not pReferences:
+				row = sg_line + '\n'
+				f.write(row)
+			elif pReferences:
+				row = sg_line_with_references + '\n'
+				f.write(row)
 	logging.info(f"Data saved to {f_Filename}")
 	return f_Filename
 
@@ -322,7 +351,7 @@ if __name__ == '__main__':
 	display_results(sorted_AllSecurityGroups, display_dict, None)
 
 	if pFilename:
-		saved_filename = save_data_to_file(sorted_AllSecurityGroups, pFilename, pNoEmpty)
+		saved_filename = save_data_to_file(sorted_AllSecurityGroups, pFilename, pReferences, pRules, pNoEmpty)
 		print(f"Data has been saved to {saved_filename}")
 	if pTiming:
 		print(ERASE_LINE)
