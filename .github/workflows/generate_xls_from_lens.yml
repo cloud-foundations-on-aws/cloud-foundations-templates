@@ -10,11 +10,13 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - name: Fetch latest changes now
-      run: |
-        git fetch --no-tags --prune --depth=1 origin ${{ github.head_ref }}
-        git checkout ${{ github.head_ref }}
-        git pull origin ${{ github.head_ref }}
+      with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+    #- name: Fetch latest changes now
+    #  run: |
+    #    git fetch --no-tags --prune --depth=1 origin ${{ github.head_ref }}
+    #    git checkout ${{ github.head_ref }}
+    #    git pull origin ${{ github.head_ref }}
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
