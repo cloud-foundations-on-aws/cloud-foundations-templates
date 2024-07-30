@@ -4,7 +4,7 @@
 import pandas as pd
 import json
 import argparse
-
+ 
 
 def create_a_splash_page(writer):
     
@@ -88,7 +88,6 @@ def format_excel(pillar_data,writer,sheet_name):
   workbook = writer.book
   worksheet = writer.sheets[sheet_name]
 
-      
 
   # Find and merge 'Section' and 'Description' cells as they are identical for multiple Actions - basically, merging multiple rows
 
@@ -97,10 +96,11 @@ def format_excel(pillar_data,writer,sheet_name):
 
 
   for section_name in pillar_data['Section'].unique():
+      
       # find indices and add one to account for header
       u=pillar_data.loc[pillar_data['Section']==section_name].index.values + 1
-
-      if len(u) <2: 
+      
+      if len(u) <2:
           pass # do not merge cells if there is only one Section name
       else:
           # merge cells using the first and last indices
@@ -171,9 +171,9 @@ def create_excel_sheets_nested(inputJSONfilename,excelfilename):
         pillar_data = pd.json_normalize(row['questions'], record_path=['choices'], meta = ['title', 'description'], record_prefix='_') 
         pillar_data.rename(columns={'_title': 'Topic or Action', 'title':'Section','description':'Description', '_helpfulResource.displayText': 'Detailed Guidance', '_additionalResources':'Additional Resources', '_helpfulResource.url': "Detailed Guidance URL"}, inplace=True)
         
-        # Remove "None of These" choice rows as these are exported from WAFR tool - not relevant for a workbook.
+        # Remove "None of These" choice rows as these are exported from WAFR tool - not relevant for a workbook. then reindex a dataframe to account for dropped columns
         pillar_data = pillar_data[pillar_data["Topic or Action"].str.contains("None of these") == False]
-  
+        pillar_data = pillar_data.reset_index(drop=True)
 
         #Add Notes and Done (Checkbox) columns
 
