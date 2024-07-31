@@ -20,7 +20,7 @@ CFAT is an open-source solution designed to provide automated discovery of an AW
     * verify by running `ls` in the current working directory you are in
 6. The CFAT creates a zip archive containing several artifacts (see [Generated Documentation and Artifacts](#generated-documentation-and-artifacts))
 7. Within the CloudShell window, go to top right of the page and click on `Actions` button and click on `Download File`
-<br/><img src="./docs/cloudshell-download.png" alt="drawing" width="50%" height="50%"/>
+<br/><img src="./docs/cloudshell-download.png" alt="drawing" width="30%" height="30%"/>
 8. In the download file enter `./cfat/assessment.zip`
 <br/><img src="./docs/downloadfile.png" alt="drawing" width="50%" height="50%"/>
 9. File is download which you can unzip and view the generated documentation and artifacts.
