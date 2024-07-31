@@ -15,14 +15,14 @@ CFAT is an open-source solution designed to provide automated discovery of an AW
 3. Within AWS CloudShell the following command: `curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/cfat/run-assessment.sh | sh`
 ![Run CloudShell](./docs/cloudshell-console-run.png)
 4. Watch screen scroll through output looking for any errors.
-![CloudShell Output](./docs/cloudshell-output.png)
+<br/><img src="./docs/cloudshell-output.png" alt="drawing" width="50%" height="50%"/>
 5. Once done you will see the tool created a directory called ./cfat
     * verify by running `ls` in the current working directory you are in
 6. The CFAT creates a zip archive containing several artifacts (see [Generated Documentation and Artifacts](#generated-documentation-and-artifacts))
 7. Within the CloudShell window, go to top right of the page and click on `Actions` button and click on `Download File`
-![CloudShell Download](./docs/cloudshell-download.png)
+<br/><img src="./docs/cloudshell-download.png" alt="drawing" width="30%" height="30%"/>
 8. In the download file enter `./cfat/assessment.zip`
-![download file](./docs/downloadfile.png)
+<br/><img src="./docs/downloadfile.png" alt="drawing" width="50%" height="50%"/>
 9. File is download which you can unzip and view the generated documentation and artifacts.
 
 ## Generated Documentation and Artifacts
