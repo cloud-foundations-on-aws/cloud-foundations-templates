@@ -5,7 +5,7 @@
   "pillars": [
     {
       "id": "management_account",
-      "name": "Management Account Hook",
+      "name": "Management Account",
       "questions": [
         {
           "id": "create_management_account",

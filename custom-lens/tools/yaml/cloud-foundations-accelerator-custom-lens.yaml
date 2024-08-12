@@ -5,7 +5,7 @@ description: AWS Cloud Foundations Accelerator
 pillars:
   # Management Account
   - id: management_account
-    name: Management Account Hook
+    name: Management Account
     questions:
       # Create AWS management account
       - id: create_management_account
