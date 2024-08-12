@@ -1,6 +1,6 @@
 ---
 schemaVersion: '2021-11-01'
-name: AWS Cloud Foundations Accelerator
+name: AWS Cloud Foundations Accelerator Hook test
 description: AWS Cloud Foundations Accelerator
 pillars:
   # Management Account
