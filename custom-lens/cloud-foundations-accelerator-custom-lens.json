@@ -3819,12 +3819,12 @@
               "id": "enable_aws_security_hub_in_delegated_account",
               "title": "Enable AWS Security Hub in delegated account",
               "helpfulResource": {
-                "displayText": "When you enable Security Hub from the console, you also have the option to enable the supported security standards.  You can configure new accounts to automatically be enabled as Security Hub member accounts.",
-                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/accounts-orgs-auto-enable.html"
+                "displayText": "When you enable Security Hub from the console, you also have the option to enable the supported security standards.  We recommend using the Central Configuration option of managing the organization Security Hub enabling and configuration.",
+                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/central-configuration-intro.html"
               },
               "improvementPlan": {
-                "displayText": "Enable AWS Security Hub in the delegated account and configure the automatic enabling of new organization accounts.",
-                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/accounts-orgs-auto-enable.html"
+                "displayText": "Enable AWS Security Hub in the delegated account using Central Configuration.",
+                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/central-configuration-intro.html"
               }
             },
             {
@@ -3849,6 +3849,18 @@
               "improvementPlan": {
                 "displayText": "Enable cross region aggregation in the home region of the Security Hub administrative account.",
                 "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation.html"
+              }
+            },
+            {
+              "id": "enable_security_hub_standard",
+              "title": "Enable Security Hub Standard",
+              "helpfulResource": {
+                "displayText": "A Security Hub standard is a predefined collection of rules based on regulatory frameworks and or best practices (e.g. NIST, CIS, FSBP, PCI DSS).  This allows you to measure the posture of your environment against the enable standard(s).  We recommend enabling at least 1 common standard (NIST, CIS, FSBP) and work to improve the posture of that standard.",
+                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards.html"
+              },
+              "improvementPlan": {
+                "displayText": "Enable at least 1 security standard in Security Hub Organization.",
+                "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/standards-reference.html"
               }
             },
             {
