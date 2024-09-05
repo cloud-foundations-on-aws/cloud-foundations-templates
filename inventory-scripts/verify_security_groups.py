@@ -14,9 +14,6 @@ __version__ = '2024.09.04'
 
 # Global Variables
 CSV_FILE = os.getenv("CSV_FILE", "./all.csv")
-DRY_RUN = os.getenv("DRY_RUN", False)
-# This is to use this script to VALIDATE the Security Group findings, instead of apply anything.
-VALIDATION = os.getenv("VALIDATION", "False")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", logging.ERROR)
 
 
@@ -67,28 +64,21 @@ def main(CSV_FILE):
 	except:
 		logging.error("ERROR: Unable to get matching CSV entries.")
 
-	if VALIDATION in ['False', 'false']:
-		logging.info("VALIDATION mode disabled. Attaching security groups.")
-		try:
-			attach_security_groups(matching_entries)
-		except:
-			logging.error("ERROR: Unable to attach security groups.")
-	else:
-		logging.info("Validation mode enabled. No changes will be made.")
-		try:
-			results = validate_security_groups(matching_entries)
-			logging.debug(results)
-			successful_results = 0
-			compliant_results = 0
-			for result in results:
-				if result['Success']:
-					successful_results += 1
-					if result['Compliant']:
-						compliant_results += 1
-				pprint(result)
-			print(f"Finished validation with {successful_results} successful checks and {compliant_results} compliant resources out of a total of {len(matching_entries)} requested resources.")
-		except:
-			logging.error("ERROR: Unable to validate security groups.")
+	# Script now only supports validation, and not attachment.
+	try:
+		results = validate_security_groups(matching_entries)
+		logging.debug(results)
+		successful_results = 0
+		compliant_results = 0
+		for result in results:
+			if result['Success']:
+				successful_results += 1
+				if result['Compliant']:
+					compliant_results += 1
+			pprint(result)
+		print(f"Finished validation with {successful_results} successful checks and {compliant_results} compliant resources out of a total of {len(matching_entries)} requested resources.")
+	except:
+		logging.error("ERROR: Unable to validate security groups.")
 
 	print("Finalized script. Exiting")
 
@@ -98,7 +88,6 @@ def current_contextual_identity():
 	Identify the current account id and region using a Boto3 call.
 
 	Args:
-		None
 	Returns:
 		String : Account ID
 		String : Region
@@ -200,7 +189,7 @@ def get_security_group_id_from_name(security_group_name: str) -> str:
 	"""
 	try:
 		security_group_response = boto3.client("ec2").describe_security_groups()
-    # The problem here is that the result of the search can bring back multiple matching security group ids for the same named security group ("default")
+		# The problem here is that the result of the search can bring back multiple matching security group ids for the same named security group ("default")
 		matching_security_group_ids = jmespath.search(f"SecurityGroups[?GroupName==`{security_group_name}`].GroupId", security_group_response)
 		if len(matching_security_group_ids) == 1:
 			return matching_security_group_ids[0]
@@ -232,328 +221,6 @@ def get_resource_type_from_arn(arn) -> str:
 	resource_type = arn_parts[2].split("/")[0]
 
 	return resource_type
-
-
-def attach_security_groups(matching_entries: List[Dict[str, Any]]) -> bool:
-	"""
-	Attach the valid security groups to the matching ARNs. Separates entries into resources types.
-	Five supported resources types today are EC2, ELBv2, RDS, Lambda, ECS. Additional resource types can be added
-
-	Args:
-		matching_entries (List[Dict[str, Any]]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		True if successful, False otherwise.
-	Raises:
-		Exception: If an error occurs while attaching security groups.
-	"""
-	try:
-		for entry in matching_entries:
-			entry_type = get_resource_type_from_arn(entry["arn"])
-			if entry_type == "ec2":
-				attach_security_groups_to_ec2(entry)
-			elif entry_type == "elasticloadbalancing":
-				attach_security_groups_to_elasticloadbalancing(entry)
-			elif entry_type == "ecs":
-				attach_security_groups_to_ecs_task(entry)
-			elif entry_type == "rds":
-				attach_security_groups_to_rds(entry)
-			elif entry_type == "lambda":
-				attach_security_groups_to_lambda(entry)
-			else:
-				logging.info("Unsupported resource type: %s", entry_type)
-		return True
-	except Exception as e:
-		logging.error(f"ERROR: Attaching security groups: {e}")
-		logging.error(f"\tResource Type: {entry_type}")
-		logging.error(f"\tARN: {entry['arn']}")
-		logging.error(f"\tSecurity Group: {entry['security_group']}")
-
-		return False
-
-
-def attach_security_groups_to_elasticloadbalancing(matching_entry: Dict[str, Any]) -> None:
-	"""
-	Attach the valid security groups to the matching ELBv2 ARNs.
-
-	Args:
-		matching_entry (List[Dict[str, Any]]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		None
-	"""
-	try:
-		elbv2_arn = matching_entry["arn"]
-		elbv2_response = boto3.client("elbv2").describe_load_balancers(LoadBalancerArns=[elbv2_arn])
-		elbv2_security_groups = jmespath.search("LoadBalancers[].SecurityGroups", elbv2_response)[0]
-
-		# Primary Case: Security Group not in security rules and there could be 0+ security groups.
-		if elbv2_security_groups == []:
-			new_elbv2_security_groups = []
-			new_elbv2_security_groups.append(matching_entry["security_group"])
-		elif not matching_entry["security_group"] in elbv2_security_groups:
-			new_elbv2_security_groups = []
-			new_elbv2_security_groups.append(elbv2_security_groups)
-			new_elbv2_security_groups.append(matching_entry["security_group"])
-			if DRY_RUN:
-				logging.info(f"DRY_RUN: ELBv2 {elbv2_arn}: Would have added Security Groups: {new_elbv2_security_groups}")
-			else:
-				boto3.client("elbv2").set_security_groups(
-					LoadBalancerArn=matching_entry["arn"],
-					SecurityGroups=new_elbv2_security_groups,
-					)
-				logging.info(
-					f"ELBv2 {elbv2_arn}. Added Security Groups: {new_elbv2_security_groups}"
-					)
-
-		# Secondary case: Security Group is the only Security Group attached.
-		elif matching_entry["security_group"] in elbv2_security_groups:
-			logging.debug(
-				f"ELBv2 {elbv2_arn}. Already has security Group: {matching_entry['security_group']}. Skipping"
-				)
-		# Third Case: there are no ELBv2s to attach
-		elif elbv2_response["LoadBalancers"] == []:
-			logging.error(f"ELBv2 {elbv2_arn} not found")
-		else:
-			logging.debug("Provided ELBv2 did not meet use cases. Skipping")
-
-	except botocore.exceptions.ClientError as e:
-		logging.error(
-			f"Error attaching security group {matching_entry['security_group']} to ELBv2 {matching_entry['arn']}: \nError: {e}"
-			)
-
-
-def attach_security_groups_to_ec2(matching_entry: Dict[str, Any]) -> None:
-	"""
-	Attach the valid security groups to the matching EC2 ARNs.
-
-	Args:
-		matching_entry (Dict[str, Any]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		None
-	"""
-
-	try:
-		ec2_id = matching_entry["arn"].split("/")[1]
-		ec2_response = boto3.client("ec2").describe_instances(InstanceIds=[ec2_id])
-		ec2_security_groups = jmespath.search(
-			"Reservations[].Instances[].SecurityGroups[].GroupId",
-			ec2_response,
-			)
-		# Primary Case: Security Group not in security rules and there could be 0+ security groups.
-		if ec2_security_groups == []:
-			new_ec2_security_groups = []
-			new_ec2_security_groups.append(matching_entry["security_group"])
-
-		elif not matching_entry["security_group"] in ec2_security_groups:
-			new_ec2_security_groups = ec2_security_groups
-			new_ec2_security_groups.append(matching_entry["security_group"])
-
-			if DRY_RUN:
-				logging.info(f"DRY_RUN: EC2 {ec2_id}: Would have added Security Groups: {new_ec2_security_groups}")
-			else:
-				boto3.client("ec2").modify_instance_attribute(
-					InstanceId=ec2_id,
-					Groups=new_ec2_security_groups,
-					)
-				logging.info(
-					f"EC2 {ec2_id}. Added Security Groups: {new_ec2_security_groups}"
-					)
-		# Secondary case: Security Group is the only Security Group attached.
-		elif matching_entry["security_group"] in ec2_security_groups:
-			logging.debug(
-				f"EC2 {ec2_id}. Already has security Group: {matching_entry['security_group']}. Skipping"
-				)
-		# Third Case: there are no EC2s to attach
-		elif ec2_response["Reservations"] == []:
-			logging.error(f"EC2 {ec2_id} not found")
-
-		else:
-			logging.debug("Provided EC2 Instances did not meet use cases. Skipping")
-
-	except botocore.exceptions.ClientError as e:
-		logging.error(
-			f"Error attaching security group {matching_entry['security_group']} to EC2 {matching_entry['arn']}. \nError: {e}"
-			)
-
-
-def attach_security_groups_to_ecs_task(matching_entry: Dict[str, Any]) -> None:
-	"""
-	Attach the valid security groups to the matching EC2 ARNs.
-
-	Args:
-		matching_entry (Dict[str, Any]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		None
-	"""
-	try:
-
-		cluster_name = matching_entry["arn"].split("/")[1]
-		service_name = matching_entry["arn"].split("/")[2]
-		ecs_service_response = boto3.client("ecs").describe_services(
-			cluster=cluster_name, services=[service_name]
-			)
-
-		security_group_ids = []
-
-		if ecs_service_response != []:
-			ecs_security_group_ids = jmespath.search(
-				"services[].networkConfiguration.awsvpcConfiguration.securityGroups",
-				ecs_service_response,
-				)[0]
-			subnet_ids = jmespath.search(
-				"services[].networkConfiguration.awsvpcConfiguration.subnets[]",
-				ecs_service_response,
-				)
-			# Primary Case: Security Group not in security rules and there could be 0+ security groups.
-			if ecs_security_group_ids == []:
-				new_ecs_security_groups = []
-				new_ecs_security_groups.append(matching_entry["security_group"])
-
-			elif not matching_entry["security_group"] in security_group_ids:
-				new_ecs_security_groups = ecs_security_group_ids
-				new_ecs_security_groups.append(matching_entry["security_group"])
-
-				if DRY_RUN:
-					logging.info(f"DRY_RUN: ECS {service_name}: Would have added Security Groups: {new_ecs_security_groups}")
-				else:
-					boto3.client("ecs").update_service(
-						cluster=cluster_name,
-						service=service_name,
-						networkConfiguration={
-							"awsvpcConfiguration": {
-								"securityGroups": new_ecs_security_groups,
-								"subnets"       : subnet_ids,
-								}
-							},
-						)
-
-					logging.info(
-						f"ECS {service_name}. Added Security Groups: {new_ecs_security_groups}"
-						)
-			# Secondary case: Security Group is the only Security Group attached.
-			elif matching_entry["security_group"] in security_group_ids:
-				logging.debug(
-					f"ECS {service_name}. Already has security Group: {matching_entry['security_group']}. Skipping"
-					)
-			# Third Case: there are no ECS Services to attach
-			elif ecs_service_response == []:
-				logging.error(f"ECS {matching_entry['arn']} not found")
-			else:
-				logging.debug("Provided ECS Services did not meet use cases. Skipping")
-
-		else:
-			logging.error(f"Cluster '{cluster_name}' not found.")
-
-	except botocore.exceptions.ClientError as e:
-		logging.error(
-			f"Error attaching security group {matching_entry['security_group']} to EC2 {matching_entry['arn']}: \nError: {e}"
-			)
-
-
-def attach_security_groups_to_rds(matching_entry: Dict[str, Any]) -> None:
-	"""
-	Attach the valid security groups to the matching RDS ARNs.
-
-	Args:
-		matching_entry (Dict[str, Any]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		None
-	"""
-	try:
-		rds_response = boto3.client("rds").describe_db_instances(
-			DBInstanceIdentifier=matching_entry["arn"]
-			)
-		rds_security_groups = jmespath.search(
-			"DBInstances[].VpcSecurityGroups[].VpcSecurityGroupId", rds_response
-			)
-		rds_instance_id = jmespath.search(
-			"DBInstances[].DBInstanceIdentifier", rds_response
-			)[0]
-
-		# Primary Case: Security Group not in security rules and there could be 0+ security groups.
-		if rds_security_groups == []:
-			new_rds_security_groups = []
-			new_rds_security_groups.append(matching_entry["security_group"])
-
-		elif not matching_entry["security_group"] in rds_security_groups:
-			new_rds_security_groups = rds_security_groups
-			new_rds_security_groups.append(matching_entry["security_group"])
-
-			if DRY_RUN:
-				logging.info(f"DRY_RUN: RDS {matching_entry['arn']}: Would have added Security Groups: {new_rds_security_groups}")
-			else:
-				boto3.client("rds").modify_db_instance(
-					DBInstanceIdentifier=rds_instance_id,
-					VpcSecurityGroupIds=new_rds_security_groups,
-					)
-				logging.info(
-					f"RDS {matching_entry['arn']}. Added Security Groups: {new_rds_security_groups}"
-					)
-		# Secondary case: Security Group is the only Security Group attached.
-		elif matching_entry["security_group"] in rds_security_groups:
-			logging.debug(
-				f"RDS {matching_entry['arn']}. Already has security Group: {matching_entry['security_group']}. Skipping"
-				)
-		# Third Case: there are no RDS Instances to attach
-		elif rds_response["DBInstances"] == []:
-			logging.error(f"RDS {matching_entry['arn']} not found")
-		else:
-			logging.debug("Provided RDS Instances did not meet use cases. Skipping")
-
-	except botocore.exceptions.ClientError as e:
-		logging.error(
-			f"Error attaching security group {matching_entry['security_group']} to RDS {matching_entry['arn']}: \nError: {e}"
-			)
-
-
-def attach_security_groups_to_lambda(matching_entry: Dict[str, Any]) -> None:
-	"""
-	Attach the valid security groups to the matching Lambda ARNs.
-
-	Args:
-		matching_entry (Dict[str, Any]): A list of dictionaries representing the matching CSV entries.
-	Returns:
-		None
-	"""
-	try:
-		lambda_arn = matching_entry["arn"]
-		lambda_response = boto3.client("lambda").get_function(FunctionName=lambda_arn)
-		lambda_security_groups = jmespath.search(
-			"Configuration.VpcConfig.SecurityGroupIds", lambda_response
-			)
-		# Primary Case: Security Group not in security rules and there could be 0+ security groups.
-		if lambda_security_groups == []:
-			new_lambda_security_groups = []
-			new_lambda_security_groups.append(matching_entry["security_group"])
-
-		elif not matching_entry["security_group"] in lambda_security_groups:
-			new_lambda_security_groups = lambda_security_groups
-			new_lambda_security_groups.append(matching_entry["security_group"])
-
-			if DRY_RUN:
-				logging.info(f"DRY_RUN: Lambda {lambda_arn}: Would have added Security Groups: {new_lambda_security_groups}")
-			else:
-				boto3.client("lambda").update_function_configuration(
-					FunctionName=lambda_arn,
-					VpcConfig={"SecurityGroupIds": new_lambda_security_groups},
-					)
-				logging.info(
-					f"Lambda {lambda_arn}. Added Security Groups: {new_lambda_security_groups}"
-					)
-		# Secondary case: Security Group is the only Security Group attached.
-		elif matching_entry["security_group"] in lambda_security_groups:
-			logging.debug(
-				f"Lambda {lambda_arn}. Already has security Group: {matching_entry['security_group']}. Skipping"
-				)
-		# Third Case: there are no Lambda Functions to attach
-		elif lambda_response == []:
-			logging.error(f"Lambda {matching_entry['arn']} not found")
-		else:
-			logging.debug("Provided Lambda Functions did not meet use cases. Skipping")
-
-	except botocore.exceptions.ClientError as e:
-		logging.error(
-			f"Error attaching security group {matching_entry['security_group']} to Lambda {matching_entry['arn']}: \nError: {e}"
-			)
 
 
 def validate_security_groups(matching_entries: List[Dict[str, Any]]) -> list:
@@ -707,7 +374,7 @@ def validate_security_groups_to_ec2(matching_entry: Dict[str, Any]) -> dict:
 			                        "Compliant"             : True})
 
 		# Secondary Case: there are no EC2s to attach
-		elif ec2_response["Reservations"] == []:
+		elif not ec2_response["Reservations"]:
 			error_message = f"EC2 {ec2_id} not found"
 			logging.error(error_message)
 			return_response.update({"ErrorMessage"          : error_message,
@@ -751,7 +418,8 @@ def validate_security_groups_to_ecs_task(matching_entry: Dict[str, Any]) -> dict
 		ecs_service_response = boto3.client("ecs").describe_services(
 			cluster=cluster_name, services=[service_name])
 
-		if ecs_service_response != []:
+		# Simplified way of saying "Not a null response"
+		if ecs_service_response:
 			ecs_security_group_ids = jmespath.search(
 				"services[].networkConfiguration.awsvpcConfiguration.securityGroups",
 				ecs_service_response)[0]
@@ -778,7 +446,7 @@ def validate_security_groups_to_ecs_task(matching_entry: Dict[str, Any]) -> dict
 				                        "Success"               : True,
 				                        "Compliant"             : False})
 			# Secondary Case: there are no ECS Services to attach
-			elif ecs_service_response == []:
+			elif not ecs_service_response:
 				error_message = f"ECS {matching_entry['arn']} not found"
 				logging.info(error_message)
 				return_response.update({"ErrorMessage"          : error_message,
