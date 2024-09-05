@@ -1168,8 +1168,7 @@
               "title": "IAM policies",
               "helpfulResource": {
                 "displayText": "An AWS Identity and Access Management (IAM) policy is a JSON document that defines permissions and access control rules for AWS resources. IAM policies allow you to specify who has access to which AWS resources and what actions they can perform on those resources.",
-                "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
-                "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_access-management.html"
+                "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
               },
               "improvementPlan": {
                 "displayText": "Review AWS IAM policies.",
