@@ -200,7 +200,7 @@ def get_security_group_id_from_name(security_group_name: str) -> str:
 	"""
 	try:
 		security_group_response = boto3.client("ec2").describe_security_groups()
-		# The problem here is that the result of the search can bring back multiple matching security group ids for the same named security group ("default")
+    # The problem here is that the result of the search can bring back multiple matching security group ids for the same named security group ("default")
 		matching_security_group_ids = jmespath.search(f"SecurityGroups[?GroupName==`{security_group_name}`].GroupId", security_group_response)
 		if len(matching_security_group_ids) == 1:
 			return matching_security_group_ids[0]

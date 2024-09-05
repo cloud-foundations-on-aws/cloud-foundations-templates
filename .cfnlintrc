@@ -1,0 +1,4 @@
+templates:
+  - ./**/*.yaml
+ignore_templates:
+  - ./custom-lens/tools/yaml/*.yaml

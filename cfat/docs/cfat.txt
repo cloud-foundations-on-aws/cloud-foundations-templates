@@ -1,0 +1,335 @@
+Cloud Foundation Assessment Tool
+Generated on: Mon, 22 Jul 2024 20:00:52 GMT 
+
+
+Incomplete Requirements:
+    INCOMPLETE: Config Recorder in Management Account configured
+    INCOMPLETE: Config Delivery Channel in Management Account configured
+
+====================================
+
+Foundation Status: INCOMPLETE
+Estimate of Required Level of Effort (LOE): 4 hours
+CFAT Score: 133 out of 158
+
+====================================
+
+Foundation Checks:
+┌─────────┬────────────────────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────┬──────────────┬──────────┬────────┬─────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ (index) │                           check                            │                                        description                                        │    status    │ required │ weight │ loe │                                                                 remediationLink                                                                 │
+├─────────┼────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────┼──────────────┼──────────┼────────┼─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│    0    │                 'AWS Organization created'                 │                              'AWS Organization is enabled.'                               │  'complete'  │   true   │   6    │  1  │                                             'https://aws.amazon.com/organizations/getting-started/'                                             │
+│    1    │                'Management Account created'                │                             'AWS Management account exists.'                              │  'complete'  │   true   │   6    │  1  │                                'https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-creating.html'                                │
+│    2    │           'Management Account IAM users removed'           │                    'IAM Users should not exist in Management Account.'                    │  'complete'  │  false   │   4    │  1  │                            'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_manage.html#id_users_deleting'                            │
+│    3    │         'Management Account EC2 instances removed'         │                  'EC2 Instances should not exist in Management Account.'                  │ 'incomplete' │  false   │   4    │  1  │                                'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html'                                 │
+│    4    │             'Management Account VPCs removed'              │                      'Management Account should not have any VPCs.'                       │ 'incomplete' │  false   │   4    │  1  │       'https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/blob/main/network/network-default-vpc-deletion/README.md'        │
+│    5    │                 'CloudTrail Trail created'                 │                    'CloudTrail should be enabled within the account.'                     │  'complete'  │   true   │   6    │  3  │                          'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html'                          │
+│    6    │         'CloudTrail Organization Service enabled'          │                    'CloudTrail should be enabled on the Organization.'                    │  'complete'  │   true   │   6    │  1  │                    'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-cloudtrail.html'                     │
+│    7    │              'CloudTrail Org Trail deployed'               │              'At least one CloudTrail Organization Trail should be enabled.'              │  'complete'  │   true   │   6    │  1  │                          'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html'                          │
+│    8    │     'Config Recorder in Management Account configured'     │              'Config Recorder in the Management Account should be enabled.'               │ 'incomplete' │   true   │   6    │  2  │            'https://aws.amazon.com/blogs/mt/managing-aws-organizations-accounts-using-aws-config-and-aws-cloudformation-stacksets/'             │
+│    9    │ 'Config Delivery Channel in Management Account configured' │            'Config Delivery Channel in Management Account should be enabled.'             │ 'incomplete' │   true   │   6    │  2  │            'https://aws.amazon.com/blogs/mt/managing-aws-organizations-accounts-using-aws-config-and-aws-cloudformation-stacksets/'             │
+│   10    │            'CloudFormation StackSets activated'            │       'CloudFormation StackSets should be activated in the CloudFormation console.'       │ 'incomplete' │  false   │   5    │  1  │ 'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-cloudformation.html#integrate-enable-ta-cloudformation' │
+│   11    │          'GuardDuty Organization service enabled'          │                   'GuardDuty Organization services should be enabled.'                    │  'complete'  │  false   │   4    │  1  │      'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-guardduty.html#integrate-enable-ta-guardduty'      │
+│   12    │             'RAM Organization service enabled'             │ 'Resource Access Manager (RAM) trusted access should be enabled in the AWS Organization.' │  'complete'  │  false   │   4    │  1  │            'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-ram.html#integrate-enable-ta-ram'            │
+│   13    │        'Security Hub Organization service enabled'         │         'Security Hub trusted access should be enabled in the AWS Organization.'          │  'complete'  │  false   │   4    │  1  │    'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-securityhub.html#integrate-enable-ta-securityhub'    │
+│   14    │     'IAM Access Analyzer Organization service enabled'     │      'IAM Access Analyzer trusted access should be enabled in the AWS Organization.'      │  'complete'  │  false   │   4    │  1  │                'https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html#access-analyzer-enabling'                 │
+│   15    │           'Config Organization service enabled'            │          'AWS Config trusted access should be enabled in the AWS Organization.'           │  'complete'  │  false   │   4    │  1  │         'https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-config.html#integrate-enable-ta-config'         │
+│   16    │       'CloudFormation Organization service enabled'        │        'CloudFormation trusted access should be enabled in the AWS Organization.'         │  'complete'  │  false   │   5    │  1  │                  'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-orgs-activate-trusted-access.html'                   │
+│   17    │           'Top-level Infrastructure OU deployed'           │                        'Top-level Infrastructure OU should exist.'                        │  'complete'  │  false   │   5    │  2  │                                   'https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou'                                    │
+│   18    │              'Top-level Security OU deployed'              │                           'Top-level Security OU should exist.'                           │  'complete'  │   true   │   6    │  2  │                                   'https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou'                                    │
+│   19    │             'Top-level Workloads OU deployed'              │                          'Top-level Workloads OU should exist.'                           │  'complete'  │  false   │   5    │  2  │                                   'https://catalog.workshops.aws/control-tower/en-US/introduction/manage-ou'                                    │
+│   20    │           'IAM IdC Organization service enabled'           │      'IAM Identity Center trusted access should be enabled in the AWS Organization'       │  'complete'  │   true   │   6    │  1  │                               'https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html'                               │
+│   21    │                    'IAM IdC configured'                    │                        'IAM Identity Center should be configured.'                        │  'complete'  │   true   │   6    │  3  │                                   'https://docs.aws.amazon.com/singlesignon/latest/userguide/tutorials.html'                                    │
+│   22    │             'Service Control Policies enabled'             │          'Service Control Policy should be enabled within the AWS Organization.'          │  'complete'  │   true   │   6    │  1  │                      'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html'                      │
+│   23    │             'Organization Tag Policy enabled'              │                'Tag Policy should be enabled within the AWS Organization.'                │  'complete'  │   true   │   6    │  1  │                      'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html'                      │
+│   24    │            'Organization Backup Policy enabled'            │              'Backup Policy should be enabled within the AWS Organization.'               │  'complete'  │  false   │   5    │  1  │                      'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html'                      │
+│   25    │                  'Control Tower deployed'                  │                            'Control Tower should be deployed.'                            │  'complete'  │   true   │   6    │  6  │                                   'https://catalog.workshops.aws/control-tower/en-US/prerequisites/deploying'                                   │
+│   26    │               'Control Tower latest version'               │                       'Control Tower should be the latest version.'                       │  'complete'  │  false   │   5    │  2  │                              'https://docs.aws.amazon.com/controltower/latest/userguide/update-controltower.html'                               │
+│   27    │                'Control Tower not drifted'                 │                          'Control Tower should not be drifted.'                           │  'complete'  │   true   │   6    │  2  │                                 'https://docs.aws.amazon.com/controltower/latest/userguide/resolve-drift.html'                                  │
+│   28    │               'Log Archive account deployed'               │                            'Log Archive account should exist.'                            │  'complete'  │   true   │   6    │  2  │                          'https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-from-console.html'                          │
+│   29    │                  'Audit account deployed'                  │                      'Audit/Security Tooling account should exist.'                       │  'complete'  │   true   │   6    │  2  │                          'https://docs.aws.amazon.com/controltower/latest/userguide/getting-started-from-console.html'                          │
+└─────────┴────────────────────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────┴──────────────┴──────────┴────────┴─────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+Start Detailed Report:
+
+
+*********************************************************
+                   MANAGEMENT ACCOUNT
+*********************************************************
+
+AWS ACCOUNT TYPE
+
+  Is in AWS Organization: true
+  Assessing AWS Management Account: true
+
+IAM USERS CHECK
+
+  No IAM Users found.
+
+EC2 INSTANCE CHECK
+
+  No EC2 instances found.
+
+VPC CHECK
+
+  ap-south-1 - found VPC(s).
+  eu-north-1 - found VPC(s).
+  eu-west-3 - found VPC(s).
+  eu-west-2 - found VPC(s).
+  eu-west-1 - found VPC(s).
+  ap-northeast-3 - found VPC(s).
+  ap-northeast-2 - found VPC(s).
+  ap-northeast-1 - found VPC(s).
+  ca-central-1 - found VPC(s).
+  sa-east-1 - found VPC(s).
+  ap-southeast-1 - found VPC(s).
+  ap-southeast-2 - found VPC(s).
+  eu-central-1 - found VPC(s).
+  us-east-1 - found VPC(s).
+  us-east-2 - found VPC(s).
+  us-west-1 - found VPC(s).
+  us-west-2 - found VPC(s).
+
+AWS CONFIG CHECK
+
+  No AWS Config resource discovered
+
+MANAGEMENT ACCOUNT TASKS:
+  Delete VPC in ap-south-1 - Management Account - Delete any unnecessary VPC in ap-south-1 to include the default VPC.
+  Delete VPC in eu-north-1 - Management Account - Delete any unnecessary VPC in eu-north-1 to include the default VPC.
+  Delete VPC in eu-west-3 - Management Account - Delete any unnecessary VPC in eu-west-3 to include the default VPC.
+  Delete VPC in eu-west-2 - Management Account - Delete any unnecessary VPC in eu-west-2 to include the default VPC.
+  Delete VPC in eu-west-1 - Management Account - Delete any unnecessary VPC in eu-west-1 to include the default VPC.
+  Delete VPC in ap-northeast-3 - Management Account - Delete any unnecessary VPC in ap-northeast-3 to include the default VPC.
+  Delete VPC in ap-northeast-2 - Management Account - Delete any unnecessary VPC in ap-northeast-2 to include the default VPC.
+  Delete VPC in ap-northeast-1 - Management Account - Delete any unnecessary VPC in ap-northeast-1 to include the default VPC.
+  Delete VPC in ca-central-1 - Management Account - Delete any unnecessary VPC in ca-central-1 to include the default VPC.
+  Delete VPC in sa-east-1 - Management Account - Delete any unnecessary VPC in sa-east-1 to include the default VPC.
+  Delete VPC in ap-southeast-1 - Management Account - Delete any unnecessary VPC in ap-southeast-1 to include the default VPC.
+  Delete VPC in ap-southeast-2 - Management Account - Delete any unnecessary VPC in ap-southeast-2 to include the default VPC.
+  Delete VPC in eu-central-1 - Management Account - Delete any unnecessary VPC in eu-central-1 to include the default VPC.
+  Delete VPC in us-east-1 - Management Account - Delete any unnecessary VPC in us-east-1 to include the default VPC.
+  Delete VPC in us-east-2 - Management Account - Delete any unnecessary VPC in us-east-2 to include the default VPC.
+  Delete VPC in us-west-1 - Management Account - Delete any unnecessary VPC in us-west-1 to include the default VPC.
+  Delete VPC in us-west-2 - Management Account - Delete any unnecessary VPC in us-west-2 to include the default VPC.
+
+*********************************************************
+                    GOVERNANCE
+*********************************************************
+
+AWS ORGANIZATION POLICY TYPES
+
+  Service Control Policies (SCP) enabled: true
+  Tag Policies enabled: true
+  Backup Policies enabled: true
+
+AWS ORGANIZATION CLOUDFORMATION
+
+  AWS CloudFormation Organization stack sets status : ENABLED
+
+CLOUDTRAIL CHECK
+
+  CloudTrail found in us-west-2
+    Is Organization Trail: true
+    Is MultiRegion: true
+
+
+GOVERNANCE SERVICES ENABLED IN AWS ORGANIZATION:
+
+  AWS CloudTrail
+  AWS Config
+
+GOVERNANCE TASKS:
+
+*********************************************************
+                FINANCIAL MANAGEMENT
+*********************************************************
+
+Legacy CUR
+  Is legacy CUR setup: false
+
+CLOUD FINANCIAL MANAGEMENT TASKS:
+  Setup legacy CUR - Cloud Financial Management - Setup legacy CUR in AWS Organization
+
+*********************************************************
+                MULTI-ACCOUNT STRATEGY
+*********************************************************
+
+AWS ORGANIZATION DETAILS
+
+  AWS Organization Id: o-12345abcde
+  AWS Organization ARN: arn:aws:organizations::12345678912:organization/o-12345abcde
+  AWS Organization Root OU Id: r-ab12
+
+AWS ORGANIZATION CLOUDFORMATION
+
+  AWS CloudFormation Organization stack sets status : ENABLED
+
+AWS ORGANIZATION TOP-LEVEL ORGANIZATION UNITS
+
+  List of Organization's top-level OUs and AWS accounts:
+    Organizational Unit: Exceptions
+      Organizational Unit Id: ou-ab12-abch1234
+      AWS Accounts: None
+
+    Organizational Unit: Security
+      Organizational Unit Id: ou-ab12-1234abc
+      AWS Accounts: None
+
+    Organizational Unit: Transitional
+      Organizational Unit Id: ou-ab12-abcl1234
+      AWS Accounts: None
+
+    Organizational Unit: Workloads
+      Organizational Unit Id: ou-ab12-1234vabc
+      AWS Accounts: None
+
+    Organizational Unit: Suspended
+      Organizational Unit Id: ou-ab12-abcc1234
+      AWS Accounts: None
+
+    Organizational Unit: CT Security
+      Organizational Unit Id: ou-ab12-1234rabc
+      AWS Accounts:
+        Log Archive
+        Audit
+
+    Organizational Unit: Infrastructure
+      Organizational Unit Id: ou-ab12-abcn1234
+      AWS Accounts:
+        Shared Resources
+        Identity
+        Network
+
+
+AWS ORGANIZATION MEMBER ACCOUNTS
+
+  Account: Audit
+  Account Email: my-example+ctlab-audit@example.com
+
+  Account: Log Archive
+  Account Email: my-example+ctlab-log-archive@example.com
+
+  Account: Shared Resources
+  Account Email: my-example+ctlab-shared-resources@example.com
+
+  Account: Network
+  Account Email: my-example+ctlab-network@example.com
+
+  Account: Identity
+  Account Email: my-example+ctlab-identity@example.com
+
+  Account: Management
+  Account Email: my-example+ct-lab@aol.com
+
+
+AWS ORGANIZATION ENABLED SERVICES
+
+  The following AWS Services are enabled within your AWS Organization:
+    access-analyzer.amazonaws.com
+    account.amazonaws.com
+    cloudtrail.amazonaws.com
+    config.amazonaws.com
+    controltower.amazonaws.com
+    guardduty.amazonaws.com
+    inspector2.amazonaws.com
+    ipam.amazonaws.com
+    macie.amazonaws.com
+    member.org.stacksets.cloudformation.amazonaws.com
+    ram.amazonaws.com
+    securityhub.amazonaws.com
+    sso.amazonaws.com
+    storage-lens.s3.amazonaws.com
+    tagpolicies.tag.amazonaws.com
+
+AWS ORGANIZATION INTEGRATED SERVICE REGISTERED DELEGATED ADMINS
+
+  Account: Audit
+  Delegated Services:
+    guardduty.amazonaws.com
+    inspector2.amazonaws.com
+    macie.amazonaws.com
+    securityhub.amazonaws.com
+    storage-lens.s3.amazonaws.com
+ 
+  Account: Network
+  Delegated Services:
+    ipam.amazonaws.com
+ 
+  Account: Identity
+  Delegated Services:
+    access-analyzer.amazonaws.com
+    sso.amazonaws.com
+ 
+
+MULTI-ACCOUNT STRATEGY TASKS:
+  Review Account Email Addresses - Multi-Account Strategy - Review Account Email Addresses in AWS Organization
+
+*********************************************************
+                  LANDING ZONE
+*********************************************************
+
+AWS CONTROL TOWER
+
+  Control Tower home region: us-west-2
+  Control Tower status: ACTIVE
+  Control Tower Landing Zone version: 3.3
+  Latest available version: 3.3
+  Drift Status: IN_SYNC
+
+LANDING ZONE TASKS:
+
+*********************************************************
+                    IDENTITY
+*********************************************************
+
+AWS IAM IDENTITY CENTER
+
+  IdC Region: us-west-2
+  IdC ARN: arn:aws:sso:::instance/ssoins-123456789abcdefg
+  IdC Instance Id: d-12345abcde
+
+IDENTITY TASKS:
+
+*********************************************************
+                    SECURITY
+*********************************************************
+
+AWS SECURITY SERVICES ENABLED IN AWS ORGANIZATION:
+
+  AWS GuardDuty
+  AWS Security Hub
+  IAM Access Analyzer
+  Macie
+  Amazon S3 Storage Lens
+  Amazon Inspector
+  AWS CloudTrail
+  AWS Config
+
+SECURITY TASKS:
+  Delegate administration of AWS Config - Security - Delegate administration to AWS Config
+
+*********************************************************
+                    NETWORK
+*********************************************************
+
+NETWORK TASKS:
+
+*********************************************************
+                  OBSERVABILITY
+*********************************************************
+
+OBSERVABILITY TASKS:
+  Delegate administration of AWS Account - Observability - Delegate administration to AWS Account
+
+*********************************************************
+               BACKUP AND RECOVERY
+*********************************************************
+
+BACKUP AND RECOVERY TASKS:
+  Enable AWS Backup - Backup and Recovery - Enable AWS Backup in AWS Organization
+  Delegate administration of AWS Backup - Backup and Recovery - Delegate administration to AWS Backup
+
+
+END REVIEW
