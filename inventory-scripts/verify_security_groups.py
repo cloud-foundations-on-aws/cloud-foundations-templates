@@ -30,7 +30,7 @@ def main(CSV_FILE):
 	5. Attaching valid Security Groups with valid ARNS.
 
 	Args:
-		csv (str): CSV file path
+		CSV_FILE (str): CSV file path
 
 	Returns:
 		Pass or Failure [0/1]
@@ -49,7 +49,8 @@ def main(CSV_FILE):
 	try:
 		csv_data = csv_import(CSV_FILE)
 	except Exception as e:
-		logging.error(f"ERROR: Unable to importing CSV file.")
+		logging.error(f"ERROR: Unable to importing CSV file.\n"
+		              f"Error Message: {e}")
 
 	try:
 		account_id, region = current_contextual_identity()
@@ -149,7 +150,7 @@ def get_arns_for_current_account(csv_data: List[Dict[str, Any]], account_id: str
 		# Test 1: Check to see if Account ID and Region match
 		# Test 2: Check to see if the Security Group is valid
 		# Test 3: Check to see if the Security Group name is unique (multiple sgs named "default" is possible given multiple VPCs)
-		# If Test 1 and Test 2 pass - add to matching entries (after stripping all whitespace, tabs, etc.
+		# If Test 1 and Test 2 pass - add to matching entries (after stripping all whitespace, tabs, etc.)
 
 		target_account_id = entry["arn"].strip().split(":")[4]
 		target_region = entry["arn"].strip().split(":")[3]
@@ -193,14 +194,12 @@ def get_security_group_id_from_name(security_group_name: str) -> str:
 	Get the Security Group ID from the Security Group Name. Returns sg-id or empty string
 
 	Args:
-		security_group (Dict[str, Any]): The security group name dictionary.
+		security_group_name (Dict[str, Any]): The security group name dictionary.
 	Returns:
 		str: Security Group ID
 	"""
 	try:
 		security_group_response = boto3.client("ec2").describe_security_groups()
-		# if isinstance(security_group_id, list):
-		# 	continue
 		# The problem here is that the result of the search can bring back multiple matching security group ids for the same named security group ("default")
 		matching_security_group_ids = jmespath.search(f"SecurityGroups[?GroupName==`{security_group_name}`].GroupId", security_group_response)
 		if len(matching_security_group_ids) == 1:
@@ -277,7 +276,7 @@ def attach_security_groups_to_elasticloadbalancing(matching_entry: Dict[str, Any
 	Attach the valid security groups to the matching ELBv2 ARNs.
 
 	Args:
-		matching_entries (List[Dict[str, Any]]): A list of dictionaries representing the matching CSV entries.
+		matching_entry (List[Dict[str, Any]]): A list of dictionaries representing the matching CSV entries.
 	Returns:
 		None
 	"""
@@ -294,7 +293,7 @@ def attach_security_groups_to_elasticloadbalancing(matching_entry: Dict[str, Any
 			new_elbv2_security_groups = []
 			new_elbv2_security_groups.append(elbv2_security_groups)
 			new_elbv2_security_groups.append(matching_entry["security_group"])
-			if (DRY_RUN):
+			if DRY_RUN:
 				logging.info(f"DRY_RUN: ELBv2 {elbv2_arn}: Would have added Security Groups: {new_elbv2_security_groups}")
 			else:
 				boto3.client("elbv2").set_security_groups(
@@ -348,7 +347,7 @@ def attach_security_groups_to_ec2(matching_entry: Dict[str, Any]) -> None:
 			new_ec2_security_groups = ec2_security_groups
 			new_ec2_security_groups.append(matching_entry["security_group"])
 
-			if (DRY_RUN):
+			if DRY_RUN:
 				logging.info(f"DRY_RUN: EC2 {ec2_id}: Would have added Security Groups: {new_ec2_security_groups}")
 			else:
 				boto3.client("ec2").modify_instance_attribute(
@@ -413,7 +412,7 @@ def attach_security_groups_to_ecs_task(matching_entry: Dict[str, Any]) -> None:
 				new_ecs_security_groups = ecs_security_group_ids
 				new_ecs_security_groups.append(matching_entry["security_group"])
 
-				if (DRY_RUN):
+				if DRY_RUN:
 					logging.info(f"DRY_RUN: ECS {service_name}: Would have added Security Groups: {new_ecs_security_groups}")
 				else:
 					boto3.client("ecs").update_service(
@@ -479,7 +478,7 @@ def attach_security_groups_to_rds(matching_entry: Dict[str, Any]) -> None:
 			new_rds_security_groups = rds_security_groups
 			new_rds_security_groups.append(matching_entry["security_group"])
 
-			if (DRY_RUN):
+			if DRY_RUN:
 				logging.info(f"DRY_RUN: RDS {matching_entry['arn']}: Would have added Security Groups: {new_rds_security_groups}")
 			else:
 				boto3.client("rds").modify_db_instance(
@@ -530,7 +529,7 @@ def attach_security_groups_to_lambda(matching_entry: Dict[str, Any]) -> None:
 			new_lambda_security_groups = lambda_security_groups
 			new_lambda_security_groups.append(matching_entry["security_group"])
 
-			if (DRY_RUN):
+			if DRY_RUN:
 				logging.info(f"DRY_RUN: Lambda {lambda_arn}: Would have added Security Groups: {new_lambda_security_groups}")
 			else:
 				boto3.client("lambda").update_function_configuration(
@@ -612,8 +611,6 @@ def validate_security_groups_to_elasticloadbalancing(matching_entry: Dict[str, A
 	"""
 	return_response = matching_entry.copy()
 	return_response.update({"Compliant": False, "Success": False, "SecurityGroupsAttached": None, "ErrorMessage": ""})
-	# return_response = {"arn": str, "security_group": "security_group_name", "Compliant": False, "Success": False, "SecurityGroupsAttached": None, "ErrorMessage": ""}
-	# return_response.update(matching_entry.copy())
 	try:
 		elbv2_arn = matching_entry["arn"]
 		elbv2_response = boto3.client("elbv2").describe_load_balancers(LoadBalancerArns=[elbv2_arn])
@@ -703,7 +700,7 @@ def validate_security_groups_to_ec2(matching_entry: Dict[str, Any]) -> dict:
 			                        "Compliant"             : False})
 		elif matching_entry["security_group"] in ec2_security_groups:
 			error_message = f'Security group {matching_entry["security_group"]} found attached to {matching_entry["arn"]}'
-			logging.error(error_message)
+			logging.info(error_message)
 			return_response.update({"ErrorMessage"          : error_message,
 			                        "SecurityGroupsAttached": ec2_security_groups,
 			                        "Success"               : True,
