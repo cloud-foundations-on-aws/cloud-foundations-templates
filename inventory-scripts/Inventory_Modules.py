@@ -1546,7 +1546,7 @@ def delete_gd_invites2(ocredentials, fRegion, fAccountId):
 			print(my_Error)
 
 
-def find_account_instances2(ocredentials, fRegion='us-east-1'):
+def find_account_instances2(ocredentials=None):
 	"""
 	ocredentials is an object with the following structure:
 		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
@@ -1558,25 +1558,74 @@ def find_account_instances2(ocredentials, fRegion='us-east-1'):
 	import boto3
 	import logging
 
-	if 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+	if ocredentials == None:
+		session_ec2 = boto3.Session()
+		ocredentials = dict()
+		ocredentials['AccountNumber'] = session_ec2.client('sts').get_caller_identity()['Account']
+		ocredentials['Region'] = session_ec2.region_name
+	elif 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
 		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
 		logging.info(
 			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
 		if ProfileAccountNumber == ocredentials['AccountNumber']:
 			session_ec2 = boto3.Session(profile_name=ocredentials['Profile'],
-			                            region_name=fRegion)
+			                            region_name=ocredentials['Region'])
 		else:
 			session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 			                            aws_secret_access_key=ocredentials['SecretAccessKey'],
 			                            aws_session_token=ocredentials['SessionToken'],
-			                            region_name=fRegion)
+			                            region_name=ocredentials['Region'])
 	else:
 		session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 		                            aws_secret_access_key=ocredentials['SecretAccessKey'],
 		                            aws_session_token=ocredentials['SessionToken'],
-		                            region_name=fRegion)
+		                            region_name=ocredentials['Region'])
 	instance_info = session_ec2.client('ec2')
-	logging.info(f"Looking for instances in account # {ocredentials['AccountNumber']} in region {fRegion}")
+	logging.info(f"Looking for instances in account # {ocredentials['AccountNumber']} in region {ocredentials['Region']}")
+	instances = instance_info.describe_instances()
+	AllInstances = instances
+	while 'NextToken' in instances.keys():
+		instances = instance_info.describe_instances(NextToken=instances['NextToken'])
+		AllInstances['Reservations'].extend(instances['Reservations'])
+	return AllInstances
+
+
+def find_account_ecs_clusters_and_tasks2(ocredentials=None):
+	"""
+	ocredentials is an object with the following structure:
+		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
+		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
+		- ['SessionToken'] holds the AWS_SESSION_TOKEN
+		- ['AccountNumber'] holds the account number
+		- ['Profile'] can hold the profile, instead of the session credentials
+	"""
+	import boto3
+	import logging
+
+	if ocredentials == None:
+		session_ecs = boto3.Session()
+		ocredentials = dict()
+		ocredentials['AccountNumber'] = session_ecs.client('sts').get_caller_identity()['Account']
+		ocredentials['Region'] = session_ecs.region_name
+	elif 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
+		logging.info(
+			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
+		if ProfileAccountNumber == ocredentials['AccountNumber']:
+			session_ecs = boto3.Session(profile_name=ocredentials['Profile'],
+			                            region_name=ocredentials['Region'])
+		else:
+			session_ecs = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+			                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+			                            aws_session_token=ocredentials['SessionToken'],
+			                            region_name=ocredentials['Region'])
+	else:
+		session_ecs = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+		                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+		                            aws_session_token=ocredentials['SessionToken'],
+		                            region_name=ocredentials['Region'])
+	instance_info = session_ecs.client('ecs')
+	logging.info(f"Looking for instances in account # {ocredentials['AccountNumber']} in region {ocredentials['Region']}")
 	instances = instance_info.describe_instances()
 	AllInstances = instances
 	while 'NextToken' in instances.keys():
@@ -4444,7 +4493,7 @@ def display_results(results_list, fdisplay_dict: dict, defaultAction=None, file_
 		#   Possibly we can have a setting where this data is written to a csv locally. We could create separate analytics once the data was saved.
 		if file_to_save is not None:
 			Heading = ''
-			my_filename = f'{file_to_save}-{datetime.now().strftime("%y-%m-%d--%H-%M-%S")}'
+			my_filename = f'{file_to_save.split(".")[0]}-{datetime.now().strftime("%y-%m-%d--%H-%M-%S")}.csv'
 			logging.info(f"Writing your data to: {my_filename}")
 			with open(my_filename, 'w') as savefile:
 				for field, value in sorted_display_dict.items():
