@@ -79,7 +79,7 @@ def find_all_instances(fAllCredentials: list, fStatus: str = None) -> list:
 				try:
 					# Now go through those stacksets and determine the instances, made up of accounts and regions
 					# Most time spent in this loop
-					Instances = Inventory_Modules.find_account_instances2(c_account_credentials, c_account_credentials['Region'])
+					Instances = Inventory_Modules.find_account_instances2(c_account_credentials)
 					logging.info(f"Account: {c_account_credentials['AccountId']} Region: {c_account_credentials['Region']} | Found {len(Instances['Reservations'])} instances")
 					State = InstanceType = InstanceId = PublicDnsName = Name = ""
 					if 'Reservations' in Instances.keys():
