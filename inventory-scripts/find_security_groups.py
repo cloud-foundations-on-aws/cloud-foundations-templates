@@ -13,7 +13,7 @@ from time import time
 import logging
 
 init()
-__version__ = '2024.06.30'
+__version__ = '2024.08.24'
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
 
@@ -86,8 +86,24 @@ def check_accounts_for_security_groups(fCredentialList, fFragment: list = None, 
 				c_account_credentials, c_fragments, c_exact, c_default = self.queue.get()
 				logging.info(f"De-queued info for account number {c_account_credentials['AccountId']}")
 				try:
+					# TODO:
+					#   If I wanted to find the arns of the resources that belonged to the security groups,
+					#   I'd have to get a listing of all the resources that could possibly have a security group attached
+					#   and then use that list to reverse-match the enis we find to the enis attached to the resources,
+					#   so I could figure out which resources were being represented by the enis.
+					#   This seems like a lot of work, although I understand why it would be useful
+					#   It's possible we could start with just EC2 instances, and eventually widen the scope
 					# Now go through each credential (account / region), and find all default security groups
 					SecurityGroups = find_security_groups2(c_account_credentials, c_fragments, c_exact, c_default)
+					"""
+					instances = aws_acct.session.client('ec2').describe_instances()
+					for sg in SecurityGroups:
+						for instance in instances['Reservations']:
+							for inst in instance['Instances']:
+								for secgrp in inst['SecurityGroups']: 
+									if sg['GroupName'] in secgrp['GroupName']:
+										print(inst['InstanceId'], inst['PrivateIpAddress'], inst['State']['Name'], inst['PrivateDnsName'], sg['GroupName'], sg['Description'])
+					"""
 					logging.info(f"Account: {c_account_credentials['AccountId']} | Region: {c_account_credentials['Region']} | Found {len(SecurityGroups)} groups")
 					# Checking whether the list is empty or not
 					if SecurityGroups:
@@ -198,6 +214,7 @@ def check_accounts_for_security_groups(fCredentialList, fFragment: list = None, 
 # Determine whether these Security Groups are in use (Done)
 # For each security group, find if any rules mention the security group found (either ENI or in other Security Groups) (Done)
 # TODO:
+#  To find the arn of the resource using that security group, instead of just the ENI.
 #  To fix the use of a default security group:
 #   For each security group, find if any rules mention the security group found
 #   Once all the rules are found, create a new security group - cloning those rules
@@ -205,17 +222,14 @@ def check_accounts_for_security_groups(fCredentialList, fFragment: list = None, 
 #   Determine if there's a way to update those resources to use the new security group
 #   Present what we've found, and ask the user if they want to update those resources to use the new security group created
 
-# def find_rules_within_security_group():
-
-# def find_enis_associated_to_security_group(f_account:str, f_sec_grps:list):
-# 	for sec_grp in f_sec_grps:
-# 		# Find all enis associated with each security group
-#
-def save_data_to_file(f_AllSecurityGroups:list, f_Filename:str, f_References: bool = False, f_Rules: bool = False, f_NoEmpty:bool = False) -> str:
+def save_data_to_file(f_AllSecurityGroups: list, f_Filename: str, f_References: bool = False, f_Rules: bool = False, f_NoEmpty: bool = False) -> str:
 	"""
 	Description: Saves the data to a file
 	@param f_AllSecurityGroups: The security groups and associated data that were found
 	@param f_Filename: The file to save the data to
+	@param f_References: Whether to include the references to the security groups or not
+	@param f_Rules: Whether to include the rules within the security groups or not
+	@param f_NoEmpty: Whether to include non-referenced security groups or not
 	@return: The filename that was saved
 	"""
 	# Save the header to the file
@@ -237,16 +251,16 @@ def save_data_to_file(f_AllSecurityGroups:list, f_Filename:str, f_References: bo
 					continue
 				elif sg['NumOfReferences'] == 0:
 					sg_line_with_references = sg_line + f"{'|None' * 7}"
-					# f.write(sg_line)
+				# f.write(sg_line)
 				elif sg['NumOfReferences'] > 0:
 					for reference in sg['ReferencedResources']:
 						reference_line = f"|{reference['ResourceType']}|{reference['Id']}|{reference['Status']}|{reference['AttachmentId']}|{reference['InstanceNameTag']}|{reference['IpAddress']}|{reference['Description']}"
 						sg_line_with_references = sg_line + reference_line
-						# f.write(sg_line + reference_line)
+					# f.write(sg_line + reference_line)
 			if pRules:
 				if sg['NumOfRules'] == 0:
 					sg_line_with_rules = sg_line + f"{'|None' * 4}\n"
-					# f.write(sg_line)
+				# f.write(sg_line)
 				else:
 					for inbound_permission in sg['IpPermissions']:
 						inbound_permission_line = f"|{inbound_permission['Protocol']}|{inbound_permission['FromPort']}|{inbound_permission['ToPort']}|{inbound_permission['From']}"
@@ -264,6 +278,22 @@ def save_data_to_file(f_AllSecurityGroups:list, f_Filename:str, f_References: bo
 				f.write(row)
 	logging.info(f"Data saved to {f_Filename}")
 	return f_Filename
+
+
+def find_resource_using_eni(f_eni: str, f_sg: dict, f_AllSecurityGroups: list) -> dict:
+	"""
+	Description: Finds the resource using the ENI
+	@param f_eni: The ENI to find the resource for
+	@param f_sg: The security group to find the resource for
+	@param f_AllSecurityGroups: The list of all security groups and associated data
+	@return: The resource using the ENI
+	"""
+	for resource in f_AllSecurityGroups:
+		if resource['GroupId'] == f_sg['GroupId']:
+			for eni in resource['NetworkInterfaces']:
+				if eni['NetworkInterfaceId'] == f_eni:
+					return resource
+	return None
 
 
 ##################
