@@ -1,8 +1,6 @@
 import logging
 
-__version__ = "2024.02.27"
-
-from typing import Any, Dict, List
+__version__ = "2024.09.09"
 
 """
 ** Why are some functions "function" vs. "function2" vs. "function3"?**
@@ -1592,7 +1590,7 @@ def find_account_instances2(ocredentials=None):
 	return AllInstances
 
 
-def find_account_ecs_clusters_services_and_tasks2(ocredentials=None) -> list[dict[str, Any]]:
+def find_account_ecs_clusters_services_and_tasks2(ocredentials=None) -> list[dict[str, any]]:
 	"""
 	ocredentials is an object with the following structure:
 		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
