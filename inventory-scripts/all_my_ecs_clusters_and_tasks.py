@@ -3,7 +3,7 @@
 import sys
 from os.path import split
 import Inventory_Modules
-from Inventory_Modules import get_all_credentials, display_results
+from Inventory_Modules import get_all_credentials, display_results, find_account_ecs_clusters_services_and_tasks2
 from ArgumentsClass import CommonArguments
 from colorama import init, Fore
 from botocore.exceptions import ClientError
@@ -15,7 +15,7 @@ from time import time
 import logging
 
 init()
-__version__ = "2024.09.24"
+__version__ = "2024.09.06"
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
 
@@ -56,12 +56,12 @@ def parse_args(f_arguments):
 
 
 # The parameters passed to this function should be the dictionary of attributes that will be examined within the thread.
-def find_all_instances(fAllCredentials: list, fStatus: str = None) -> list:
+def find_all_clusters_and_tasks(fAllCredentials: list, fStatus: str = None) -> list:
 	"""
 	Description: Finds all the instances from all the accounts/ regions within the Credentials supplied
 	@param fAllCredentials: list of all credentials for all member accounts supplied
 	@param fStatus: string determining whether you're looking for "running" or "stopped" instances
-	@return: Returns a list of Instances
+	@return: Returns a list of ECS Clusters, Services and Tasks
 	"""
 
 	# This function is called
@@ -79,7 +79,7 @@ def find_all_instances(fAllCredentials: list, fStatus: str = None) -> list:
 				try:
 					# Now go through those stacksets and determine the instances, made up of accounts and regions
 					# Most time spent in this loop
-					Instances = Inventory_Modules.find_account_instances2(c_account_credentials)
+					EcsInfo = Inventory_Modules.find_account_ecs_clusters_services_and_tasks2(c_account_credentials)
 					logging.info(f"Account: {c_account_credentials['AccountId']} Region: {c_account_credentials['Region']} | Found {len(Instances['Reservations'])} instances")
 					State = InstanceType = InstanceId = PublicDnsName = Name = ""
 					if 'Reservations' in Instances.keys():
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 		print()
 	print(f"Now running through all accounts and regions identified to find resources...")
 	# Collect all the instances from the credentials found
-	AllInstances = find_all_instances(CredentialList, pStatus)
+	AllInstances = find_all_clusters_and_tasks(CredentialList, pStatus)
 	# Display the information we've found thus far
 	display_dict = {'ParentProfile': {'DisplayOrder': 1, 'Heading': 'Parent Profile'},
 	                'MgmtAccount'  : {'DisplayOrder': 2, 'Heading': 'Mgmt Acct'},

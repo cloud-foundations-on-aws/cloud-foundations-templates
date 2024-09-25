@@ -199,15 +199,9 @@ This script identifies all roles across the examined accounts, addressing the co
 
 ### [all_my_saml_providers.py](./all_my_saml_providers.py)
 
-This script aims to locate all Identity Providers (IDPs) across the user's organizational accounts. While the script also includes the capability to delete these IDPs, it is generally not a common requirement, as most users prefer to maintain visibility and control over their configured IDPs.
-
 The primary purpose of this tool is to provide a comprehensive inventory of the IDPs within the user's environment. This information can be valuable for understanding the identity and access management landscape, ensuring compliance, and managing the overall security posture of the cloud infrastructure.
 
-### [all_my_saml_providers.py](./all_my_saml_providers.py)
-
 This script is designed to locate all SAML providers within the user's organization. While the script also includes the capability to delete these SAML providers, this functionality should be used with caution, as it can significantly impact access to the affected accounts, potentially making it challenging to regain access.
-
-The primary purpose of this tool is to provide a comprehensive inventory of the SAML providers configured across the organization. This information can be valuable for understanding the identity and access management landscape, ensuring compliance, and managing the overall security posture of the cloud infrastructure.
 
 By offering the ability to identify all configured SAML providers, this script empowers users to have a centralized view of their identity-related resources. The deletion functionality is included as a safeguard, but its usage should be carefully considered, as it can have significant consequences on the organization's access and authentication mechanisms.
 
