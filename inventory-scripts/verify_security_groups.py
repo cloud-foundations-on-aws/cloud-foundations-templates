@@ -6,22 +6,27 @@
 
 import csv, logging, jmespath, os
 import boto3, botocore
-from Inventory_Modules import find_account_instances2
+from Inventory_Modules import find_account_instances2, find_account_ecs_clusters_services_and_tasks2, find_account_rds_instances2, find_load_balancers2, find_lambda_functions2
 from typing import Any, Dict, List
 
-__version__ = '2024.09.04'
+__version__ = '2024.09.25'
 # import time
 
 # Global Variables
 CSV_FILE = os.getenv("CSV_FILE", "./all.csv")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", logging.ERROR)
 FILENAME_TO_SAVE_TO = os.getenv("VERIFY_FILENAME", "results.csv")
-FIND_EVERYTHING = os.getenv("FIND_EVERYTHING", True)
+VERIFICATION = os.getenv("VERIFICATION", False)
+FIND_EVERYTHING = os.getenv("FIND_EVERYTHING", False)
+TAG_VALUE_TO_FILTER = os.getenv("TAG_VALUE_TO_FILTER", None)
 
 
 ##################
 # Functions
 ##################
+
+# TODO:
+#  Can we add a verification for the script o validate that the security groups applied to the resources are applied to the proper resources?
 
 
 def main(CSV_FILE):
@@ -61,7 +66,6 @@ def main(CSV_FILE):
 		if account_id is None or region is None:
 			raise ValueError("Unable to determine current account id and region.")
 		logging.info(f"Found that we're working in account {account_id} in region {region}")
-
 	except:
 		logging.error("ERROR: Unable to get AWS IAM contextual identity.")
 
@@ -71,31 +75,42 @@ def main(CSV_FILE):
 	except:
 		logging.error("ERROR: Unable to get matching CSV entries.")
 
-	display_dict = {'arn'                   : {'DisplayOrder': 1, 'Heading': 'ARN'},
-	                'Success'               : {'DisplayOrder': 2, 'Heading': 'Success', 'Condition': ['False', 'false', False]},
-	                'Compliant'             : {'DisplayOrder': 3, 'Heading': 'Compliance', 'Condition': ['False', 'false', False]},
-	                'SecurityGroupsAttached': {'DisplayOrder': 4, 'Heading': 'SecGrps Attached'},
-	                'security_group_name'   : {'DisplayOrder': 5, 'Heading': 'Requested Sec Grp Name'},
-	                'security_group'        : {'DisplayOrder': 6, 'Heading': 'Requested Sec Grp ID'},
-	                'ErrorMessage'          : {'DisplayOrder': 7, 'Heading': 'Error Message'}}
-	# Script only supports validation, and not attachment.
-	try:
-		results = validate_security_groups(matching_entries)
-		logging.debug(results)
-		successful_results = 0
-		compliant_results = 0
-		for result in results:
-			if result['Success']:
-				successful_results += 1
-				if result['Compliant']:
-					compliant_results += 1
-		display_results(results, display_dict, None, FILENAME_TO_SAVE_TO)
-		print(f"Finished validation with {successful_results} successful checks and {compliant_results} compliant resources out of a total of {len(matching_entries)} requested resources.")
-	except Exception as e:
-		logging.error(f"ERROR: Unable to validate security groups. Error Message: {e}")
+	if VERIFICATION in ['True', 'true', True]:
+		try:
+			display_dict = {'arn'                   : {'DisplayOrder': 1, 'Heading': 'ARN'},
+			                'Success'               : {'DisplayOrder': 2, 'Heading': 'Success', 'Condition': ['False', 'false', False]},
+			                'Compliant'             : {'DisplayOrder': 3, 'Heading': 'Compliance', 'Condition': ['False', 'false', False]},
+			                'SecurityGroupsAttached': {'DisplayOrder': 4, 'Heading': 'SecGrps Attached'},
+			                'security_group_name'   : {'DisplayOrder': 5, 'Heading': 'Requested Sec Grp Name'},
+			                'security_group'        : {'DisplayOrder': 6, 'Heading': 'Requested Sec Grp ID'},
+			                'ErrorMessage'          : {'DisplayOrder': 7, 'Heading': 'Error Message'}}
+			# Script only supports validation, and not attachment.
+			results = validate_security_groups(matching_entries)
+			logging.debug(results)
+			successful_results = 0
+			compliant_results = 0
+			for result in results:
+				if result['Success']:
+					successful_results += 1
+					if result['Compliant']:
+						compliant_results += 1
+			display_results(results, display_dict, None, FILENAME_TO_SAVE_TO)
+			print(f"Finished validation with {successful_results} successful checks and {compliant_results} compliant resources out of a total of {len(matching_entries)} requested resources.")
+		except Exception as e:
+			logging.error(f"ERROR: Unable to validate security groups. Error Message: {e}")
 
-	if FIND_EVERYTHING in ['True', True]:
-		all_arns = find_all_arns(matching_entries, account_id, region)
+	if FIND_EVERYTHING in ['True', 'true', True]:
+		try:
+			all_arns = find_all_arns(account_id, region, TAG_VALUE_TO_FILTER)
+			display_dict = {'ARN'         : {'DisplayOrder': 1, 'Heading': 'ARN'},
+			                'Success'     : {'DisplayOrder': 2, 'Heading': 'Success', 'Condition': ['False', 'false', False]},
+			                'Account'     : {'DisplayOrder': 3, 'Heading': 'Account'},
+			                'Region'      : {'DisplayOrder': 4, 'Heading': 'Region'},
+			                'ResourceType': {'DisplayOrder': 5, 'Heading': 'Resource Type'},
+			                'ErrorMessage': {'DisplayOrder': 6, 'Heading': 'Error Message'}}
+			display_results(all_arns, display_dict, None, FILENAME_TO_SAVE_TO)
+		except Exception as e:
+			logging.error(f"ERROR: Unable to find all ARNs. Error Message: {e}")
 
 	print("Finalized script. Exiting")
 
@@ -177,7 +192,7 @@ def get_arns_for_current_account(csv_data: List[Dict[str, Any]], account_id: str
 				logging.info("No matching entries found, returning empty list")
 		except Exception as e:
 			logging.error(f"Error processing entry: {e}")
-			
+
 	return matching_entries
 
 
@@ -214,7 +229,8 @@ def get_security_groups() -> List[str]:
 	except Exception as e:
 		logging.error(f"Had a problem retrieving security groups: {e}")
 
-def get_security_group_id_from_name(security_group_name: str, security_group_response:dict) -> str:
+
+def get_security_group_id_from_name(security_group_name: str, security_group_response: dict) -> str:
 	"""
 	Get the Security Group ID from the Security Group Name. Returns sg-id or empty string
 
@@ -240,7 +256,7 @@ def get_security_group_id_from_name(security_group_name: str, security_group_res
 		logging.error(f"Security Group doesn't exist: {e}")
 
 
-def dict_lower(dict_object:dict) -> dict:
+def dict_lower(dict_object: dict) -> dict:
 	"""
 	Convert all keys and values in a dictionary to lowercase.
 
@@ -249,13 +265,14 @@ def dict_lower(dict_object:dict) -> dict:
 	Returns:
 		dict: The dictionary with all keys and values converted to lowercase.
 	"""
-	def handle_int(item:int)->int:
+
+	def handle_int(item: int) -> int:
 		return item
 
-	def handle_string(item:str)->str:
+	def handle_string(item: str) -> str:
 		return item.lower()
 
-	def handle_list(item:list)->list:
+	def handle_list(item: list) -> list:
 		for i in item:
 			if type(i) == int:
 				item[item.index(i)] = handle_int(i)
@@ -265,7 +282,7 @@ def dict_lower(dict_object:dict) -> dict:
 				item[item.index(i)] = dict_lower(i)
 		return item
 
-	for k,v in dict_object.items():
+	for k, v in dict_object.items():
 		logging.info(f"Pre change - Key: {k}, Value: {v}")
 		value_type = type(dict_object[k])
 		if type(dict_object[k]) == int:
@@ -701,7 +718,7 @@ def validate_security_groups_to_lambda(matching_entry: Dict[str, Any]) -> dict:
 	return return_response
 
 
-def find_all_arns(matching_entries: List[Dict[str, Any]], account_id, region) -> list:
+def find_all_arns(account_id, region, tag_value_to_filter: str = None) -> list:
 	"""
 	@Description: This function will find the arns in the account (and region) so that QA can validate they've covered all resources expected.
 		Resource Types covered thus far:
@@ -710,31 +727,49 @@ def find_all_arns(matching_entries: List[Dict[str, Any]], account_id, region) ->
 			- ECS
 			- Load Balancers
 			- RDS
-	@matching_entries: a list of the arns that *are* known, so these can be either filtered out, or something...
+	@account_id: AWS Account ID
+	@region: AWS Region
+	@tag_values_to_filter: list of tag values to filter on.
 	@return: list of dicts, with arns and types
 	"""
 	try:
 		multiple_responses = []
 		supported_resource_types = ['ec2', 'ecs', 'rds', 'elasticloadbalancing', 'lambda']
 		for resource_type in supported_resource_types:
+			single_response_list = []
 			if resource_type == 'ec2':
 				list_of_ec2_arns = find_all_ec2_arns(account_id, region)
-				single_response = {'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARNs': list_of_ec2_arns, 'ErrorMessage': None}
-			# elif resource_type == 'ecs':
-			# 	single_response = find_all_ecs_arns()
-			# elif resource_type == 'rds':
-			# 	single_response = find_all_rds_arns()
-			# elif resource_type == 'elasticloadbalancing':
-			# 	single_response = find_all_elasticloadbalancing_arns()
-			# elif resource_type == 'lambda':
-			# 	single_response = find_all_lambda_arns()
+				logging.info(f"Found {len(list_of_ec2_arns)} ec2 arns")
+				for arn in list_of_ec2_arns:
+					single_response_list.append({'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': arn, 'ErrorMessage': None})
+			elif resource_type == 'ecs':
+				list_of_ecs_arns = find_all_ecs_service_arns(account_id, region)
+				logging.info(f"Found {len(list_of_ecs_arns)} ecs arns")
+				for arn in list_of_ecs_arns:
+					single_response_list.append({'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': arn, 'ErrorMessage': None})
+			elif resource_type == 'rds':
+				list_of_rds_arns = find_all_rds_arns(account_id, region)
+				logging.info(f"Found {len(list_of_rds_arns)} rds arns")
+				for arn in list_of_rds_arns:
+					single_response_list.append({'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': arn, 'ErrorMessage': None})
+			elif resource_type == 'elasticloadbalancing':
+				list_of_elasticloadbalancing_arns = find_all_elasticloadbalancing_arns(account_id, region)
+				for arn in list_of_elasticloadbalancing_arns:
+					single_response_list.append({'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': arn, 'ErrorMessage': None})
+			elif resource_type == 'lambda':
+				list_of_lambda_arns = find_all_lambda_arns(account_id, region, tag_value_to_filter)
+				logging.info(f"Found {len(list_of_lambda_arns)} lambda arns")
+				for arn in list_of_lambda_arns:
+					single_response_list.append({'Success': True, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': arn, 'ErrorMessage': None})
 			else:
 				error_message = f"Unsupported resource type: {resource_type}"
 				logging.error(error_message)
-				single_response = {'Success': False, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARNs': None, 'ErrorMessage': error_message}
-			multiple_responses.append(single_response)
+				single_response = {'Success': False, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARN': None, 'ErrorMessage': error_message}
+				single_response_list.append(single_response)
+
+			multiple_responses.extend(single_response_list)
 	except Exception as e:
-		error_message = (f"ERROR: Finding all arns: {e}"
+		error_message = (f"ERROR: Finding all arns: {e} | "
 		                 f"Resource Type: {resource_type}")
 		single_response = {'Success': False, 'Account': account_id, 'Region': region, 'ResourceType': resource_type, 'ARNs': None, 'ErrorMessage': error_message}
 
@@ -762,7 +797,9 @@ def find_all_ec2_arns(account_id: str, region: str) -> list:
 	except Exception as e:
 		logging.error(f"Failed to get instances from account {account_id} and region {region} | {e}")
 		return None
-def find_all_ecs_arns(account_id: str, region: str) -> list:
+
+
+def find_all_ecs_service_arns(account_id: str, region: str) -> list:
 	"""
 	@Description: This function will find all ECS ARNs in the account (and region)
 	@account_id: The account ID to search for instances in
@@ -771,16 +808,74 @@ def find_all_ecs_arns(account_id: str, region: str) -> list:
 	"""
 
 	try:
-		ec2_response = find_account_instances2()
-		ec2_instances = jmespath.search("Reservations[].Instances[].InstanceId", ec2_response)
-		ec2_arns = []
-		for instance in ec2_instances:
-			instance_arn = f"arn:aws:ec2:{region}:{account_id}:instance/{instance}"
-			ec2_arns.append(instance_arn)
-		return ec2_arns
+		ecs_response = find_account_ecs_clusters_services_and_tasks2()
+		ecs_arns = [resource['ServiceArn'] for resource in ecs_response if 'ServiceArn' in resource.keys()]
+		logging.info(f"Found {len(ecs_arns)} ECS services")
+		return ecs_arns
 	except Exception as e:
-		logging.error(f"Failed to get instances from account {account_id} and region {region} | {e}")
-		return None
+		error_message = f"Failed to get instances from account {account_id} and region {region} | {e}"
+		logging.error(error_message)
+		return []
+
+
+def find_all_rds_arns(account_id: str, region: str) -> list:
+	"""
+	@Description: This function will find all RDS ARNs in the account (and region)
+	@account_id: The account ID to search for instances in
+	@region: The region to search for instances in
+	@return: list of the rds_arns found in the account/region
+	"""
+
+	try:
+		rds_response = find_account_rds_instances2()
+		# Should look like this: arn:aws:rds:us-west-2:513645610340:db:test-rds
+		rds_arns = [f"arn:aws:rds:{region}:{account_id}:db:{db['DBInstanceIdentifier']}" for db in rds_response['DBInstances']]
+		logging.info(f"Found {len(rds_arns)} ECS services")
+		return rds_arns
+	except Exception as e:
+		error_message = f"Failed to get RDS instances from account {account_id} and region {region} | {e}"
+		logging.error(error_message)
+		return []
+
+
+def find_all_elasticloadbalancing_arns(account_id, region):
+	"""
+	@Description: This function will find all Elastic Load Balancer ARNs in the account (and region)
+	@account_id: The account ID to search for instances in
+	@region: The region to search for instances in
+	@return: list of the elasticloadbalancing_arns found in the account/region
+	"""
+
+	try:
+		list_of_elbs = find_load_balancers2()
+		# Should look like this: 'arn:aws:elasticloadbalancing:us-west-2:513645610340:loadbalancer/app/test-lb-tf/17a80f4fa92cedaf'
+		elb_arns = [lb['LoadBalancerArn'] for lb in list_of_elbs]
+		logging.info(f"Successfully found {len(elb_arns)} elb arns in account {account_id} and region {region}")
+		return elb_arns
+	except Exception as e:
+		error_message = f"Failed to get ELB instances from account {account_id} and region {region} | {e}"
+		logging.error(error_message)
+		return []
+
+
+def find_all_lambda_arns(account_id, region, tag_value_to_filter: str = None):
+	"""
+	@Description: This function will find all Lambda ARNs in the account (and region)
+	@account_id: The account ID to search for instances in
+	@region: The region to search for instances in
+	@return: list of the lambdas found in the account/region
+	"""
+
+	try:
+		list_of_lambdas = find_lambda_functions2(fTagValueToFilter=tag_value_to_filter)
+		# Should look like this: 'arn:aws:elasticloadbalancing:us-west-2:513645610340:loadbalancer/app/test-lb-tf/17a80f4fa92cedaf'
+		lambda_arns = [function['FunctionArn'] for function in list_of_lambdas]
+		logging.info(f"Successfully found {len(lambda_arns)} elb arns in account {account_id} and region {region}")
+		return lambda_arns
+	except Exception as e:
+		error_message = f"Failed to get Lambda functions from account {account_id} and region {region} | {e}"
+		logging.error(error_message)
+		return []
 
 
 def display_results(results_list, fdisplay_dict: dict, defaultAction=None, file_to_save: str = None, subdisplay: bool = False):
