@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import sys
+import os
 
 import Inventory_Modules
 from Inventory_Modules import display_results, get_all_credentials
 from ArgumentsClass import CommonArguments
-from datetime import datetime
+# from datetime import datetime
 from colorama import init, Fore
 from botocore.exceptions import ClientError
 from queue import Queue
@@ -15,7 +16,7 @@ import logging
 
 init()
 
-__version__ = '2024.05.07'
+__version__ = '2024.10.24'
 
 
 def parse_args(f_args):
@@ -25,6 +26,7 @@ def parse_args(f_args):
 	@return: returns an object namespace that contains the individualized parameters passed in
 	"""
 	parser = CommonArguments()
+	script_path, script_name = os.path.split(sys.argv[0])
 	parser.multiprofile()
 	parser.multiregion()
 	parser.extendedargs()
@@ -33,7 +35,8 @@ def parse_args(f_args):
 	parser.save_to_file()
 	parser.verbosity()
 	parser.version(__version__)
-	parser.my_parser.add_argument(
+	local = parser.my_parser.add_argument_group(script_name, 'Parameters specific to this script')
+	local.add_argument(
 		"--ipaddress", "--ip",
 		dest="pipaddresses",
 		nargs="*",
@@ -105,10 +108,10 @@ def check_accounts_for_enis(fCredentialList, fip=None):
 	return Results
 
 
-def present_results(ENIsFound:list):
+def present_results(f_ENIsFound: list):
 	"""
 	Description: Presents results at the end of the script
-	@param ENIsFound: The list of records to show...
+	@param f_ENIsFound: The list of records to show...
 	"""
 	display_dict = {'MgmtAccount'     : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
 	                'AccountId'       : {'DisplayOrder': 2, 'Heading': 'Acct Number'},
@@ -119,7 +122,7 @@ def present_results(ENIsFound:list):
 	                'ENIId'           : {'DisplayOrder': 7, 'Heading': 'ENI Id'},
 	                'PrivateIpAddress': {'DisplayOrder': 8, 'Heading': 'Assoc. IP'}}
 
-	sorted_ENIs_Found = sorted(ENIsFound, key=lambda d: (d['MgmtAccount'], d['AccountId'], d['Region'], d['VpcId']))
+	sorted_ENIs_Found = sorted(f_ENIsFound, key=lambda d: (d['MgmtAccount'], d['AccountId'], d['Region'], d['VpcId']))
 	display_results(sorted_ENIs_Found, display_dict, 'None', pFilename)
 
 	DetachedENIs = [x for x in sorted_ENIs_Found if x['Status'] in ['available', 'attaching', 'detaching']]
@@ -130,8 +133,9 @@ def present_results(ENIsFound:list):
 	print(f"These accounts were skipped - as requested: {pSkipAccounts}") if pSkipAccounts is not None else ""
 	print(f"These profiles were skipped - as requested: {pSkipProfiles}") if pSkipProfiles is not None else ""
 	print()
-	print(f"Your output will be saved to {Fore.GREEN}'{pFilename}-{datetime.now().strftime('%y-%m-%d--%H:%M:%S')}'{Fore.RESET}") if pFilename is not None else ""
-	print(f"Found {len(ENIsFound)} ENIs across {len(AccountList)} accounts across {len(RegionList)} regions")
+	# print(f"Your output will be saved to {Fore.GREEN}'{pFilename}-{datetime.now().strftime('%y-%m-%d--%H:%M:%S')}'{Fore.RESET}") if pFilename is not None else ""
+	print(f"The output has also been written to a file beginning with '{pFilename}' + the date and time") if pFilename is not None else ""
+	print(f"Found {len(f_ENIsFound)} ENIs across {len(AccountList)} accounts across {len(RegionList)} regions")
 	print(f"{Fore.RED}Found {len(DetachedENIs)} ENIs that are not listed as 'in-use' and may therefore be costing you additional money while they're unused.{Fore.RESET}")
 	print()
 	if verbose < 40:
