@@ -18,6 +18,9 @@ init()
 
 __version__ = '2024.10.24'
 
+##################
+# Functions
+##################
 
 def parse_args(f_args):
 	"""
@@ -143,6 +146,8 @@ def present_results(f_ENIsFound: list):
 			print(x)
 
 
+##################
+# Main
 ##################
 
 ERASE_LINE = '\x1b[2K'
