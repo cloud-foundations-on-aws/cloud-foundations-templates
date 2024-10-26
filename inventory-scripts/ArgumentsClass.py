@@ -15,7 +15,9 @@ How to use:
 	verbose = args.loglevel
 
 """
-__version__ = "2024.05.09"
+__version__ = "2024.09.24"
+
+import os
 
 
 class CommonArguments:
@@ -186,7 +188,8 @@ class CommonArguments:
 				nargs="*",
 				dest="Regions",
 				metavar="region name string",
-				default=["us-east-1"],
+				# default=["us-east-1"],
+				default=[os.getenv("AWS_DEFAULT_REGION","us-east-1")],
 				help="String fragment of the region(s) you want to check for resources. You can supply multiple fragments.\n"
 				     "Use 'all' for everything you've opted into, and 'global' for everything, regardless of opted-in status")
 

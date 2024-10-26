@@ -9,17 +9,17 @@ The tools presented below have evolved organically over time. They are presented
 
 > ***Note***: *The `verbose` and `debugging` options consistent across all the scripts to best effort.*
 
-| Param | Description |
-| --- | --- |
-| -v | For those times when I decided to show less information on screen, to keep the output neat - you could use this level of logging to get what an interested user might want to see. |
-| -vv | You could use this level of logging to get what a developer might want to see. |
-| -vvv | This is generally the lowest level I would recommend anyone use. I started changing most scripts over from "-d" for INFO, to "-vvv" to align with standard practices. This is generally the lowest level I would recommend anyone use. |
-| -d | I've updated the DEBUG to be the -d. Beware - this is a crazy amount of debugging, and it includes a lot of the open-source libraries that I use, since I don't disable that functionality within my scripts. |
-| -h | Provide "-h" or "--help" on the command line and get a nicely formatted screen that describes all possible parameters. |
-| -p | To specify the profile which the script will work with. In most cases, this could/ should be a Master Profile, but doesn't always have to be. Additionally - in many scripts, this parameter takes more than one possible profile AND ALSO allows you to specify a fragment of a profile, so it you have 3 profiles all with the same fragment, it will include all 3. |
-| -r | To specify the single region for the script to work in. Most scripts take "all" as a valid parameter. Most scripts also assume "us-east-1" as a default if nothing is specified. |
-| -rs | In many of the scripts, you can specify a fragment - so you can specify "us-east" and get both "us-east-1" and "us-east-2". Specify "us-" and you'll get all four "us-" regions. |
-| -f | String fragment - some scripts (specifically ones dealing with CFN stacks and stacksets) take a parameter that allows you to specify a fragment of the stack name, so you can find that stack you can't quite remember the whole name of. |
+| Param | Description                                                                                                                                                                                                                                                                                                                                                            |
+|-------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -v    | For those times when I decided to show less information on screen, to keep the output neat - you could use this level of logging to get what an interested user might want to see.                                                                                                                                                                                     |
+| -vv   | You could use this level of logging to get what a developer might want to see.                                                                                                                                                                                                                                                                                         |
+| -vvv  | This is generally the lowest level I would recommend anyone use. I started changing most scripts over from "-d" for INFO, to "-vvv" to align with standard practices. This is generally the lowest level I would recommend anyone use.                                                                                                                                 |
+| -d    | I've updated the DEBUG to be the -d. Beware - this is a crazy amount of debugging, and it includes a lot of the open-source libraries that I use, since I don't disable all of that functionality within my scripts.                                                                                                                                                   |
+| -h    | Provide "-h" or "--help" on the command line and get a nicely formatted screen that describes all possible parameters.                                                                                                                                                                                                                                                 |
+| -p    | To specify the profile which the script will work with. In most cases, this could/ should be a Master Profile, but doesn't always have to be. Additionally - in many scripts, this parameter takes more than one possible profile AND ALSO allows you to specify a fragment of a profile, so it you have 3 profiles all with the same fragment, it will include all 3. |
+| -r    | To specify the single region for the script to work in. Most scripts take "all" as a valid parameter. Most scripts also assume "us-east-1" as a default if nothing is specified.                                                                                                                                                                                       |
+| -rs   | In many of the scripts, you can specify a fragment - so you can specify "us-east" and get both "us-east-1" and "us-east-2". Specify "us-" and you'll get all four "us-" regions.                                                                                                                                                                                       |
+| -f    | String fragment - some scripts (specifically ones dealing with CFN stacks and stacksets) take a parameter that allows you to specify a fragment of the stack name, so you can find that stack you can't quite remember the whole name of.                                                                                                                              |
 
 ## Less used common parameters
 
@@ -199,15 +199,9 @@ This script identifies all roles across the examined accounts, addressing the co
 
 ### [all_my_saml_providers.py](./all_my_saml_providers.py)
 
-This script aims to locate all Identity Providers (IDPs) across the user's organizational accounts. While the script also includes the capability to delete these IDPs, it is generally not a common requirement, as most users prefer to maintain visibility and control over their configured IDPs.
-
 The primary purpose of this tool is to provide a comprehensive inventory of the IDPs within the user's environment. This information can be valuable for understanding the identity and access management landscape, ensuring compliance, and managing the overall security posture of the cloud infrastructure.
 
-### [all_my_saml_providers.py](./all_my_saml_providers.py)
-
 This script is designed to locate all SAML providers within the user's organization. While the script also includes the capability to delete these SAML providers, this functionality should be used with caution, as it can significantly impact access to the affected accounts, potentially making it challenging to regain access.
-
-The primary purpose of this tool is to provide a comprehensive inventory of the SAML providers configured across the organization. This information can be valuable for understanding the identity and access management landscape, ensuring compliance, and managing the overall security posture of the cloud infrastructure.
 
 By offering the ability to identify all configured SAML providers, this script empowers users to have a centralized view of their identity-related resources. The deletion functionality is included as a safeguard, but its usage should be carefully considered, as it can have significant consequences on the organization's access and authentication mechanisms.
 
