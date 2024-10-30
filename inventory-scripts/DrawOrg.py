@@ -102,6 +102,9 @@ def traverse_ous_and_accounts(ou_id: str, dot):
 		# Retrieve the policies associated with this OU
 		ou_associated_policies = []
 		for aws_policy_type in aws_policy_type_list:
+			# The function below is a paginated operation, but returns more values than are allowed to be applied to a single OU, so pagination isn't needed in this case.
+			# Eventually, they will likely change that - so this is a TODO for later.
+			logging.info(f"Checking for {aws_policy_type} policies on OU {ou_id}")
 			ou_associated_policies.extend(org_client.list_policies_for_target(TargetId=ou_id, Filter=aws_policy_type)['Policies'])
 		for policy in ou_associated_policies:
 			# If it's a Managed Policy and the user didn't want to see managed policies, then skip, otherwise show it.
