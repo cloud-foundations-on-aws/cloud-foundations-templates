@@ -7,11 +7,11 @@ from graphviz import Digraph
 from time import time
 from colorama import init, Fore
 from ArgumentsClass import CommonArguments
-import ipywidgets as widgets
-from ipywidgets import interactive, interactive_output
-from IPython.display import display
+# import ipywidgets as widgets
+# from ipywidgets import interactive, interactive_output
+# from IPython.display import display
 
-__version__ = '2024.06.18'
+__version__ = '2024.10.29'
 init()
 
 account_fillcolor = 'orange'
@@ -22,6 +22,8 @@ policy_linecolor = 'red'
 policy_shape = 'hexagon'
 ou_fillcolor = 'burlywood'
 ou_shape = 'box'
+aws_policy_type_list = ['SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY', 'AISERVICES_OPT_OUT_POLICY', 'CHATBOT_POLICY']
+
 
 #####################
 # Function Definitions
@@ -157,7 +159,6 @@ def traverse_ous_and_accounts(ou_id: str, dot):
 			dot.edge(association[0], association[1])
 
 	# Retrieve the child OUs under the current OU, and use pagination, since it's possible to have so many OUs that pagination is required.
-	all_child_ous = []
 	child_ous = org_client.list_organizational_units_for_parent(ParentId=ou_id)
 	all_child_ous = child_ous['OrganizationalUnits']
 	while 'NextToken' in child_ous.keys():
@@ -190,6 +191,8 @@ def create_policy_nodes(dot):
 			policy_type = 'backup'
 		elif policy['Type'] == 'AISERVICES_OPT_OUT_POLICY':
 			policy_type = 'ai'
+		elif policy['Type'] == 'CHATBOT_POLICY':
+			policy_type = 'chatbot'
 		else:
 			policy_type = 'unknown'
 
@@ -280,8 +283,6 @@ if __name__ == '__main__':
 	# If they specified they want to see the AWS policies, then they obviously want to see policies overall.
 	if pManaged and not pPolicy:
 		pPolicy = True
-
-	aws_policy_type_list = ['SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY', 'AISERVICES_OPT_OUT_POLICY']
 
 	# Find all the Organization Accounts
 	all_org_accounts = find_accounts_in_org()
