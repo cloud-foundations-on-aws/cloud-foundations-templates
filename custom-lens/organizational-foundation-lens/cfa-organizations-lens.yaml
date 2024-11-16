@@ -1,0 +1,337 @@
+---
+schemaVersion: '2021-11-01'
+name: AWS Cloud Foundations Accelerator - 10 Step organizational foundation
+description: AWS Cloud Foundations Accelerator - 10 Step Lens for a lean organizational foundation. It is a 10 step guidance to enable you to set up a lightweight multi-account environment. It provides a good starting point following AWS best practices, doesn't cause any disruptions, and doesn't have any cost implications.
+pillars:
+  # Multi-Account Strategy
+  - id: multi_account_strategy
+    name: Multi-Account Strategy
+    questions:
+      # Create basic Organizational Structure
+      - id: create_basic_organizational_structure
+        title: Create basic Organizational Structure
+        description: >
+          Foundational OUs are OUs that contain accounts, workloads, and otherenable_organization_instance_of_iam_identity_center AWS resources
+          that provide common security and infrastructure capabilities to secure and support
+          your overall AWS environment. Establishing foundational OUs early on is important.
+        choices:
+          # AWS Organizations
+          - id: review_aws_organizations_service
+            title: Review AWS Organizations service
+            helpfulResource:
+              displayText: >
+                AWS Organizations is an account management service that enables you to
+                consolidate multiple AWS accounts into an organization that you create and
+                centrally manage.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html
+            improvementPlan:
+              displayText: Review the AWS Organizations service.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html
+
+          # Create Workloads OU
+          - id: create_workloads_ou
+            title: Create Workloads OU
+            helpfulResource:
+              displayText: >
+                The Workloads organizational unit (OU) is intended to hold your business-specific
+                workloads. Reference the AWS multi-account strategy whitepaper for more info.
+              url: https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/workloads-ou.html
+            improvementPlan:
+              displayText: >
+                Follow AWS Control Tower documentation to create and enroll a top-level OU named Workloads.
+              url: https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html
+            additionalResources:
+              - type: HELPFUL_RESOURCE
+                content:
+                  - displayText: Organizing your AWS environment whitepaper
+                    url: https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-workload-oriented-ous.html
+                  - displayText: AWS Control Tower guidance on creating OUs
+                    url: https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html
+
+          # Create Sandbox OU
+          - id: create_sandbox_ou
+            title: Create Sandbox OU
+            helpfulResource:
+              displayText: >
+                The Sandbox OU contains accounts where builders can explore and experiment with
+                AWS services subject to your acceptable use policies. These environments are
+                typically disconnected from internal networks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/sandbox-ou.html
+            improvementPlan:
+              displayText: Follow AWS Control Tower documentation to create a top-level OU named Sandbox.
+              url: https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html
+            additionalResources:
+              - type: HELPFUL_RESOURCE
+                content:
+                  - displayText: Organizing your AWS environment whitepaper
+                    url: https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/sandbox-ou.html
+                  - displayText: AWS Control Tower guidance on creating OUs
+                    url: https://docs.aws.amazon.com/controltower/latest/userguide/create-new-ou.html
+
+          # None
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Choose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: create_workloads_ou && create_sandbox_ou
+            risk: NO_RISK
+          - condition: create_sandbox_ou
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+
+      # Implement service control policies
+      - id: implement_service_control_policies
+        title: Implement service control policies (SCPs)
+        description: >
+          Service control policies (SCPs) are organizational policies for central control over IAM permissions.  SCPs allow you to control which AWS service actions are accessible to principals (account root, IAM users, and IAM roles) in the accounts of your organization.
+        choices:
+          - id: enable_scp_in_your_organization
+            title: Enable SCP in your organization
+            helpfulResource:
+              displayText: Enable SCP in your environment before creating and attaching them.  If you have already enabled SCP in your organization, you can skip this section.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/enable-policy-type.html
+            improvementPlan:
+              displayText: Enabling an SCP is a one-time task via the management account.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/enable-policy-type.html
+
+          - id: create_a_region_access_scp
+            title: Create a Region Access SCP
+            helpfulResource:
+              displayText: >
+                Deny access to operations outside specified Regions. Replace regions in the
+                example with the AWS Regions you want to use.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_general.html#example-scp-deny-region
+            improvementPlan:
+              #todo
+              displayText: Enabling an SCP is a one-time task via the management account.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/enable-policy-type.html
+
+          - id: attach_region_access_scp_to_ou
+            title: Attach a Region Access SCP to Sandbox OU
+            helpfulResource:
+              displayText: >
+                Attach the SCP to the 'Sandbox OU' via the console's Policies > SCPs tab.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_policies_attach.html
+            improvementPlan:
+              #todo
+              displayText: Enabling an SCP is a one-time task via the management account.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/enable-policy-type.html
+
+          # Review example Service Control Policies (SCPs)
+          - id: review_example_service_control_policies
+            title: Review example Service Control Policies (SCPs)
+            helpfulResource:
+              displayText: A list of example SCPs is provided in the AWS Organizations User Guide that can be used to find additional SCPs that can help secure your environment.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples.html
+            improvementPlan:
+              displayText: Review example Service Control Policies.
+              url: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples.html
+            additionalResources:
+              - type: HELPFUL_RESOURCE
+                content:
+                  - displayText: SCP examples- github
+                    url: https://github.com/aws-samples/service-control-policy-examples
+
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Choose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: enable_scp_in_your_organization && create_a_region_access_scp
+            risk: NO_RISK
+          - condition: enable_scp_in_your_organization
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+  # Multi-Account Strategy
+  - id: cloudtrail
+    name: CloudTrail
+    questions:
+      - id: enable_and_configure_CloudTrail
+        title: Enable and configure CloudTrail
+        description: >
+          AWS CloudTrail enables operational and risk auditing of AWS accounts. Create a CloudTrail
+          trail to record events for more than 90 days.
+        choices:
+          - id: create_a_cloudtrail_management_event_trail
+            title: Create an organization CloudTrail management event trail
+            helpfulResource:
+              displayText: >
+                CloudTrail Management events provide event history for AWS accounts activity, including
+                actions taken through various AWS interfaces.
+              url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html
+            improvementPlan:
+              displayText: Enable organization CloudTrail management event trail.
+              url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html
+
+          - id: remove_redundant_cloudtrail_trails
+            title: Remove redundant CloudTrail trails
+            helpfulResource:
+              displayText: >
+                Only one organization Management Event Trail is typically needed to capture events.  Remove redundant management event trails in the organization to save on cost (the first management event trail is free).  Note: An organization trail creates a trail in each account and region in the organization therefore, account or region based management trails would be considered more than one trail and will be charged.
+              url: https://aws.amazon.com/cloudtrail/pricing/
+            improvementPlan:
+              displayText: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-delete-trails-console.html
+              url: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-delete-trails-console.html
+            additionalResources:
+              - type: HELPFUL_RESOURCE
+                content:
+                  - displayText: CloudTrail Pricing
+                    url: https://aws.amazon.com/cloudtrail/pricing/
+
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Choose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: create_a_cloudtrail_management_event_trail && remove_redundant_cloudtrail_trails
+            risk: NO_RISK
+          - condition: remove_redundant_cloudtrail_trails
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+
+  # Federated Access
+  - id: federated_access
+    name: Federated Access
+    questions:
+      - id: enable_iam_identity_center
+        title: Enable IAM Identity Center
+        description: >
+          AWS IAM Identity Center enables you to access all the accounts in an AWS Organizations organization and centralize user management. We recommend you to enable IAM Identity Center for single sign-on for the workforce in your organization. It provides secure single sign-on, centralized identity management, and access control, reducing IT overhead. Additionally, you can extend identity federation to allow access to not only AWS accounts, but also other applications such as Jenkins, JIRA, Slack, and Zoom.
+        choices:
+          - id: enable_organization_instance_of_iam_identity_center
+            title: Enable organizations instance of IAM Identity Center
+            helpfulResource:
+              displayText: >
+                An organization instance is our recommended best practice because it supports all features of IAM Identity Center and provides central management capabilities. Given that you already have an organization set up, we recommend you configure a delegated administrator for IAM Identity Center.  Deploy organization IAM Identity Center in the region where you conduct management operations.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html
+            improvementPlan:
+              displayText: Enable organization IAM Identity Center.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/get-set-up-for-idc.html
+
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Choose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: enable_organization_instance_of_iam_identity_center
+            risk: NO_RISK
+          - condition: enable_organization_instance_of_iam_identity_center
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+      # Configure AWS IAM Identity Center
+      - id: configure_aws_iam_identity_center
+        title: Configure AWS IAM Identity Center
+        description: IAM Identity Center (IdC) stores administrative permission settings that specify the amount of access granted to users and groups for an AWS account. After enabling IAM Identity Center and creating a permission set, the identity provider must be configured to support best practices.  If you are using AWS Control Tower, AWS IAM Identity Center is deployed in the home Region of your management account.
+        choices:
+
+          # Set MFA in AWS IAM Identity Center
+          - id: set_mfa_in_aws_iam_identity_center
+            title: Set MFA in AWS IAM Identity Center
+            helpfulResource:
+              displayText: It is recommended to enable Multi-Factor-Authentication (MFA) for AWS IAM Identity Center users. This is enabled from the IAM Identity Center web console by setting the option to configure MFA enforcement which will not allow users to log in for the first time until they configure an MFA device.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/how-to-configure-mfa-device-enforcement.html
+            improvementPlan:
+              displayText: Follow the IAM Identity Center User Guide to configure MFA for IAM Identity Center users
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/how-to-configure-mfa-device-enforcement.html
+
+          # Configure IdC URL in AWS IAM Identity Center
+          - id: configure_idc_url_in_aws_iam_center
+            title: Configure IdC URL in AWS IAM Identity Center
+            helpfulResource:
+              displayText: To make accessing your AWS environment easier for your users, you can set a customized portal URL in AWS IAM Identity Center.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/howtochangeURL.html
+            improvementPlan:
+              displayText: Create a customized portal URL in AWS IAM Identity Center.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/howtochangeURL.html
+
+          # NONE
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Chose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: set_mfa_in_aws_iam_identity_center
+            risk: NO_RISK
+          - condition: set_mfa_in_aws_iam_identity_center
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+      # Discontinue use of management account root user
+      - id: discontinue_use_of_management_account_root_user
+        title: Discontinue use of management account root user
+        description: When you first create an Amazon Web Services (AWS) account, you begin with a single sign-in identity that has complete access to all AWS services and resources in the account. This identity is called the AWS account root user and is accessed by signing in with the email address and password that you used to create the account.
+        choices:
+          # Use IAM Identity center for account access
+          - id: use_aws_iam_identity_center_for_account_access
+            title: Use AWS IAM Identity center for account access
+            helpfulResource:
+              displayText: We strongly recommend that you do not use the root user for your everyday tasks, even the administrative ones. As a best practice, safeguard your root user credentials and don't use them for everyday tasks. Root user credentials are only required to perform a few account and service management tasks.
+              url: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html
+            improvementPlan:
+              displayText: Use AWS IAM Identity Center users to access your accounts.
+              url: https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html
+
+          # NONE
+          - id: none_no
+            title: None of these
+            helpfulResource:
+              displayText: Chose this if you have not completed any of these tasks.
+              url: https://docs.aws.amazon.com/whitepapers/latest/establishing-your-cloud-foundation-on-aws/welcome.html
+
+        riskRules:
+          - condition: use_aws_iam_identity_center_for_account_access
+            risk: NO_RISK
+          - condition: use_aws_iam_identity_center_for_account_access
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
+
+  # Full Foundation
+  - id: full_foundation
+    name: Full Foundation
+    questions:
+      - id: deploy_a_full_cfa_foundation
+        title: Deploy a full CFA Foundation
+        description: >
+          A full Cloud Foundation includes capabilities in Security, Financial Management, Landing Zone automation, Logging & Monitoring and Networking that work together to provide a secure, cloud optimized, and agile multi-account environment.
+        choices:
+          - id: deploy_and_implement_the_full_CFA_WA_Lens
+            title: Deploy and implement the full CFA WA Lens
+            helpfulResource:
+              displayText: >
+                This Custom Lens provides improvements to your AWS environment.  For a full evaluation or implementation of your Cloud Foundation, deploy and implement the full CFA Lens.
+              url: https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/tree/main/custom-lens
+            improvementPlan:
+              displayText: Implement the full CFA Lens.
+              url: https://github.com/cloud-foundations-on-aws/cloud-foundations-templates/tree/main/custom-lens
+
+
+        riskRules:
+          - condition: deploy_and_implement_the_full_CFA_WA_Lens
+            risk: NO_RISK
+          - condition: deploy_and_implement_the_full_CFA_WA_Lens
+            risk: MEDIUM_RISK
+          - condition: default
+            risk: HIGH_RISK
+
