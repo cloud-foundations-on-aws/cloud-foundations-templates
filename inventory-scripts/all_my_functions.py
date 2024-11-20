@@ -105,7 +105,7 @@ def fix_runtime(CredentialList, new_runtime):
 							sleep(3)
 							logging.info(f"Sleeping to allow {c_function_name} to update to runtime {c_new_runtime}")
 						elif Status == 'Failed':
-							raise Exception(f'Runtime update for {c_function_name} to {c_new_runtime} failed')
+							raise RuntimeError(f'Runtime update for {c_function_name} to {c_new_runtime} failed')
 				except TypeError as my_Error:
 					logging.info(f"Error: {my_Error}")
 					continue

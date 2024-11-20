@@ -14,14 +14,19 @@ from ArgumentsClass import CommonArguments
 from Inventory_Modules import display_results, get_all_credentials
 
 init()
-__version__ = "2024.05.31"
+__version__ = "2024.10.24"
+
+# TODO: Add Elastic IPs to this script as well.
 
 
 ##################
-def parse_args(args):
+# Functions
+##################
+
+def parse_args(f_args):
 	"""
 	Description: Parses the arguments passed into the script
-	@param args: args represents the list of arguments passed in
+	@param f_args: args represents the list of arguments passed in
 	@return: returns an object namespace that contains the individualized parameters passed in
 	"""
 	script_path, script_name = os.path.split(sys.argv[0])
@@ -43,7 +48,7 @@ def parse_args(args):
 		metavar="IP address",
 		default=None,
 		help="IP address(es) you're looking for within your VPCs")
-	return parser.my_parser.parse_args(args)
+	return parser.my_parser.parse_args(f_args)
 
 
 def check_accounts_for_subnets(CredentialList, fip=None):
@@ -172,6 +177,9 @@ def analyze_results(fSubnetsFound: list):
 
 
 ##################
+# Main
+##################
+
 
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
