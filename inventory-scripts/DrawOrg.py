@@ -7,11 +7,9 @@ from graphviz import Digraph
 from time import time
 from colorama import init, Fore
 from ArgumentsClass import CommonArguments
-# import ipywidgets as widgets
-# from ipywidgets import interactive, interactive_output
-# from IPython.display import display
 
 __version__ = '2024.10.29'
+
 init()
 
 account_fillcolor = 'orange'
@@ -22,7 +20,8 @@ policy_linecolor = 'red'
 policy_shape = 'hexagon'
 ou_fillcolor = 'burlywood'
 ou_shape = 'box'
-aws_policy_type_list = ['SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY', 'AISERVICES_OPT_OUT_POLICY', 'CHATBOT_POLICY']
+aws_policy_type_list = ['SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY',
+                        'AISERVICES_OPT_OUT_POLICY', 'CHATBOT_POLICY', 'RESOURCE_CONTROL_POLICY']
 
 
 #####################
@@ -167,10 +166,14 @@ def traverse_ous_and_accounts(ou_id: str, dot):
 	while 'NextToken' in child_ous.keys():
 		child_ous = org_client.list_organizational_units_for_parent(ParentId=ou_id, NextToken=child_ous['NextToken'])
 		all_child_ous.extend(child_ous['OrganizationalUnits'])
+
+	logging.info(f"There are {len(all_child_ous)} OUs in OU {ou_id}")
 	for child_ou in all_child_ous:
 		child_ou_id = child_ou['Id']
 		# Recursively traverse the child OU and add edges to the diagram
+		logging.info(f"***** Starting to look at OU {child_ou['Name']} right now... ")
 		traverse_ous_and_accounts(child_ou_id, dot)
+		logging.info(f"***** Finished looking at OU {child_ou['Name']} right now... ")
 		dot.edge(ou_id, child_ou_id)
 
 
@@ -188,6 +191,8 @@ def create_policy_nodes(dot):
 
 		if policy['Type'] == 'SERVICE_CONTROL_POLICY':
 			policy_type = 'scp'
+		elif policy['Type'] == 'RESOURCE_CONTROL_POLICY':
+			policy_type = 'rcp'
 		elif policy['Type'] == 'TAG_POLICY':
 			policy_type = 'tag'
 		elif policy['Type'] == 'BACKUP_POLICY':
@@ -210,11 +215,19 @@ def find_max_accounts_per_ou(ou_id, max_accounts=0):
 	all_accounts = []
 	accounts = org_client.list_accounts_for_parent(ParentId=ou_id)
 	all_accounts.extend(accounts['Accounts'])
+	logging.info(f"Found {len(all_accounts)} accounts in ou {ou_id} - totaling {len(all_accounts)}")
+	# TODO: Figure a way to put a progress bar here - even thought we don't know how many accounts there might eventually be
+	# TODO: This has to somehow recurse, to handle the finding of # of accounts in the OUs under root
 	while 'NextToken' in accounts.keys():
 		accounts = org_client.list_accounts_for_parent(ParentId=ou_id, NextToken=accounts['NextToken'])
 		all_accounts.extend(accounts['Accounts'])
 		logging.info(f"Found {len(all_accounts)} more accounts in ou {ou_id} - totaling {len(all_accounts)} accounts so far")
 	max_accounts_return = max(len(all_accounts), max_accounts)
+
+	nested_ous = org_client.list_organizational_units_for_parent(ParentId=ou_id)
+	logging.info(f"Found {len(nested_ous['OrganizationalUnits'])} OUs in ou {ou_id}")
+	for ou in nested_ous['OrganizationalUnits']:
+		max_accounts_return = max(find_max_accounts_per_ou(ou['Id'], max_accounts_return), max_accounts_return)
 	return max_accounts_return
 
 
@@ -247,7 +260,7 @@ def draw_org(froot, filename):
 
 	# Save the diagram to a PNG file
 	dot_unflat.render(filename, format='png', view=False)
-	print(f"Diagram saved to '{filename}.png'")
+	print(f"Diagram saved to '{Fore.RED}{filename}.png{Fore.RESET}'")
 
 
 if __name__ == '__main__':
@@ -279,9 +292,11 @@ if __name__ == '__main__':
 		# Find the root Org ID
 		logging.info(f"User didn't include a specific OU ID, so we're starting from the root")
 		root = org_client.list_roots()['Roots'][0]['Id']
+		saved_filename = 'aws_organization'
 	else:
 		logging.info(f"User asked us to start from a specific OU ID: {pStartingPlace}")
 		root = pStartingPlace
+		saved_filename = 'aws_organization_subset'
 
 	# If they specified they want to see the AWS policies, then they obviously want to see policies overall.
 	if pManaged and not pPolicy:
@@ -298,9 +313,15 @@ if __name__ == '__main__':
 		print()
 		sys.exit(1)
 	if pPolicy:
-		print(f"Due to there being {len(all_org_accounts)} accounts in this Org, this process will likely take about {5 + (len(all_org_accounts) / 2)} seconds")
+		anticipated_time = 5 + (len(all_org_accounts) * 2)
+		print(f"Due to there being {len(all_org_accounts)} accounts in this Org, this process will likely take about {anticipated_time} seconds")
+		if anticipated_time > 30:
+			print()
+			print(f"{Fore.RED}Since this may take a while, you could re-run this script for only a specific OU by using the '--ou <OU ID>' parameter {Fore.RESET}")
+			print()
 	else:
-		print(f"Due to there being {len(all_org_accounts)} accounts in this Org, this process will likely take about {5 + (len(all_org_accounts) / 10)} seconds")
+		anticipated_time = 5 + (len(all_org_accounts) / 10)
+		print(f"Due to there being {len(all_org_accounts)} accounts in this Org, this process will likely take about {anticipated_time} seconds")
 
 	# Draw the Org itself and save it to the local filesystem
 	draw_org(root, 'aws_organization')
