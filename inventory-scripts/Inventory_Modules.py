@@ -1846,13 +1846,16 @@ def find_account_subnets2(ocredentials, fipaddresses=None):
 
 def find_account_enis2(ocredentials, fRegion=None, fipaddresses=None):
 	"""
-	ocredentials is an object with the following structure:
+	@param: ocredentials is an object with the following structure:
 		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
 		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
 		- ['SessionToken'] holds the AWS_SESSION_TOKEN
 		- ['Region'] holds the region
 		- ['AccountNumber'] holds the account number
 		- ['Profile'] can hold the profile, instead of the session credentials
+	@param: fRegion is a string specifying which region we're looking at
+	@param: fipaddresses is a list of IP addresses to search for
+
 	"""
 	import boto3
 	from botocore.exceptions import ClientError
@@ -1866,7 +1869,7 @@ def find_account_enis2(ocredentials, fRegion=None, fipaddresses=None):
 	session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 	                            aws_secret_access_key=ocredentials['SecretAccessKey'],
 	                            aws_session_token=ocredentials['SessionToken'],
-	                            region_name=fRegion)
+	                            region_name=ocredentials['Region'])
 	eni_info = session_ec2.client('ec2')
 	ENIs = {'NextToken': None}
 	AllENIs = []
@@ -1878,8 +1881,6 @@ def find_account_enis2(ocredentials, fRegion=None, fipaddresses=None):
 		try:
 			logging.info(f"Looking for ENIs that match any of {fipaddresses} in account #{ocredentials['AccountNumber']} in region {fRegion}")
 			ENIs = eni_info.describe_network_interfaces()
-			# Run through each of the subnets, and determine if the passed in IP address fits within any of them
-			# If it does - then include that data within the array, otherwise next...
 			for interface in ENIs['NetworkInterfaces']:
 				if fipaddresses is not None:
 					return_this_result = False
