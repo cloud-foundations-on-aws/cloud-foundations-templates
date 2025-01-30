@@ -5,6 +5,7 @@ cd ./cfat
 echo "installing npm packages..."
 
 for i in \
+  '@aws-sdk/client-sts' \
   '@aws-sdk/client-cloudtrail' \
   '@aws-sdk/client-config-service' \
   '@aws-sdk/client-ec2' \
