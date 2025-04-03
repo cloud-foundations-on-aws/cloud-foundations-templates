@@ -3,8 +3,9 @@
 import logging
 import sys
 
-from queue import Queue
 from threading import Thread
+from queue import Queue
+from tqdm.auto import tqdm
 from time import time
 from botocore.exceptions import ClientError
 from colorama import Fore, init
@@ -19,8 +20,8 @@ ERASE_LINE = '\x1b[2K'
 
 def parse_args(args):
 	parser = CommonArguments()
-	parser.multiregion()
 	parser.multiprofile()
+	parser.singleregion()
 	parser.extendedargs()
 	parser.rootOnly()
 	parser.save_to_file()
@@ -31,6 +32,10 @@ def parse_args(args):
 
 
 def find_all_hosted_zones(fAllCredentials):
+	"""
+
+	@rtype: object
+	"""
 	class FindZones(Thread):
 		def __init__(self, queue):
 			Thread.__init__(self)
@@ -38,19 +43,19 @@ def find_all_hosted_zones(fAllCredentials):
 
 		def run(self):
 			while True:
-				c_account_credentials, c_PlaceCount = self.queue.get()
+				c_account_credentials = self.queue.get()
 				logging.info(f"De-queued info for account number {c_account_credentials['AccountId']}")
 				try:
 					HostedZones = find_private_hosted_zones2(c_account_credentials, c_account_credentials['Region'])
 					logging.info(f"Account: {c_account_credentials['AccountId']} Region: {c_account_credentials['Region']} | Found {len(HostedZones['HostedZones'])} zones")
 
-					if len(HostedZones['HostedZones']) > 0:
+					if HostedZones['HostedZones']:
 						for zone in HostedZones['HostedZones']:
-							ThreadedHostedZones.append({
+							AllHostedZones.append({
 								'ParentProfile': c_account_credentials['ParentProfile'],
 								'MgmtAccount'  : c_account_credentials['MgmtAccount'],
 								'AccountId'    : c_account_credentials['AccountId'],
-								'Region'       : c_account_credentials['Region'],
+								'Region'       : 'Global',
 								'PHZName'      : zone['Name'],
 								'Records'      : zone['ResourceRecordSetCount'],
 								'PHZId'        : zone['Id']
@@ -73,37 +78,42 @@ def find_all_hosted_zones(fAllCredentials):
 						logging.warning(my_Error)
 						continue
 				finally:
-					print(".", end='')
+					logging.info(f"Finished finding phzs in account {c_account_credentials['AccountId']}")
+					pbar.update()
 					self.queue.task_done()
 
 	checkqueue = Queue()
-	ThreadedHostedZones = []
-	PlaceCount = 0
+	AllHostedZones = []
 	WorkerThreads = min(len(fAllCredentials), 25)
+
+	pbar = tqdm(desc=f"Finding private hosted zones from {len(fAllCredentials)} account{'' if len(fAllCredentials) == 1 else 's'}",
+	            total=len(fAllCredentials), unit=' phz'
+	            )
 
 	for x in range(WorkerThreads):
 		worker = FindZones(checkqueue)
+		# Setting daemon to True will let the main thread exit even though the workers are blocking
 		worker.daemon = True
 		worker.start()
 
 	for credential in fAllCredentials:
 		logging.info(f"Beginning to queue data - starting with {credential['AccountId']}")
 		try:
-			checkqueue.put((credential, PlaceCount))
-			PlaceCount += 1
+			checkqueue.put((credential))
 		except ClientError as my_Error:
 			if "AuthFailure" in str(my_Error):
 				logging.error(f"Authorization Failure accessing account {credential['AccountId']} in {credential['Region']} region")
 				logging.warning(f"It's possible that the region {credential['Region']} hasn't been opted-into")
 				pass
 	checkqueue.join()
-	return ThreadedHostedZones
+	pbar.close()
+	return AllHostedZones
 
 
 if __name__ == "__main__":
 	args = parse_args(sys.argv[1:])
 	pProfiles = args.Profiles
-	pRegionList = args.Regions
+	pRegion = args.Region
 	pSkipProfiles = args.SkipProfiles
 	pSkipAccounts = args.SkipAccounts
 	pRootOnly = args.RootOnly
@@ -120,14 +130,23 @@ if __name__ == "__main__":
 
 	begin_time = time()
 	# Get Credentials
-	AllCredentials = get_all_credentials(pProfiles, pTiming, pSkipProfiles, pSkipAccounts, pRootOnly, pAccounts, pRegionList)
+	AllCredentials = get_all_credentials(pProfiles, pTiming, pSkipProfiles, pSkipAccounts, pRootOnly, pAccounts, pRegion)
 	AllAccountList = list(set([x['AccountId'] for x in AllCredentials]))
 	AllRegionList = list(set([x['Region'] for x in AllCredentials]))
+	if len(AllRegionList) > 1:
+		MultipleRegionsSpecified = True
+		print()
+		print(f"{Fore.RED}The region string you provided '{pRegion}' matched more than one region.\n"
+		      f"Since Private Hosted Zones are global, this will result in duplicates in the output.\n"
+		      f"You may want to run this script again, with only a specific region specified.{Fore.RESET}")
+		print()
+	else:
+		MultipleRegionsSpecified = False
 	# Find the hosted zones
 	AllHostedZones = find_all_hosted_zones(AllCredentials)
-	# Display results
-	print()
 
+	print()
+	# Display results
 	display_dict = {
 		# 'ParentProfile': {'DisplayOrder': 1, 'Heading': 'Parent Profile'},
 		'MgmtAccount'  : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
@@ -137,10 +156,17 @@ if __name__ == "__main__":
 		'Records'      : {'DisplayOrder': 5, 'Heading': '# of Records'},
 		'PHZId'        : {'DisplayOrder': 6, 'Heading': 'Zone ID'}
 	}
-	sorted_results = sorted(AllHostedZones, key=lambda x: (x['ParentProfile'], x['MgmtAccount'], x['AccountId'], x['PHZName'], x['Region']))
+	sorted_results = sorted(AllHostedZones, key=lambda x: (x['ParentProfile'], x['MgmtAccount'], x['AccountId'], x['PHZName']))
 	display_results(sorted_results, display_dict, None, pFilename)
 
-	print(f"{Fore.RED}Found {len(AllHostedZones)} Hosted Zones across {len(AllAccountList)} accounts across {len(AllRegionList)} regions{Fore.RESET}")
+	if MultipleRegionsSpecified:
+		print()
+		print(f"{Fore.RED}The region string you provided '{pRegion}' matched more than one region.\n"
+		      f"Since Private Hosted Zones are global, this will result in duplicates in the output.\n"
+		      f"You may want to run this script again, with only a single region specified.{Fore.RESET}")
+		print()
+	else:
+		print(f"{Fore.RED}Found {len(AllHostedZones)} Hosted Zones across {len(AllAccountList)} accounts globally{Fore.RESET}")
 	print()
 	if pTiming:
 		print(ERASE_LINE)
