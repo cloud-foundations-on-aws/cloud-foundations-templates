@@ -4910,7 +4910,6 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 	"""
 	import logging
 	from account_class import aws_acct_access
-	# from time import time
 	from colorama import init, Fore
 
 	init()
@@ -4927,6 +4926,8 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 		fAccounts = []
 	if fRegionList is None:
 		fRegionList = ['us-east-1']
+	if isinstance(fRegionList, str):
+		fRegionList = [fRegionList]
 	if fProfiles is None:  # Default use case from the classes
 		print("Getting Accounts to check: ", end='')
 		aws_acct = aws_acct_access()
