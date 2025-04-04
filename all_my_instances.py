@@ -152,7 +152,7 @@ def find_all_instances(fAllCredentials: list, fStatus: str = None) -> list:
 		logging.info(f"Beginning to queue data - starting with {credential['AccountId']}")
 		try:
 			# I don't know why - but double parens are necessary below. If you remove them, only the first parameter is queued.
-			checkqueue.put(credential)
+			checkqueue.put((credential))
 		except ClientError as my_Error:
 			if "AuthFailure" in str(my_Error):
 				logging.error(f"Authorization Failure accessing account {credential['AccountId']} in {credential['Region']} region")
