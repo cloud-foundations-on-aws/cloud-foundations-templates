@@ -15,6 +15,14 @@ inventory-scripts/*.png
 inventory-scripts/*.txt
 inventory-scripts/*.csv
 
+### Ignoring files from the subtree ###
+inventory-scripts/.gitignore
+inventory-scripts/venv
+inventory-scripts/Config
+inventory-scripts/LICENSE
+inventory-scripts/Makefile
+
+
 
 cfat/node_modules
 node_modules/**/*
