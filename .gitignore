@@ -30,3 +30,5 @@ cfat/build
 cfat/cfat.txt
 cfat/node_modules/*
 cfat/build/*
+
+*.idea*
