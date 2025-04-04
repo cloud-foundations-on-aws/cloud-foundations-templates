@@ -21,7 +21,7 @@ inventory-scripts/venv
 inventory-scripts/Config
 inventory-scripts/LICENSE
 inventory-scripts/Makefile
-
+inventory-scripts/stackoverflow_test/*
 
 
 cfat/node_modules
