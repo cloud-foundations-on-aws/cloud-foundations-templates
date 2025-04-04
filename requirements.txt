@@ -1,0 +1,12 @@
+boto3>=1.26.84
+botocore>=1.29.84
+colorama>=0.4.6
+prettytable>=3.6.0
+simplejson>=3.18.3
+urllib3>=1.26.14
+randominfo>=2.0.2
+graphviz>=0.20.1
+tqdm>=4.65.0
+python-dateutil>=2.9.0.post0
+pytest>=8.2.2
+ipywidgets<=8.1.3
