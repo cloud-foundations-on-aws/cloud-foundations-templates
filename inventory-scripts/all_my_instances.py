@@ -15,7 +15,7 @@ from time import time
 import logging
 
 init()
-__version__ = "2024.09.24"
+__version__ = "2025.04.09"
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
 
@@ -138,7 +138,7 @@ def find_all_instances(fAllCredentials: list, fStatus: str = None) -> list:
 	AllInstances = []
 	WorkerThreads = min(len(fAllCredentials), 25)
 
-	pbar = tqdm(desc=f'Finding instances from {len(fAllCredentials)} accounts / regions',
+	pbar = tqdm(desc=f'Finding instances from {len(fAllCredentials)} locations',
 	            total=len(fAllCredentials), unit=' locations'
 	            )
 

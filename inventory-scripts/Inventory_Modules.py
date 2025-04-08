@@ -41,6 +41,7 @@ def get_regions3(faws_acct, fregion_list=None):
 	# This handles the case where the user passes a single string, instead of a list or nothing.
 	if isinstance(fregion_list, str):
 		fregion_list = [fregion_list]
+
 	region_info = faws_acct.session.client('ec2')
 	if fregion_list is None or "all" in fregion_list or "ALL" in fregion_list or "All" in fregion_list:
 		regions = region_info.describe_regions(Filters=[{'Name': 'opt-in-status', 'Values': ['opt-in-not-required', 'opted-in']}])

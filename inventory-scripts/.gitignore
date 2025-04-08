@@ -351,3 +351,4 @@ src/.package
 .idea/*
 
 my_venv/
+/stackoverflow_test/
