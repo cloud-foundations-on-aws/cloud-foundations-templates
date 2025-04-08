@@ -24,8 +24,7 @@ The following script can draw out the Organization. The output will be a file in
 DrawOrg.py --policy --timing
 ```
 
-Find those accounts which have been closed (and may no longer be in the Org at all), but are still represented in the stacksets of the Org - and therefore may (eventually) cause stacksets to slow down or fail. Best to find these issues ahead of time, rather than after the fact.
-
+The following script can do soooo much _(Yeah - I'm pretty proud of this one)_. As it's shown here, it doesn't yet support the "--filename" parameter, since I haven't decided how to write out the data. The goal of using this output in Discovery, is to find those accounts which have been closed (and may no longer be in the Org at all), but are still represented in the stacksets of the Org - and therefore may (eventually) cause stacksets to slow down or fail. Best to find these issues ahead of time, rather than after the fact. For instance - I found a customer with 450 accounts in their Org, but their largest stackset had over 100 closed (and already dropped out) accounts, so while the stackset was still considered "CURRENT", more than 20% of the time spent on that stackset was spent attempting to connect to previously closed accounts.
 ```sh
 mod_my_cfnstacksets.py -v -r <home region> --timing [-p <profile of Org Account>] -check
 ```
@@ -62,6 +61,7 @@ The following scripts will just show very useful Inventory information that will
 all_my_vpcs.py -v
 all_my_phzs.py -v
 ```
+Whenever we do Discovery, we always want to find possible money-savings areas for the customer as well. The script below will find any Log Groups and their retention settings. This gives the customer the opportunity (perhaps) to update those retention settings (from their default of "NEVER") to something that will purge data after a specific time. The bottom of the script gives an *idea* of how much you're spending on Log Groups anyway, so you have an idea if taking action is worthwhile. 
 
 ALZ used Service Catalog to create and manage accounts. It's important that these Service Catalog products are properly terminated when ALZ  is decommissioned, so this tool will report on the accounts in the Org reconciled with the Service Catalog Products that were created and point out if there are products for already closed accounts, or whether there are more than one product for a given account (or no products for a given account).
 
