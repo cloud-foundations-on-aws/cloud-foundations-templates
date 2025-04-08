@@ -33,12 +33,11 @@ class CommonArguments:
 				prefix_chars='-+')
 
 	def version(self, script_version):
-		# self.my_parser.add_argument(
-		# 	"--version", "-V",
-		# 	dest="Version",
-		# 	default=None,
-		# 	help="Version #")
-		self.my_parser.add_argument("--version", action="version", version=f"Version: {script_version}")
+		self.my_parser.add_argument(
+			"--version",
+			help="Version #",
+			action="version",
+			version=f"Version: {script_version}")
 
 	def rootOnly(self):
 		self.my_parser.add_argument(

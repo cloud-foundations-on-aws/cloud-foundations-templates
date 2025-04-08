@@ -16,7 +16,7 @@ from os.path import split
 import logging
 
 init()
-__version__ = "2024.03.05"
+__version__ = "2024.06.05"
 
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
