@@ -1,6 +1,6 @@
 import logging
 
-__version__ = "2024.09.24"
+__version__ = "2025.04.03"
 
 """
 ** Why are some functions "function" vs. "function2" vs. "function3"?**
@@ -41,6 +41,7 @@ def get_regions3(faws_acct, fregion_list=None):
 	# This handles the case where the user passes a single string, instead of a list or nothing.
 	if isinstance(fregion_list, str):
 		fregion_list = [fregion_list]
+
 	region_info = faws_acct.session.client('ec2')
 	if fregion_list is None or "all" in fregion_list or "ALL" in fregion_list or "All" in fregion_list:
 		regions = region_info.describe_regions(Filters=[{'Name': 'opt-in-status', 'Values': ['opt-in-not-required', 'opted-in']}])
@@ -465,7 +466,7 @@ def get_child_access(fRootProfile, fChildAccount, fRegion='us-east-1', fRoleList
 	The min response object is the rolename that worked to gain access to the target account
 
 	The format of the account credentials dict is here:
-	account_credentials = {'Profile' : fRootProfile,
+	account_credentials = {	'Profile' : fRootProfile,
 							'AccessKeyId' : '',
 							'SecretAccessKey' : None,
 							'SessionToken' : None,
@@ -1147,22 +1148,31 @@ def find_account_vpcs2(ocredentials, defaultOnly=False):
 	"""
 	import boto3
 	import logging
+	from botocore.exceptions import ClientError
 
 	session_vpc = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 	                            aws_secret_access_key=ocredentials['SecretAccessKey'],
 	                            aws_session_token=ocredentials['SessionToken'],
 	                            region_name=ocredentials['Region'])
 	client_vpc = session_vpc.client('ec2')
-	if defaultOnly:
-		logging.info(f"Looking for default VPCs in account {ocredentials['AccountNumber']} from Region {ocredentials['Region']}")
-		logging.info(f"defaultOnly: {str(defaultOnly)}")
-		response = client_vpc.describe_vpcs(Filters=[{'Name': 'isDefault', 'Values': ['true']}])
-	else:
-		logging.info(f"Looking for all VPCs in account {ocredentials['AccountNumber']} from Region {ocredentials['Region']}")
-		logging.info(f"defaultOnly: {str(defaultOnly)}")
-		response = client_vpc.describe_vpcs()
-	# TODO: Enable pagination
-	logging.info(f"We found {len(response['Vpcs'])} VPCs in account {ocredentials['AccountNumber']} in Region {ocredentials['Region']}")
+	response = {'Vpcs': []}
+	try:
+		if defaultOnly:
+			logging.info(f"Looking for default VPCs in account {ocredentials['AccountNumber']} from Region {ocredentials['Region']}")
+			logging.info(f"defaultOnly: {str(defaultOnly)}")
+			# TODO: Enable pagination
+			response = client_vpc.describe_vpcs(Filters=[{'Name': 'isDefault', 'Values': ['true']}])
+		else:
+			logging.info(f"Looking for all VPCs in account {ocredentials['AccountNumber']} from Region {ocredentials['Region']}")
+			logging.info(f"defaultOnly: {str(defaultOnly)}")
+			# TODO: Enable pagination
+			response = client_vpc.describe_vpcs()
+		logging.info(f"We found {len(response['Vpcs'])} VPCs in account {ocredentials['AccountNumber']} in Region {ocredentials['Region']}")
+	except ClientError as my_Error:
+		if 'UnauthorizedOperation' in str(my_Error):
+			logging.warning(f"Authorization Failure accessing account {ocredentials['AccountNumber']} in {ocredentials['Region']} region")
+			logging.warning(f"Please check that 'DescribeVpcs' is an allowed action in this account in this region.")
+			pass
 	return response
 
 
@@ -1743,6 +1753,94 @@ def find_account_rds_instances2(ocredentials=None, fRegion=None):
 	return AllInstances
 
 
+def find_global_accelerators2(ocredentials=None):
+	"""
+	ocredentials is an object with the following structure:
+		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
+		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
+		- ['SessionToken'] holds the AWS_SESSION_TOKEN
+		- ['AccountNumber'] holds the account number
+		- ['Region'] holds the region
+		- ['Profile'] can hold the profile, instead of the session credentials
+	Note that due to global accelerator constraints, I've hard-coded the region 'us-west-2' into the region
+	:@return: list of dictionaries representing the global accelerators
+	"""
+	import boto3
+	import logging
+
+	def enrich_accelerator_list(AllAccelerators: list) -> list:
+		"""
+		This function takes a list of dictionaries representing global accelerators and adds the listeners and endpoint groups to each accelerator
+		:param AllAccelerators:
+		:return: list of dictionaries representing the global accelerators with listeners and endpoint groups
+
+		Returns a dict that looks like this (all accelerators for a given account, regardless of region):
+			[{'AcceleratorArn': 'arn:aws:globalaccelerator::517713657778:accelerator/3d32f33e-5f7e-4fe4-800c-fcb3f4838370',
+			'Name': 'myAccelerator', 'IpAddressType': 'IPV4', 'Enabled': True, 'IpSets': [{'IpFamily': 'IPv4', 'IpAddresses': ['15.197.241.203', '3.33.249.169'], 'IpAddressFamily': 'IPv4'}], 'DnsName': 'a1eb1253defab335b.awsglobalaccelerator.com', 'Status': 'DEPLOYED', 'CreatedTime': datetime.datetime(2023, 1, 13, 15, 43, 13, tzinfo=tzlocal()), 'LastModifiedTime': datetime.datetime(2023, 1, 13, 15, 45, 48, tzinfo=tzlocal()), 'Listeners': [{'ListenerArn': 'arn:aws:globalaccelerator::517713657778:accelerator/3d32f33e-5f7e-4fe4-800c-fcb3f4838370/listener/6c50b6f3', 'PortRanges': [{'FromPort': 8080, 'ToPort': 8080}], 'Protocol': 'TCP', 'ClientAffinity': 'NONE'}], 'ListenerArns': []}]
+		"""
+		for accelerator in AllAccelerators:
+			listeners = accelerator_client.list_listeners(AcceleratorArn=accelerator['AcceleratorArn'])
+			accelerator['Listeners'] = []
+			try:
+				for listener in listeners['Listeners']:
+				# accelerator['ListenerArns'] = []
+				# try:
+					# for listener in accelerator['Listeners']:
+						# accelerator['ListenerArns'].append(listener['ListenerArn'])
+					endpoints = accelerator_client.list_endpoint_groups(ListenerArn=listener['ListenerArn'])
+					listener['EndpointGroups'] = []
+					for endpoint in endpoints['EndpointGroups']:
+						listener['EndpointGroups'].append(endpoint)
+					accelerator['Listeners'].append(listener)
+			except KeyError as my_Error:
+				logging.error(f"KeyError: {my_Error}")
+			except Exception as my_Error:
+				logging.error(f"Generic Exception: {my_Error}")
+		return AllAccelerators
+
+	if ocredentials is None:
+		session_ga = boto3.Session(region_name='us-west-2')
+		ocredentials = dict()
+		ocredentials['AccountNumber'] = session_ga.client('sts').get_caller_identity()['Account']
+		ocredentials['Region'] = session_ga.region_name
+	elif 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
+		logging.info(
+			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
+		if ProfileAccountNumber == ocredentials['AccountNumber']:
+			session_ga = boto3.Session(profile_name=ocredentials['Profile'],
+			                           region_name='us-west-2')
+		else:
+			session_ga = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+			                           aws_secret_access_key=ocredentials['SecretAccessKey'],
+			                           aws_session_token=ocredentials['SessionToken'],
+			                           region_name='us-west-2')
+	else:
+		session_ga = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+		                           aws_secret_access_key=ocredentials['SecretAccessKey'],
+		                           aws_session_token=ocredentials['SessionToken'],
+		                           region_name='us-west-2')
+
+	accelerator_client = session_ga.client('globalaccelerator')
+	logging.info(f"Looking for Global Accelerators in account #{ocredentials['AccountNumber']}")
+	accelerators = accelerator_client.list_accelerators()
+
+	AllAccelerators = accelerators['Accelerators']
+	while accelerators and 'NextToken' in accelerators.keys():
+		accelerators = accelerator_client.list_accelerators(NextToken=accelerators['NextToken'])
+		AllAccelerators.extend(accelerators['Accelerators'])
+
+	AllAccelerators = enrich_accelerator_list(AllAccelerators)
+
+	for item1 in AllAccelerators:
+		listening_ports = 0
+		for item2 in item1['Listeners']:
+			for _ in item2['PortRanges']:
+				listening_ports += 1
+		item1['ListeningPorts'] = listening_ports
+	return AllAccelerators
+
+
 def find_account_cloudtrail2(ocredentials, fRegion='us-east-1'):
 	"""
 	ocredentials is an object with the following structure:
@@ -1842,6 +1940,169 @@ def find_account_subnets2(ocredentials, fipaddresses=None):
 			              f"Error Message: {my_Error}")
 			continue
 	return AllSubnets
+
+
+def find_tgws2(ocredentials):
+	"""
+	ocredentials is an object with the following structure:
+		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
+		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
+		- ['SessionToken'] holds the AWS_SESSION_TOKEN
+		- ['AccountNumber'] holds the account number
+		- ['Region'] holds the region being accessed
+		- ['Profile'] can hold the profile, instead of the session credentials
+	"""
+	import boto3
+	from botocore.exceptions import ClientError
+	import logging
+
+	if 'Region' not in ocredentials.keys() or ocredentials['Region'] is None:
+		ocredentials['Region'] = 'us-east-1'
+	if 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
+		logging.info(
+			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
+		if ProfileAccountNumber == ocredentials['AccountNumber']:
+			session_ec2 = boto3.Session(profile_name=ocredentials['Profile'],
+			                            region_name=ocredentials['Region'])
+		else:
+			session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+			                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+			                            aws_session_token=ocredentials['SessionToken'],
+			                            region_name=ocredentials['Region'])
+	else:
+		session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+		                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+		                            aws_session_token=ocredentials['SessionToken'],
+		                            region_name=ocredentials['Region'])
+	tgw_info = session_ec2.client('ec2')
+	TGWs = {'NextToken': None}
+	AllTGWs = []
+
+	while 'NextToken' in TGWs.keys():
+		# Had to add this so that a failure of the describe_subnet function doesn't cause a race condition
+		TGWs = dict()
+		try:
+			logging.info(f"Looking for all tgws in account #{ocredentials['AccountNumber']} in region {ocredentials['Region']}")
+			TGWs = tgw_info.describe_transit_gateways()
+			for tgw in TGWs['TransitGateways']:
+				if tgw['OwnerId'] != ocredentials['AccountNumber']:
+					# This means that the TGW seen is being shared from another account
+					pass
+				else:
+					AllTGWs.append(tgw)
+		except ClientError as my_Error:
+			logging.error(f"Error connecting to account {ocredentials['AccountNumber']} in region {ocredentials['Region']}\n"
+			              f"This is likely due to '{ocredentials['Region']}' not being enabled for your account\n"
+			              f"Error Message: {my_Error}")
+			continue
+	return AllTGWs
+
+
+def find_attachments2(ocredentials):
+	"""
+	ocredentials is an object with the following structure:
+		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
+		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
+		- ['SessionToken'] holds the AWS_SESSION_TOKEN
+		- ['AccountNumber'] holds the account number
+		- ['Region'] holds the region being accessed
+		- ['Profile'] can hold the profile, instead of the session credentials
+	"""
+	import boto3
+	from botocore.exceptions import ClientError
+	import logging
+
+	if 'Region' not in ocredentials.keys() or ocredentials['Region'] is None:
+		ocredentials['Region'] = 'us-east-1'
+	if 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
+		logging.info(
+			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
+		if ProfileAccountNumber == ocredentials['AccountNumber']:
+			session_ec2 = boto3.Session(profile_name=ocredentials['Profile'],
+			                            region_name=ocredentials['Region'])
+		else:
+			session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+			                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+			                            aws_session_token=ocredentials['SessionToken'],
+			                            region_name=ocredentials['Region'])
+	else:
+		session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+		                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+		                            aws_session_token=ocredentials['SessionToken'],
+		                            region_name=ocredentials['Region'])
+	tgw_info = session_ec2.client('ec2')
+	Attachments = {'NextToken': None}
+	AllAttachments = []
+
+	while 'NextToken' in Attachments.keys():
+		# Had to add this so that a failure of the describe_subnet function doesn't cause a race condition
+		Attachments = dict()
+		try:
+			logging.info(f"Looking for all tgw attachments in account #{ocredentials['AccountNumber']} in region {ocredentials['Region']}")
+			Attachments = tgw_info.describe_transit_gateway_attachments()
+			for attachment in Attachments['TransitGatewayAttachments']:
+				AllAttachments.append(attachment)
+		except ClientError as my_Error:
+			logging.error(f"Error connecting to account {ocredentials['AccountNumber']} in region {ocredentials['Region']}\n"
+			              f"This is likely due to '{ocredentials['Region']}' not being enabled for your account\n"
+			              f"Error Message: {my_Error}")
+			continue
+	return AllAttachments
+
+
+def find_route_tables2(ocredentials):
+	"""
+	ocredentials is an object with the following structure:
+		- ['AccessKeyId'] holds the AWS_ACCESS_KEY
+		- ['SecretAccessKey'] holds the AWS_SECRET_ACCESS_KEY
+		- ['SessionToken'] holds the AWS_SESSION_TOKEN
+		- ['AccountNumber'] holds the account number
+		- ['Region'] holds the region being accessed
+		- ['Profile'] can hold the profile, instead of the session credentials
+	"""
+	import boto3
+	from botocore.exceptions import ClientError
+	import logging
+
+	if 'Region' not in ocredentials.keys() or ocredentials['Region'] is None:
+		ocredentials['Region'] = 'us-east-1'
+	if 'Profile' in ocredentials.keys() and ocredentials['Profile'] is not None:
+		ProfileAccountNumber = find_account_number(ocredentials['Profile'])
+		logging.info(
+			f"Profile: {ocredentials['Profile']} | Profile Account Number: {ProfileAccountNumber} | Account Number passed in: {ocredentials['AccountNumber']}")
+		if ProfileAccountNumber == ocredentials['AccountNumber']:
+			session_ec2 = boto3.Session(profile_name=ocredentials['Profile'],
+			                            region_name=ocredentials['Region'])
+		else:
+			session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+			                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+			                            aws_session_token=ocredentials['SessionToken'],
+			                            region_name=ocredentials['Region'])
+	else:
+		session_ec2 = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
+		                            aws_secret_access_key=ocredentials['SecretAccessKey'],
+		                            aws_session_token=ocredentials['SessionToken'],
+		                            region_name=ocredentials['Region'])
+	tgw_info = session_ec2.client('ec2')
+	Route_Tables = {'NextToken': None}
+	AllRouteTables = []
+
+	while 'NextToken' in Route_Tables.keys():
+		# Had to add this so that a failure of the describe_subnet function doesn't cause a race condition
+		Route_Tables = dict()
+		try:
+			logging.info(f"Looking for all tgw attachments in account #{ocredentials['AccountNumber']} in region {ocredentials['Region']}")
+			Route_Tables = tgw_info.describe_transit_gateway_route_tables()
+			for routetable in Route_Tables['TransitGatewayRouteTables']:
+				AllRouteTables.append(routetable)
+		except ClientError as my_Error:
+			logging.error(f"Error connecting to account {ocredentials['AccountNumber']} in region {ocredentials['Region']}\n"
+			              f"This is likely due to '{ocredentials['Region']}' not being enabled for your account\n"
+			              f"Error Message: {my_Error}")
+			continue
+	return AllRouteTables
 
 
 def find_account_enis2(ocredentials, fRegion=None, fipaddresses=None):
@@ -2297,6 +2558,7 @@ def find_idc_users2(ocredentials, f_IdentityStoreId: str) -> list:
 
 
 def find_profile_vpcs(fProfile, fRegion, fDefaultOnly):
+	# TODO: Needs paging
 	import boto3
 	session_ec2 = boto3.Session(profile_name=fProfile, region_name=fRegion)
 	vpc_info = session_ec2.client('ec2')
@@ -2368,8 +2630,8 @@ def find_lambda_functions2(ocredentials=None, fRegion=None, fSearchStrings=None,
 				for lambda_item in AllFunctions:
 					lambda_function = client_lambda.get_function(FunctionName=lambda_item['FunctionArn'])
 					AllFilteredFunctions.append({'Function': lambda_function['Configuration'], 'Tags': lambda_function['Tags'] if 'Tags' in lambda_function.keys() and any(fTagValueToFilter in lambda_function['Tags'].values()) else []})
-					# for i in t:
-					# 	ts.extend([v for k, v in i['Tags'].items() if v == tag_value])
+				# for i in t:
+				# 	ts.extend([v for k, v in i['Tags'].items() if v == tag_value])
 
 				AllFunctions = AllFilteredFunctions.copy()
 			return AllFunctions
@@ -4738,7 +5000,7 @@ def get_credentials_for_accounts_in_org(faws_acct, fSkipAccounts=None, fRootOnly
 				c_account_info, c_profile, c_region = self.queue.get()
 				logging.info(f"De-queued info for account {c_account_info['AccountId']}")
 				try:
-					logging.info(f"Attempting to connect to {c_account_info['AccountId']} using one of {fRoleNames}")
+					logging.info(f"Attempting to connect to {c_account_info['AccountId']} {'using a role from this list: ' + fRoleNames if fRoleNames is not None else 'using pre-configured role names'} ")
 					faccount_credentials = get_child_access3(faws_acct, c_account_info['AccountId'], c_region, fRoleNames)
 					if faccount_credentials['Success']:
 						logging.info(f"Successfully connected to account {c_account_info['AccountId']}")
@@ -4809,7 +5071,8 @@ def get_credentials_for_accounts_in_org(faws_acct, fSkipAccounts=None, fRootOnly
 
 	logging.debug(f"Account Passed in: {faws_acct.acct_number} | Child Accounts: {ChildAccounts} | Account Type: {faws_acct.AccountType} | Account Status: {faws_acct.AccountStatus} | RoleNames to try: {fRoleNames}")
 	account_credentials = {'Role': 'Nothing'}
-	AccountNum = RegionNum = 0
+	AccountNum = 0
+	RegionNum = 0
 	AllCreds = []
 	credqueue = Queue()
 
@@ -4872,7 +5135,7 @@ def get_org_accounts_from_profiles(fProfileList):
 			self.queue = queue
 
 		def run(self):
-			Account = dict()
+			# Account = dict()
 			while True:
 				# Get the work from the queue and expand the tuple
 				profile = self.queue.get()

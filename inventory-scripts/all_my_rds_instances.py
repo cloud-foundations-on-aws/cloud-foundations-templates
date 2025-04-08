@@ -3,9 +3,11 @@
 # import boto3
 import sys
 import Inventory_Modules
-from Inventory_Modules import display_results
+from Inventory_Modules import display_results, get_all_credentials, find_account_rds_instances2
 from ArgumentsClass import CommonArguments
-from account_class import aws_acct_access
+from queue import Queue
+from threading import Thread
+from tqdm.auto import tqdm
 from time import time
 from colorama import init, Fore
 from botocore.exceptions import ClientError
@@ -14,7 +16,12 @@ import logging
 
 init()
 
-__version__ = '2024.09.23'
+__version__ = '2025.04.09'
+
+
+##################
+# Functions
+##################
 
 def parse_args(args):
 	"""
@@ -26,77 +33,115 @@ def parse_args(args):
 	parser.my_parser.description = "We're going to find all rds instances within any of the accounts we have access to, given the profile(s) provided."
 	parser.multiprofile()
 	parser.multiregion()
-	parser.timing()
+	parser.extendedargs()
+	parser.rolestouse()
+	parser.rootOnly()
 	parser.save_to_file()
+	parser.timing()
 	parser.verbosity()
 	parser.version(__version__)
 	return parser.my_parser.parse_args(args)
 
 
-def check_accounts_for_instances(faws_acct: aws_acct_access, fRegionList: list = None) -> list:
+def check_accounts_for_instances(fAllCredentials: list) -> list:
 	"""
 	Description: Note that this function checks the account AND any children accounts in the Org.
 	@param faws_acct: the well-known account class object
 	@param fRegionList: listing of regions to look in
 	@return: The list of RDS instances found
 	"""
-	ChildAccounts = faws_acct.ChildAccounts
-	AllInstances = []
-	Instances = dict()
-	if fRegionList is None:
-		fRegionList = [faws_acct.Region]
-	for account in ChildAccounts:
-		acct_instances = []
-		logging.info(f"Connecting to account {account['AccountId']}")
+
+	class FindRDSInstances(Thread):
+
+		def __init__(self, queue):
+			Thread.__init__(self)
+			self.queue = queue
+
+		def run(self):
+			while True:
+				# Get the work from the queue and expand the tuple
+				c_account_credentials = self.queue.get()
+				logging.info(f"De-queued info for account number {c_account_credentials['AccountId']}")
+				try:
+					# Now go through those stacksets and determine the instances, made up of accounts and regions
+					# Most time spent in this loop
+					DBInstances = find_account_rds_instances2(c_account_credentials)
+					logging.info(f"Account: {c_account_credentials['AccountId']} Region: {c_account_credentials['Region']} | Found {len(DBInstances['DBInstances'])} RDS instances")
+					if 'DBInstances' in DBInstances.keys():
+						for RDSinstance in DBInstances['DBInstances']:
+							Name = RDSinstance['DBName'] if 'DBName' in RDSinstance.keys() else 'No Name'
+							LastBackup = RDSinstance['LatestRestorableTime'] if 'LatestRestorableTime' in RDSinstance.keys() else 'No Backups'
+							AllRDSInstances.append({
+								'MgmtAccount'  : c_account_credentials['MgmtAccount'],
+								'AccountNumber': c_account_credentials['AccountId'],
+								'Region'       : c_account_credentials['Region'],
+								'InstanceType' : RDSinstance['DBInstanceClass'],
+								'State'        : RDSinstance['DBInstanceStatus'],
+								'DBId'         : RDSinstance['DBInstanceIdentifier'],
+								'Name'         : Name,
+								'Size'         : RDSinstance['AllocatedStorage'],
+								'LastBackup'   : LastBackup,
+								'Engine'       : RDSinstance['Engine']
+								})
+					else:
+						continue
+				except KeyError as my_Error:
+					logging.error(f"Account Access failed - trying to access {c_account_credentials['AccountId']}")
+					logging.info(f"Actual Error: {my_Error}")
+					pass
+				except AttributeError as my_Error:
+					logging.error(f"Error: Likely that one of the supplied profiles was wrong")
+					logging.warning(my_Error)
+					continue
+				except ClientError as my_Error:
+					if 'AuthFailure' in str(my_Error):
+						logging.error(f"Authorization Failure accessing account {c_account_credentials['AccountId']} in {c_account_credentials['Region']} region")
+						logging.warning(f"It's possible that the region {c_account_credentials['Region']} hasn't been opted-into")
+						continue
+					if my_Error.response['Error']['Code'] == 'AccessDenied':
+						logging.warning(f"Authorization Failure accessing account {c_account_credentials['AccountId']} in {c_account_credentials['Region']} region")
+						logging.warning(f"It's likely there's an SCP blocking access to this {c_account_credentials['AccountId']} account")
+						continue
+					else:
+						logging.error(f"Error: Likely throttling errors from too much activity")
+						logging.warning(my_Error)
+						continue
+				finally:
+					pbar.update()
+					self.queue.task_done()
+
+	checkqueue = Queue()
+
+	AllRDSInstances = []
+	WorkerThreads = min(len(fAllCredentials), 25)
+
+	pbar = tqdm(desc=f'Finding RDS instances from {len(fAllCredentials)} locations',
+	            total=len(fAllCredentials), unit=' location'
+	            )
+
+	for x in range(WorkerThreads):
+		worker = FindRDSInstances(checkqueue)
+		# Setting daemon to True will let the main thread exit even though the workers are blocking
+		worker.daemon = True
+		worker.start()
+
+	for credential in fAllCredentials:
+		logging.info(f"Beginning to queue data - starting with {credential['AccountId']}")
 		try:
-			account_credentials = Inventory_Modules.get_child_access3(faws_acct, account['AccountId'])
-			logging.info(f"Connected to account {account['AccountId']} using role {account_credentials['Role']}")
-		# TODO: We shouldn't refer to "account_credentials['Role']" below, if there was an error.
+			# I don't know why - but double parens are necessary below. If you remove them, only the first parameter is queued.
+			checkqueue.put((credential))
 		except ClientError as my_Error:
 			if "AuthFailure" in str(my_Error):
-				logging.error(f"{account['AccountId']}: Authorization failure using role: {account_credentials['Role']}")
-				logging.warning(my_Error)
-			elif str(my_Error).find("AccessDenied") > 0:
-				logging.error(f"{account['AccountId']}: Access Denied failure using role: {account_credentials['Role']}")
-				logging.warning(my_Error)
-			else:
-				logging.error(f"{account['AccountId']}: Other kind of failure using role: {account_credentials['Role']}")
-				logging.warning(my_Error)
-			continue
-		except AttributeError as my_Error:
-			logging.error(f"Error: Likely that one of the supplied profiles {pProfiles} was wrong")
-			logging.warning(my_Error)
-			continue
-		for region in fRegionList:
-			try:
-				print(f"{ERASE_LINE}Checking account {account['AccountId']} in region {region}", end='\r')
-				Instances = Inventory_Modules.find_account_rds_instances2(account_credentials, region)
-				logging.info(f"Root Account: {faws_acct.acct_number} Account: {account['AccountId']} Region: {region} | Found {len(Instances['DBInstances'])} instances")
-			except ClientError as my_Error:
-				if "AuthFailure" in str(my_Error):
-					logging.error(f"Authorization Failure accessing account {account['AccountId']} in {region} region")
-					logging.warning(f"It's possible that the region {region} hasn't been opted-into")
-					pass
-			if 'DBInstances' in Instances.keys():
-				for y in range(len(Instances['DBInstances'])):
-					Name = Instances['DBInstances'][y]['DBName'] if 'DBName' in Instances['DBInstances'][y].keys() else 'No Name'
-					LastBackup = Instances['DBInstances'][y]['LatestRestorableTime'] if 'LatestRestorableTime' in Instances['DBInstances'][y].keys() else 'No Backups'
-					acct_instances.append({
-						'MgmtAccount'  : faws_acct.acct_number,
-						'AccountNumber': account['AccountId'],
-						'Region'       : region,
-						'InstanceType' : Instances['DBInstances'][y]['DBInstanceClass'],
-						'State'        : Instances['DBInstances'][y]['DBInstanceStatus'],
-						'DBId'         : Instances['DBInstances'][y]['DBInstanceIdentifier'],
-						'Name'         : Name,
-						'Size'         : Instances['DBInstances'][y]['AllocatedStorage'],
-						'LastBackup'   : LastBackup,
-						'Engine'       : Instances['DBInstances'][y]['Engine']
-					})
-		AllInstances.extend(acct_instances)
-	return AllInstances
+				logging.error(f"Authorization Failure accessing account {credential['AccountId']} in {credential['Region']} region")
+				logging.warning(f"It's possible that the region {credential['Region']} hasn't been opted-into")
+				pass
+	checkqueue.join()
+	pbar.close()
+	return AllRDSInstances
 
 
+##################
+# Main
 ##################
 
 
@@ -104,9 +149,15 @@ if __name__ == '__main__':
 	args = parse_args(sys.argv[1:])
 	pProfiles = args.Profiles
 	pRegionList = args.Regions
-	pTiming = args.Time
+	pAccounts = args.Accounts
+	pSkipAccounts = args.SkipAccounts
+	pSkipProfiles = args.SkipProfiles
+	pAccessRoles = args.AccessRoles
+	pRootOnly = args.RootOnly
 	pFilename = args.Filename
+	pTiming = args.Time
 	verbose = args.loglevel
+
 	# Setup logging levels
 	logging.basicConfig(level=verbose, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 	logging.getLogger("boto3").setLevel(logging.CRITICAL)
@@ -124,24 +175,6 @@ if __name__ == '__main__':
 
 	InstancesFound = []
 	AllChildAccounts = []
-	RegionList = ['us-east-1']
-
-	if pProfiles is None:  # Default use case from the classes
-		logging.info("Using whatever the default profile is")
-		aws_acct = aws_acct_access()
-		RegionList = Inventory_Modules.get_regions3(aws_acct, pRegionList)
-		logging.warning(f"Default profile will be used")
-		InstancesFound.extend(check_accounts_for_instances(aws_acct, RegionList))
-		AllChildAccounts.extend(aws_acct.ChildAccounts)
-	else:
-		ProfileList = Inventory_Modules.get_profiles(fprofiles=pProfiles, fSkipProfiles="skipplus")
-		logging.warning(f"These profiles are being checked {ProfileList}.")
-		for profile in ProfileList:
-			aws_acct = aws_acct_access(profile)
-			logging.warning(f"Looking at {profile} account now... ")
-			RegionList = Inventory_Modules.get_regions3(aws_acct, pRegionList)
-			InstancesFound.extend(check_accounts_for_instances(aws_acct, RegionList))
-			AllChildAccounts.extend(aws_acct.ChildAccounts)
 
 	# Display RDS Instances found
 	display_dict = {'MgmtAccount'  : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
@@ -154,10 +187,21 @@ if __name__ == '__main__':
 	                'Size'         : {'DisplayOrder': 8, 'Heading': 'Size (GB)'},
 	                'LastBackup'   : {'DisplayOrder': 9, 'Heading': 'Latest Backup'},
 	                'State'        : {'DisplayOrder': 10, 'Heading': 'State', 'Condition': ['Failed', 'Deleting', 'Maintenance', 'Rebooting', 'Upgrading']}}
-	display_results(InstancesFound, display_dict, None, pFilename)
+
+	# Get credentials
+	CredentialList = get_all_credentials(pProfiles, pTiming, pSkipProfiles, pSkipAccounts, pRootOnly, pAccounts, pRegionList, pAccessRoles)
+	AccountNum = len(set([acct['AccountId'] for acct in CredentialList]))
+	RegionNum = len(set([acct['Region'] for acct in CredentialList]))
+
+	# Get RDS Instances
+	InstancesFound = check_accounts_for_instances(CredentialList)
+	sorted_results = sorted(InstancesFound, key=lambda d: (d['MgmtAccount'], d['AccountNumber'], d['Region'], d['DBId']))
+	# unique_results = uniqify_dict(sorted_results)
+	# Display results
+	display_results(sorted_results, display_dict, None, pFilename)
 
 	print(ERASE_LINE)
-	print(f"Found {len(InstancesFound)} instances across {len(AllChildAccounts)} accounts across {len(RegionList)} regions")
+	print(f"Found {len(InstancesFound)} instances across {AccountNum} accounts across {RegionNum} regions")
 	if pTiming:
 		print(ERASE_LINE)
 		print(f"{Fore.GREEN}This script took {time() - begin_time:.2f} seconds{Fore.RESET}")

@@ -7,6 +7,23 @@
 *.tfstate
 *.tfstate.*
 
+### Python ###
+*.pyc
+
+### Miscellaneous ###
+inventory-scripts/*.png
+inventory-scripts/*.txt
+inventory-scripts/*.csv
+
+### Ignoring files from the subtree ###
+inventory-scripts/.gitignore
+inventory-scripts/venv
+inventory-scripts/Config
+inventory-scripts/LICENSE
+inventory-scripts/Makefile
+inventory-scripts/stackoverflow_test/*
+
+
 cfat/node_modules
 node_modules/**/*
 cfat/build
