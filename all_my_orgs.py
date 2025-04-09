@@ -10,7 +10,7 @@ from time import time
 from colorama import init, Fore, Style
 
 init()
-__version__ = "2024.05.08"
+__version__ = "2025.04.08"
 ERASE_LINE = '\x1b[2K'
 begin_time = time()
 
@@ -57,6 +57,9 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 	logging.warning(f"These profiles are being checked {ProfileList}.")
 	print(f"Please bear with us as we run through {len(ProfileList)} profiles")
 	AllProfileAccounts = get_org_accounts_from_profiles(ProfileList)
+	if not AllProfileAccounts:
+		logging.info(f"No profiles were found, hence we're going to look at the environment variables")
+		AllProfileAccounts = get_org_accounts_from_profiles()
 	AccountList = []
 	FailedProfiles = []
 	OrgsFound = []
@@ -129,7 +132,7 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 				for child_acct in item['aws_acct'].ChildAccounts:
 					account.update(child_acct)
 					account.update({'Profile': item['profile']})
-					ProfileNameLength = max(len(item['profile']), ProfileNameLength)
+					ProfileNameLength = max(len(item['profile']), ProfileNameLength) if item['profile'] else len("Organization's Profile")
 					AccountList.append(account.copy())
 					if not child_acct['AccountStatus'] == 'ACTIVE':
 						ClosedAccounts.append(child_acct['AccountId'])
@@ -147,7 +150,8 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 			print(fmt % ("----------------------", "------------"))
 			for item in AllProfileAccounts:
 				if item['Success'] and item['RootAcct']:
-					print(f"{item['profile']:{ProfileNameLength}s} {Style.BRIGHT}{item['MgmtAccount']:15s}{Style.RESET_ALL}")
+					print(f"{item['profile']:{ProfileNameLength + 2}s}", end='') if item['profile'] else print(f"{'No Profile available':{ProfileNameLength + 2}s}", end='')
+					print(f"{Style.BRIGHT}{item['MgmtAccount']:15s}{Style.RESET_ALL}")
 					print(f"\t{'Child Account Number':{len('Child Account Number')}s} {'Child Account Status':{len('Child Account Status')}s} {'Child Email Address'}")
 					for child_acct in item['aws_acct'].ChildAccounts:
 						print(f"\t{Fore.RED if not child_acct['AccountStatus'] == 'ACTIVE' else ''}{child_acct['AccountId']:{len('Child Account Number')}s} {child_acct['AccountStatus']:{len('Child Account Status')}s} {child_acct['AccountEmail']}{Fore.RESET}")
