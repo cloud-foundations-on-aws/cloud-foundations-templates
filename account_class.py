@@ -2,7 +2,7 @@
 1. Accept either a single profile or multiple profiles
 2. Determine if a profile (or multiple profiles) was provided
 3. If a single profile was provided - determine whether it's been provided as an org account, or as a single profile
-4. If the profile is of a root account and it's supposed to be for the whole Org - **note that**
+4. If the profile is of a root account, and it's supposed to be for the whole Org - **note that**
 	Otherwise - treat it like a standalone account (like anything else)
 5. If it's a root account, we need to figure out how to find all the child accounts, and the proper roles to access them by
 	5a. Find all the child accounts
@@ -16,7 +16,7 @@ What does a script need to satisfy credentials? It needs a boto3 session. From t
 
 So if we create a class object that represented the account:
 	Attributes:
-		AccountID: Its 12 digit account number
+		AccountID: Its 12-digit account number
 		botoClient: Access into the account (profile, or access via a root path)
 		MgmntAccessRoles: The role that the root account uses to get access
 		AccountStatus: Whether it's ACTIVE or SUSPENDED
@@ -113,7 +113,6 @@ class aws_acct_access:
 		@rtype: object
 		"""
 		import os
-		# logging.basicConfig(level=20, format="[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s")
 		# First thing's first: We need to validate that the region they sent us to use is valid for this account.
 		# Otherwise, all hell will break if it's not.
 		UsingKeys = False
@@ -122,6 +121,7 @@ class aws_acct_access:
 			fRegion = 'us-east-1'
 		account_access_successful = False
 		account_and_region_access_successful = False
+		# If they provided an ocredentials object - this is rare.
 		if ocredentials is not None and ocredentials['Success']:
 			# Trying to instantiate a class, based on passed in credentials
 			UsingKeys = True
@@ -140,19 +140,24 @@ class aws_acct_access:
 				                               aws_secret_access_key=ocredentials['SecretAccessKey'],
 				                               region_name='us-east-1')
 				account_access_successful = True
+		# If they didn't provide a profile, which generally means they want to use environment variables,
+		# but it can also mean that they want to use their default profile
 		elif fProfile is None:
 			access_key = os.environ.get('AWS_ACCESS_KEY_ID', None)
 			secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
-			session_token = os.environ.get('AWS_SESSION_TOKEN')
+			session_token = os.environ.get('AWS_SESSION_TOKEN', None)
+			region = os.environ.get('AWS_REGION', 'us-east-1')
+			env_var_profile = os.environ.get('AWS_PROFILE', None)
 			logging.info(f"access key: {access_key}\n"
 			             f"secret_access_key: {secret_access_key}\n"
-			             f"session_token: {session_token}")
-			UsingEnvVars = True
-			prelim_session = boto3.Session()
-				# aws_access_key_id=access_key,
-				# aws_secret_access_key=secret_access_key,
-				# aws_session_token=session_token if session_token is not None else '',
-				# region_name='us-east-1')
+			             f"session_token: {session_token}\n"
+			             f"region: {region}\n"
+			             f"profile referenced in env vars: {env_var_profile}")
+			if env_var_profile is None:
+				UsingEnvVars = True
+			else:
+				UsingEnvVars = False
+			prelim_session = boto3.Session(region_name=region)
 			account_access_successful = True
 		else:
 			# Not trying to use account_key_credentials
@@ -171,13 +176,13 @@ class aws_acct_access:
 					account_and_region_access_successful = True
 				except JSONDecodeError as my_Error:
 					error_message = f"Failed to authenticate to AWS using {fProfile}\n" \
-					                f"Probably a profile that doesn't work..."
+					                f"Probably a profile that doesn't work...\n"
 					logging.error(f"Error: {error_message}")
 					account_access_successful = False
 					account_and_region_access_successful = False
 				except Exception as my_Error:
 					error_message = f"Failed to authenticate to AWS using {fProfile}\n" \
-					                f"Unknown reason"
+					                f"{my_Error}"
 					logging.error(f"Error: {error_message}")
 					account_access_successful = False
 					account_and_region_access_successful = False
@@ -193,7 +198,7 @@ class aws_acct_access:
 				account_and_region_access_successful = True
 				if UsingEnvVars:
 					logging.debug("Using environment variables...")
-					self.session = boto3.Session()
+					self.session = boto3.Session(region_name=region)
 					self.AccountStatus = 'ACTIVE'
 				elif UsingSessionToken:
 					logging.debug("Credentials are using SessionToken")
@@ -220,9 +225,7 @@ class aws_acct_access:
 			pass
 		else:
 			logging.info(f"account access was not successful")
-
-
-
+			
 		logging.info(f"Capturing Account Information for profile {fProfile}...")
 		if account_and_region_access_successful:
 			logging.info(f"Successfully validated access to account in region {fRegion}")
@@ -311,7 +314,7 @@ class aws_acct_access:
 
 	def acct_num(self):
 		"""
-		This function returns a string of the account's 12 digit account number
+		This function returns a string of the account's 12-digit account number
 		"""
 		import logging
 		from botocore.exceptions import ClientError, CredentialRetrievalError
@@ -406,7 +409,7 @@ class aws_acct_access:
 			print(my_Error)
 			pass
 		except Exception as my_Error:
-			print(f"Other kind of failure: {my_Error}")
+			logging.error(f"Other kind of failure: {my_Error}")
 			pass
 		except:
 			print("Excepted")
@@ -417,9 +420,9 @@ class aws_acct_access:
 		"""
 		This is an example of the list response from this call:
 			[
-			{'MgmtAccount':'<12 digit number>', 'AccountId': 'xxxxxxxxxxxx', 'AccountEmail': 'EmailAddr1@example.com', 'AccountStatus': 'ACTIVE'},
-			{'MgmtAccount':'<12 digit number>', 'AccountId': 'yyyyyyyyyyyy', 'AccountEmail': 'EmailAddr2@example.com', 'AccountStatus': 'ACTIVE'},
-			{'MgmtAccount':'<12 digit number>', 'AccountId': 'zzzzzzzzzzzz', 'AccountEmail': 'EmailAddr3@example.com', 'AccountStatus': 'SUSPENDED'}
+			{'MgmtAccount':'<12 digit-number>', 'AccountId': 'xxxxxxxxxxxx', 'AccountEmail': 'EmailAddr1@example.com', 'AccountStatus': 'ACTIVE'},
+			{'MgmtAccount':'<12 digit-number>', 'AccountId': 'yyyyyyyyyyyy', 'AccountEmail': 'EmailAddr2@example.com', 'AccountStatus': 'ACTIVE'},
+			{'MgmtAccount':'<12 digit-number>', 'AccountId': 'zzzzzzzzzzzz', 'AccountEmail': 'EmailAddr3@example.com', 'AccountStatus': 'SUSPENDED'}
 			]
 		This can be convenient for appending and removing.
 		"""
