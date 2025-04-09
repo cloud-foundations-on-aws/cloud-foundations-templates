@@ -4912,6 +4912,7 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 	import logging
 	from account_class import aws_acct_access
 	# from time import time
+	from botocore.exceptions import NoCredentialsError
 	from colorama import init, Fore
 
 	init()
@@ -4930,11 +4931,15 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 		fRegionList = ['us-east-1']
 	if fProfiles is None:  # Default use case from the classes
 		print("Getting Accounts to check: ", end='')
-		aws_acct = aws_acct_access()
-		# This doesn't mean the profile "default", this is just what the label for the Org Name will be, since there's no other text
+		try:
+			aws_acct = aws_acct_access()
+		except NoCredentialsError as my_Error:
+			logging.error(f"Credentials error: {my_Error}")
+			raise Exception(f"Credential Error")
+		# This doesn't mean the profile "default" or 'None', this is just what the label for the Org Name will be, since there's no other text
 		profile = 'None'
 		RegionList = get_regions3(aws_acct, fRegionList)
-		logging.info(f"No profile string passed in. Using string '-default-'")
+		logging.info(f"No profile string passed in. Using string 'None'")
 		# This should populate the list "AllCreds" with the credentials for the relevant accounts.
 		AllCredentials.extend(get_credentials_for_accounts_in_org(aws_acct, fSkipAccounts, fRootOnly, fAccounts, profile, RegionList, RoleList, fTiming))
 	else:
