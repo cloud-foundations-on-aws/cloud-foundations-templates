@@ -173,7 +173,6 @@ if __name__ == '__main__':
 	print(f"Checking for rds instances... ")
 	print()
 
-	InstancesFound = []
 	AllChildAccounts = []
 
 	# Display RDS Instances found

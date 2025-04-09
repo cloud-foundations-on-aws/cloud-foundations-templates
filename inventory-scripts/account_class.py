@@ -105,6 +105,14 @@ class aws_acct_access:
 	"""
 
 	def __init__(self, fProfile=None, fRegion=None, ocredentials=None):
+		"""
+		Description: Returns an object representing the AWS account
+		@param fProfile:
+		@param fRegion:
+		@param ocredentials:
+		@rtype: object
+		"""
+		import os
 		# logging.basicConfig(level=20, format="[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s")
 		# First thing's first: We need to validate that the region they sent us to use is valid for this account.
 		# Otherwise, all hell will break if it's not.
@@ -132,6 +140,20 @@ class aws_acct_access:
 				                               aws_secret_access_key=ocredentials['SecretAccessKey'],
 				                               region_name='us-east-1')
 				account_access_successful = True
+		elif fProfile is None:
+			access_key = os.environ.get('AWS_ACCESS_KEY_ID', None)
+			secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
+			session_token = os.environ.get('AWS_SESSION_TOKEN')
+			logging.info(f"access key: {access_key}\n"
+			             f"secret_access_key: {secret_access_key}\n"
+			             f"session_token: {session_token}")
+			UsingEnvVars = True
+			prelim_session = boto3.Session()
+				# aws_access_key_id=access_key,
+				# aws_secret_access_key=secret_access_key,
+				# aws_session_token=session_token if session_token is not None else '',
+				# region_name='us-east-1')
+			account_access_successful = True
 		else:
 			# Not trying to use account_key_credentials
 			try:
@@ -165,33 +187,41 @@ class aws_acct_access:
 				account_and_region_access_successful = False
 
 		if account_access_successful:
+			logging.info(f"account_access_successful!")
 			result = _validate_region(prelim_session, fRegion)
 			if result['Success'] is True:
-				if UsingSessionToken:
+				account_and_region_access_successful = True
+				if UsingEnvVars:
+					logging.debug("Using environment variables...")
+					self.session = boto3.Session()
+					self.AccountStatus = 'ACTIVE'
+				elif UsingSessionToken:
 					logging.debug("Credentials are using SessionToken")
 					self.session = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 					                             aws_secret_access_key=ocredentials['SecretAccessKey'],
 					                             aws_session_token=ocredentials['SessionToken'],
 					                             region_name=result['Region'])
-					account_and_region_access_successful = True
 					self.AccountStatus = 'ACTIVE'
 				elif UsingKeys:
 					logging.debug("Credentials are using Keys, but no SessionToken")
 					self.session = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 					                             aws_secret_access_key=ocredentials['SecretAccessKey'],
 					                             region_name=result['Region'])
-					account_and_region_access_successful = True
 					self.AccountStatus = 'ACTIVE'
 				else:
 					self.AccountStatus = 'ACTIVE'
 					logging.info(f"They're using a profile, which was checked above...")
 			else:
 				logging.error(result['Message'])
-				account_access_successful = False
+				# account_access_successful = False
 				account_and_region_access_successful = False
 		elif account_and_region_access_successful:
 			self.AccountStatus = 'ACTIVE'
 			pass
+		else:
+			logging.info(f"account access was not successful")
+
+
 
 		logging.info(f"Capturing Account Information for profile {fProfile}...")
 		if account_and_region_access_successful:
@@ -232,10 +262,10 @@ class aws_acct_access:
 			self.OrgID = 'Unknown'
 			self.MgmtEmail = 'Unknown'
 			self.Region = fRegion
-			self.ChildAccounts = [{'AccountEmail': 'ProfileFailed@doesnt.work',
-			                      'AccountId': '012345678912',
-			                      'AccountStatus': None,
-			                      'MgmtAccount': '012345678912'}]
+			self.ChildAccounts = [{'AccountEmail' : 'ProfileFailed@doesnt.work',
+			                       'AccountId'    : '012345678912',
+			                       'AccountStatus': None,
+			                       'MgmtAccount'  : '012345678912'}]
 			self.Profile = fProfile if fProfile is not None else None
 			self.creds = 'Unknown'
 			self.credentials = 'Unknown'
