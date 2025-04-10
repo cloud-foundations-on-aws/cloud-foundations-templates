@@ -6,7 +6,7 @@ from queue import Queue
 from threading import Thread
 from tqdm.auto import tqdm
 from time import time
-from decorators import timer
+# from decorators import timer
 
 from botocore.exceptions import ClientError
 from colorama import Fore, init
@@ -55,7 +55,8 @@ def parse_args(f_args):
 		action="store")
 	return parser.my_parser.parse_args(f_args)
 
-@timer()
+
+# @timer()
 def check_accounts_for_vpcs(CredentialList):
 	"""
 	Note that this function takes a list of Credentials and checks for vpcs in every account it has creds for
@@ -159,6 +160,7 @@ def dedupe_vpcs_by_account(vpcs_found):
 
 	return deduped_vpcs
 
+
 # @timer()
 def find_tgws(CredentialList: list):
 	"""
@@ -261,7 +263,8 @@ def dedupe_tgws_by_account(tgws_found):
 
 	return deduped_tgws
 
-@timer()
+
+# @timer()
 def check_for_attachments(VPCList: list):
 	"""
 	Note that this function takes a list credentials and checks for TGW attachments in each account and region it has creds for
@@ -360,7 +363,8 @@ def dedupe_attachments_by_account(attachments_found):
 
 	return deduped_attachments
 
-@timer()
+
+# @timer()
 def find_tgw_route_tables(TGWList: list) -> list:
 	"""
 	Note that this function takes a list of Credentials and checks for subnets in every account it has creds for
@@ -439,15 +443,16 @@ def find_tgw_route_tables(TGWList: list) -> list:
 	pbar.close()
 	return AllRouteTables
 
-@timer()
+
+# @timer()
 def combine_all_resources(VPCList: list, TGWList: list, AttachmentList: list, RouteTableList: list):
 	"""
 	Combines all resources into a single list
-	:param VPCList: List of VPCs
-	:param TGWList: List of TGWs
-	:param AttachmentList: List of attachments
-	:param RouteTableList: List of route tables
-	:return: List of all resources
+	:@param VPCList: List of VPCs
+	:@param TGWList: List of TGWs
+	:@param AttachmentList: List of attachments
+	:@param RouteTableList: List of route tables
+	:@return: List of all resources
 	"""
 	AllResources = []
 	resource = {}
@@ -496,95 +501,14 @@ def get_regions(Resources: list):
 	return regions
 
 
-def draw_network1(VPCList, TGWList, AttachmentList):
-	"""
-	Description: Draws out the network, given the TGWs, VPCs, etc provided
-	@param VPCList: List of VPCs
-	@param TGWList: List of TGWs
-	@param AttachmentList: List of attachments
-	"""
-	import graphviz
-
-	# Create a new directed graph
-	dot = graphviz.Digraph(comment='AWS Network Diagram')
-
-	# Set graph attributes for radial layout
-	dot.attr(rankdir='TB')  # Top to bottom direction
-	dot.attr(splines='spline')  # Curved lines
-	dot.attr(concentrate='true')  # Merge edges
-	dot.attr(ranksep='2.0')  # Increase space between ranks
-
-	# Create invisible edges between TGWs to keep them centered
-	if len(TGWList) > 1:
-		with dot.subgraph(name='cluster_tgw_align') as c:
-			c.attr(rank='same')  # Force TGWs to same rank
-			prev_tgw = None
-			for tgw in TGWList:
-				current_tgw = tgw['TransitGatewayId']
-				c.node(current_tgw,
-				       label=f"{current_tgw}\n{tgw.get('AccountId', 'Unknown')}",
-				       shape='diamond',
-				       style='filled',
-				       fillcolor='lightgreen')
-				if prev_tgw:
-					c.edge(prev_tgw, current_tgw, style='invis')  # Invisible edge
-				prev_tgw = current_tgw
-	else:
-		# If only one TGW, add it directly
-		for tgw in TGWList:
-			dot.node(tgw['TransitGatewayId'],
-			         label=f"{tgw['TransitGatewayId']}\n{tgw.get('AccountId', 'Unknown')}",
-			         shape='diamond',
-			         style='filled',
-			         fillcolor='lightgreen')
-
-	# Group VPCs by which TGW they connect to
-	vpc_groups = {}
-	for attachment in AttachmentList:
-		tgw_id = attachment['TransitGatewayId']
-		if tgw_id not in vpc_groups:
-			vpc_groups[tgw_id] = []
-		vpc_groups[tgw_id].append(attachment['ResourceId'])
-
-	# Add VPCs in subgraphs around their TGWs
-	for tgw_id, vpc_list in vpc_groups.items():
-		with dot.subgraph(name=f'cluster_vpc_{tgw_id}') as c:
-			c.attr(rank='same')
-			for vpc_id in vpc_list:
-				# Find the full VPC info
-				vpc = next((v for v in VPCList if v['VpcId'] == vpc_id), None)
-				if vpc:
-					c.node(vpc_id,
-					       label=f"{vpc_id}\n{vpc.get('AccountId', 'Unknown')}",
-					       shape='box',
-					       style='filled',
-					       fillcolor='lightblue')
-
-	# Add edges with labels on both sides
-	for attachment in AttachmentList:
-		dot.edge(attachment['ResourceId'],
-		         attachment['TransitGatewayId'],
-		         headlabel=f"TGW: {attachment['TransitGatewayAttachmentId'][-8:]}",
-		         taillabel=f"VPC: {attachment.get('VpcAttachmentId', 'Unknown')[-8:]}",
-		         labeldistance='2.0',
-		         labelangle='45')
-
-	# Render the graph
-	try:
-		dot.render('aws_network_diagram', format='png', cleanup=True)
-		print("Network diagram has been saved as 'aws_network_diagram.png'")
-	except Exception as e:
-		print(f"Error generating diagram: {str(e)}")
-		print("Make sure graphviz is installed on your system")
-
-
-def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: list, RouteTableList: list):
+def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: list, RouteTableList: list, filename: str = 'aws_network_diagram'):
 	"""
 	Description: Draws out the network from the VPCs, TGWs, and TGW Attachments
-	:param VPCList: List of VPCs
-	:param TGWList: List of TGWs
-	:param AttachmentList: List of attachments
-	:param RouteTableList: List of route tables
+	:@param VPCList: List of VPCs
+	:@param TGWList: List of TGWs
+	:@param AttachmentList: List of attachments
+	:@param RouteTableList: List of route tables
+	:@param filename: filename to save the network diagram
 	"""
 	import graphviz
 
@@ -670,7 +594,7 @@ def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: li
 		         )
 	# Render the graph
 	try:
-		dot.render('aws_network_diagram', format='png', cleanup=True)
+		dot.render(filename, format='png', cleanup=True)
 		print("Network diagram has been saved as 'aws_network_diagram.png'")
 	except Exception as e:
 		print(f"Error generating diagram: {str(e)}")
@@ -722,14 +646,14 @@ if __name__ == '__main__':
 	AllCredentials = get_all_credentials(pProfiles, pTiming, pSkipProfiles, pSkipAccounts, pRootOnly, pAccounts, pRegionList, pRoleList)
 
 	# Find TGWs
-	TGWsFound = find_tgws(AllCredentials) if any(item in ['tgw','all'] for item in pResourceTypes) else ''
+	TGWsFound = find_tgws(AllCredentials) if any(item in ['tgw', 'all'] for item in pResourceTypes) else ''
 	# Since multiple accounts / vpcs will show a transit gateway associated (due to sharing),
 	# we need to de-dupe the TGW Listing we send
 	# And if we didn't even look for TGWs, we can still run this, and it will be fast...
 	DeDupedTGWs = dedupe_tgws_by_account(TGWsFound)
 
 	# Find VPCs
-	VPCsFound = check_accounts_for_vpcs(AllCredentials) if any(item in ['vpc','all'] for item in pResourceTypes) else ''
+	VPCsFound = check_accounts_for_vpcs(AllCredentials) if any(item in ['vpc', 'all'] for item in pResourceTypes) else ''
 	# The Find_Attachment finds all attachments for all VPCs in one call, so by sending a list of VPCs, we're duplicating the attachments
 	# So we need to de-dupe the VPC Listing we send, to narrow it down
 	# And if we didn't even look for VPCs, we can still run this, and it will be fast...
@@ -737,11 +661,11 @@ if __name__ == '__main__':
 
 	# Finding Transit Gateway Attachments
 	DeDupedAttachments = []
-	if any(item in ['vpc', 'all'] for item in pResourceTypes) and any(item in ['attach','all'] for item in pResourceTypes):
+	if any(item in ['vpc', 'all'] for item in pResourceTypes) and any(item in ['attach', 'all'] for item in pResourceTypes):
 		logging.info(f"Finding attachments constrained by VPCs, since VPC identification was requested")
 		AttachmentsFound = check_for_attachments(AccountsWithVPCs)
 		DeDupedAttachments = dedupe_attachments_by_account(AttachmentsFound)
-	elif any(item in ['attach','all'] for item in pResourceTypes):
+	elif any(item in ['attach', 'all'] for item in pResourceTypes):
 		logging.info(f"Finding attachments without any VPC constraints, since VPC identification was not requested")
 		AttachmentsFound = check_for_attachments(AllCredentials)
 		DeDupedAttachments = dedupe_attachments_by_account(AttachmentsFound)
@@ -751,7 +675,7 @@ if __name__ == '__main__':
 	if any(item in ['tgw', 'all'] for item in pResourceTypes) and any(item in ['rt', 'all'] for item in pResourceTypes):
 		logging.info(f"Finding attachments constrained by TGWs, since TGW identification was requested")
 		RouteTablesFound = find_tgw_route_tables(DeDupedTGWs)
-	elif any(item in ['rt','all'] for item in pResourceTypes):
+	elif any(item in ['rt', 'all'] for item in pResourceTypes):
 		logging.info(f"Finding attachments without being constrained by the TGWs we found, since TGW identification was not requested")
 		RouteTablesFound = find_tgw_route_tables(AllCredentials)
 
@@ -760,28 +684,13 @@ if __name__ == '__main__':
 	ResourcedRegions = get_regions(AllResources)
 	display_results(AllResources, display_dict, None, pFilename)
 
-	draw_network(ResourcedRegions, VPCsFound, TGWsFound, DeDupedAttachments, RouteTablesFound) if pDrawNetwork else ''
-	# draw_network1(VPCsFound, TGWsFound, DeDupedAttachments) if pDrawNetwork else ''
-	# # display_results(SubnetsFound, display_dict)
-	# present_results()
-	# # Print out an analysis of what was found at the end
-	# if verbose < 50:
-	# 	analyze_results()
+	if pDrawNetwork:
+		draw_network(ResourcedRegions, VPCsFound, TGWsFound, DeDupedAttachments, RouteTablesFound, pFilename)
+		print(f"Diagram saved to '{Fore.RED}{pFilename}.png{Fore.RESET}'")
 	if pTiming:
-		print(ERASE_LINE)
+		print()
 		print(f"{Fore.GREEN}This script completed in {time() - begin_time:.2f} seconds{Fore.RESET}")
 
-"""
-print(f'{Fore.RED}Found {len(VPCsFound)} VPCs{Fore.RESET}')
-for item in VPCsFound:
-	print(item)
-print(f'{Fore.RED}Found {len(TGWsFound)} Transit Gateways{Fore.RESET}')
-for item in TGWsFound:
-	print(item)
-print(f'{Fore.RED}Found {len(AttachmentsFound)} Transit Gateway Attachments{Fore.RESET}')
-for item in AttachmentsFound:
-	print(item)
-"""
 print()
 print("Thank you for using this script")
 print()
