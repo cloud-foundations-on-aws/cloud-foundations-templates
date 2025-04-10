@@ -42,6 +42,8 @@ __version__ = "2024.03.22"  # (again)
 def _validate_region(faws_prelim_session, fRegion=None):
 	# Why are you trying to validate a region, and then didn't supply a region?
 	# Or - common case - you supplied 'us-east-1' which we know to be valid, so we can just immediately return Success
+	if fRegion is None and faws_prelim_session.region_name is not None:
+		fRegion = faws_prelim_session.region_name
 	if fRegion is None or fRegion == 'us-east-1':
 		message = f"Either no region supplied to check or region is 'us-east-1'. Defaulting to 'us-east-1'"
 		logging.info(message)
