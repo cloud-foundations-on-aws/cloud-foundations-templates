@@ -36,7 +36,7 @@ from json.decoder import JSONDecodeError
 import boto3
 from botocore.exceptions import ClientError, ConnectionError, CredentialRetrievalError, EndpointConnectionError, NoCredentialsError, ProfileNotFound, UnknownRegionError
 
-__version__ = "2024.03.22"  # (again)
+__version__ = "2025.04.11"  # (again)
 
 
 def _validate_region(faws_prelim_session, fRegion=None):
@@ -56,7 +56,7 @@ def _validate_region(faws_prelim_session, fRegion=None):
 	else:
 		try:
 			# Since we have to run this command to get a listing of the possible regions, we have to use a region we know will work today...
-			client_region = faws_prelim_session.client('ec2', region_name='us-east-1')
+			client_region = faws_prelim_session.client('ec2', region_name=fRegion)
 			# all_regions_list = [region_name['RegionName'] for region_name in client_region.describe_regions(AllRegions=True)['Regions']]
 			matching_regions = client_region.describe_regions(Filters=[{'Name': 'region-name', 'Values': [fRegion]}])['Regions']
 		except Exception as my_Error:
@@ -114,13 +114,15 @@ class aws_acct_access:
 		@param ocredentials:
 		@rtype: object
 		"""
+		global prelim_session
 		import os
 		# First thing's first: We need to validate that the region they sent us to use is valid for this account.
 		# Otherwise, all hell will break if it's not.
 		UsingKeys = False
 		UsingSessionToken = False
-		if fRegion is None:
-			fRegion = 'us-east-1'
+		UsingEnvVars = False
+		# if fRegion is None:
+		# 	fRegion = 'us-east-1'
 		account_access_successful = False
 		account_and_region_access_successful = False
 		# If they provided an ocredentials object - this is rare.
@@ -135,20 +137,22 @@ class aws_acct_access:
 				                               aws_secret_access_key=ocredentials['SecretAccessKey'],
 				                               aws_session_token=ocredentials['SessionToken'],
 				                               region_name='us-east-1')
-				account_access_successful = True
 			else:
 				# Not using a token-based role
 				prelim_session = boto3.Session(aws_access_key_id=ocredentials['AccessKeyId'],
 				                               aws_secret_access_key=ocredentials['SecretAccessKey'],
 				                               region_name='us-east-1')
-				account_access_successful = True
+			account_access_successful = True
+		elif ocredentials is not None and not ocredentials['Success']:
+			logging.error(f"credentials were supplied to this library, but the credentials don't work... Exiting")
+			raise CredentialRetrievalError('Credentials supplied were not valid')
 		# If they didn't provide a profile, which generally means they want to use environment variables,
 		# but it can also mean that they want to use their default profile
 		elif fProfile is None:
 			access_key = os.environ.get('AWS_ACCESS_KEY_ID', None)
 			secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
 			session_token = os.environ.get('AWS_SESSION_TOKEN', None)
-			region = os.environ.get('AWS_REGION', 'us-east-1')
+			region = os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
 			env_var_profile = os.environ.get('AWS_PROFILE', None)
 			logging.info(f"access key: {access_key}\n"
 			             f"secret_access_key: {secret_access_key}\n"
@@ -157,9 +161,18 @@ class aws_acct_access:
 			             f"profile referenced in env vars: {env_var_profile}")
 			if env_var_profile is None:
 				UsingEnvVars = True
+				if fRegion is None and region is not None:
+					prelim_session = boto3.Session(region_name=region)
+				elif fRegion is not None:
+					prelim_session = boto3.Session(region_name=fRegion)
 			else:
 				UsingEnvVars = False
-			prelim_session = boto3.Session(region_name=region)
+				if fRegion is None and region is None:
+					prelim_session = boto3.Session(profile_name=env_var_profile)
+				elif fRegion is None and region is not None:
+					prelim_session = boto3.Session(profile_name=env_var_profile, region_name=region)
+				elif fRegion is not None:
+					prelim_session = boto3.Session(profile_name=env_var_profile, region_name=fRegion)
 			account_access_successful = True
 		else:
 			# Not trying to use account_key_credentials
@@ -193,8 +206,13 @@ class aws_acct_access:
 				account_access_successful = False
 				account_and_region_access_successful = False
 
+		# Now that we've established how we're authenticating to the session...
 		if account_access_successful:
 			logging.info(f"account_access_successful!")
+			if fRegion is not None:
+				pass
+			else:
+				fRegion = prelim_session.region_name
 			result = _validate_region(prelim_session, fRegion)
 			if result['Success'] is True:
 				account_and_region_access_successful = True

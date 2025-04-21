@@ -43,6 +43,20 @@ def parse_args(args):
 	return parser.my_parser.parse_args(args)
 
 
+def uniquify_list(non_unique_list: list) -> list:
+	"""
+	Description: This function takes a list of results and returns a list of unique results
+	@param non_unique_list: source list
+	@return: list of unique results
+	"""
+	unique_ids = []
+	unique_items = []
+	for item in non_unique_list:
+		if item['DBId'] not in unique_ids:
+			unique_ids.append(item['DBId'])
+			unique_items.append(item)
+	return unique_items
+
 def check_accounts_for_instances(fAllCredentials: list) -> list:
 	"""
 	Description: Note that this function checks the account AND any children accounts in the Org.
@@ -115,7 +129,7 @@ def check_accounts_for_instances(fAllCredentials: list) -> list:
 	AllRDSInstances = []
 	WorkerThreads = min(len(fAllCredentials), 25)
 
-	pbar = tqdm(desc=f'Finding RDS instances from {len(fAllCredentials)} locations',
+	pbar = tqdm(desc=f'Finding RDS instances from {len(fAllCredentials)} locations with {WorkerThreads} threads',
 	            total=len(fAllCredentials), unit=' location'
 	            )
 
@@ -195,12 +209,12 @@ if __name__ == '__main__':
 	# Get RDS Instances
 	InstancesFound = check_accounts_for_instances(CredentialList)
 	sorted_results = sorted(InstancesFound, key=lambda d: (d['MgmtAccount'], d['AccountNumber'], d['Region'], d['DBId']))
-	# unique_results = uniqify_dict(sorted_results)
+	unique_results = uniquify_list(sorted_results)
 	# Display results
-	display_results(sorted_results, display_dict, None, pFilename)
+	display_results(unique_results, display_dict, None, pFilename)
 
 	print(ERASE_LINE)
-	print(f"Found {len(InstancesFound)} instances across {AccountNum} accounts across {RegionNum} regions")
+	print(f"Found {len(unique_results)} instances across {AccountNum} account{'' if AccountNum == 1 else 's'} across {RegionNum} region{'' if RegionNum == 1 else 's'}")
 	if pTiming:
 		print(ERASE_LINE)
 		print(f"{Fore.GREEN}This script took {time() - begin_time:.2f} seconds{Fore.RESET}")
