@@ -145,6 +145,7 @@ Temporary Items
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -352,3 +353,7 @@ src/.package
 
 my_venv/
 /stackoverflow_test/
+.gitallowed
+aws_organization
+*.txt
+*.csv

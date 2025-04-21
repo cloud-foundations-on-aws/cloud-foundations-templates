@@ -275,6 +275,11 @@ def fix_my_functions(fAllFunctions, fRuntime, fNewRuntime, fForceDelete, fTiming
 ##################
 # Main
 ##################
+display_dict = {'MgmtAccount' : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
+                'AccountId'   : {'DisplayOrder': 2, 'Heading': 'Acct Number'},
+                'Region'      : {'DisplayOrder': 3, 'Heading': 'Region'},
+                'FunctionName': {'DisplayOrder': 4, 'Heading': 'Function Name'},
+                'Role'        : {'DisplayOrder': 6, 'Heading': 'Role'}}
 
 if __name__ == '__main__':
 	args = parse_args(sys.argv[1:])
@@ -298,11 +303,6 @@ if __name__ == '__main__':
 	pverbose = args.loglevel
 	logging.basicConfig(level=pverbose, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 
-	display_dict = {'MgmtAccount' : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
-	                'AccountId'   : {'DisplayOrder': 2, 'Heading': 'Acct Number'},
-	                'Region'      : {'DisplayOrder': 3, 'Heading': 'Region'},
-	                'FunctionName': {'DisplayOrder': 4, 'Heading': 'Function Name'},
-	                'Role'        : {'DisplayOrder': 6, 'Heading': 'Role'}}
 	if pRuntime is None and pFragments is None:
 		display_dict.update({'Runtime': {'DisplayOrder': 5, 'Heading': 'Runtime'}})
 	elif pRuntime is not None and pFragments is None:

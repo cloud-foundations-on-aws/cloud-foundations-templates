@@ -298,7 +298,6 @@ def draw_org(froot, filename):
 	max_accounts_per_ou = find_max_accounts_per_ou(froot, max_accounts_per_ou)
 
 	# This tries to verticalize the diagram, so it doesn't look like a wide mess
-	dot.attr(rankdir='LR')
 	dot_unflat = dot.unflatten(stagger=round_up(max_accounts_per_ou / 5))
 
 	# Save the diagram to a PNG file
