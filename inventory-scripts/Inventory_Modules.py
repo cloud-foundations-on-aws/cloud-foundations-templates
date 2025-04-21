@@ -4579,7 +4579,9 @@ def display_results(results_list, fdisplay_dict: dict, defaultAction=None, file_
 
 		Enhancements:
 			- How to create a break between rows, like after every account, or Management Org, or region, or whatever...
-			- How to do sub-sections, where there is more data to show per row...  
+
+		TODO: Documentation on how to do the sub-sections - which has been written, but not explained. 
+		- How to do sub-sections, where there is more data to show per row...  
 	"""
 
 	def handle_list():

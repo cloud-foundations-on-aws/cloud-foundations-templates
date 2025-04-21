@@ -463,12 +463,15 @@ def combine_all_resources(VPCList: list, TGWList: list, AttachmentList: list, Ro
 		resource['Type'] = "VPC"
 		resource['ResourceId'] = item['VpcId']
 		resource['Name'] = item['VpcName']
+		resource['TgwId'] = next(iter([t['TransitGatewayId'] for t in AttachmentList if t['ResourceId'] == item['VpcId']]), "None")
+		# resource['TgwId'] = [t['TransitGatewayId'] for t in AttachmentList if t['ResourceId'] == item['VpcId']]
 		AllResources.append(resource.copy())
 	for item in TGWList:
 		resource['MgmtAccount'] = item['MgmtAccount']
 		resource['AccountId'] = item['AccountId']
 		resource['Region'] = item['Region']
 		resource['Type'] = "TGW"
+		resource['TgwId'] = 'N/A'
 		resource['ResourceId'] = item['TransitGatewayId']
 		resource['Name'] = item['TGWName']
 		AllResources.append(resource.copy())
@@ -478,6 +481,7 @@ def combine_all_resources(VPCList: list, TGWList: list, AttachmentList: list, Ro
 		resource['Region'] = item['Region']
 		resource['Type'] = "TGW Attachment"
 		resource['ResourceId'] = item['TransitGatewayAttachmentId']
+		resource['TgwId'] = item['TransitGatewayId']
 		resource['Name'] = item['AttachmentName']
 		AllResources.append(resource.copy())
 	for item in RouteTableList:
@@ -486,6 +490,7 @@ def combine_all_resources(VPCList: list, TGWList: list, AttachmentList: list, Ro
 		resource['Region'] = item['Region']
 		resource['Type'] = "Route Table"
 		resource['ResourceId'] = item['TransitGatewayRouteTableId']
+		resource['TgwId'] = item['TransitGatewayId']
 		resource['Name'] = item['RTName']
 		AllResources.append(resource.copy())
 	sorted_AllResource = sorted(AllResources, key=lambda x: (x['Region'], x['AccountId'], x['Type'], x['ResourceId']))
@@ -640,6 +645,7 @@ if __name__ == '__main__':
 	                'Region'     : {'DisplayOrder': 3, 'Heading': 'Region'},
 	                'ResourceId' : {'DisplayOrder': 4, 'Heading': 'Resource'},
 	                'Type'       : {'DisplayOrder': 5, 'Heading': 'Type'},
+	                'TgwId'     :  {'DisplayOrder': 7, 'Heading': 'Connected TGW'},
 	                'Name'       : {'DisplayOrder': 6, 'Heading': 'Name'}}
 
 	# Get credentials from all relevant Children accounts

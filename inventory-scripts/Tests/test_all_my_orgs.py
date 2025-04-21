@@ -33,7 +33,7 @@ def test_get_account_data(parameters, test_value_dict, mocker):
 	             'RegionSpecific' : True
 	             }
 	# _amend_make_api_call_orig(pProfiles[0], test_value, mocker)
-	_amend_make_api_call(test_data, test_value_dict, mocker)
+	_amend_make_api_call(test_data, test_value_dict, pverbose, mocker)
 
 	# if isinstance(test_value_dict, Exception):
 	# 	print("Expected Error...")
