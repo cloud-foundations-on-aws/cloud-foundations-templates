@@ -1783,10 +1783,10 @@ def find_global_accelerators2(ocredentials=None):
 			accelerator['Listeners'] = []
 			try:
 				for listener in listeners['Listeners']:
-				# accelerator['ListenerArns'] = []
-				# try:
+					# accelerator['ListenerArns'] = []
+					# try:
 					# for listener in accelerator['Listeners']:
-						# accelerator['ListenerArns'].append(listener['ListenerArn'])
+					# accelerator['ListenerArns'].append(listener['ListenerArn'])
 					endpoints = accelerator_client.list_endpoint_groups(ListenerArn=listener['ListenerArn'])
 					listener['EndpointGroups'] = []
 					for endpoint in endpoints['EndpointGroups']:
@@ -4579,7 +4579,9 @@ def display_results(results_list, fdisplay_dict: dict, defaultAction=None, file_
 
 		Enhancements:
 			- How to create a break between rows, like after every account, or Management Org, or region, or whatever...
-			- How to do sub-sections, where there is more data to show per row...  
+
+		TODO: Documentation on how to do the sub-sections - which has been written, but not explained. 
+		- How to do sub-sections, where there is more data to show per row...  
 	"""
 
 	def handle_list():
@@ -4912,6 +4914,7 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 	import logging
 	from account_class import aws_acct_access
 	# from time import time
+	from botocore.exceptions import NoCredentialsError
 	from colorama import init, Fore
 
 	init()
@@ -4930,11 +4933,15 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 		fRegionList = ['us-east-1']
 	if fProfiles is None:  # Default use case from the classes
 		print("Getting Accounts to check: ", end='')
-		aws_acct = aws_acct_access()
-		# This doesn't mean the profile "default", this is just what the label for the Org Name will be, since there's no other text
-		profile = '-default-'
+		try:
+			aws_acct = aws_acct_access()
+		except NoCredentialsError as my_Error:
+			logging.error(f"Credentials error: {my_Error}")
+			raise Exception(f"Credential Error")
+		# This doesn't mean the profile "default" or 'None', this is just what the label for the Org Name will be, since there's no other text
+		profile = 'None'
 		RegionList = get_regions3(aws_acct, fRegionList)
-		logging.info(f"No profile string passed in. Using string '-default-'")
+		logging.info(f"No profile string passed in. Using string 'None'")
 		# This should populate the list "AllCreds" with the credentials for the relevant accounts.
 		AllCredentials.extend(get_credentials_for_accounts_in_org(aws_acct, fSkipAccounts, fRootOnly, fAccounts, profile, RegionList, RoleList, fTiming))
 	else:
@@ -5115,7 +5122,7 @@ def get_credentials_for_accounts_in_org(faws_acct, fSkipAccounts=None, fRootOnly
 	return AllCreds
 
 
-def get_org_accounts_from_profiles(fProfileList):
+def get_org_accounts_from_profiles(fProfileList=None):
 	"""
 	Note that this function returns account_class objects based on the list of profiles passed to it
 	This function is fairly slow since it needs to call the aws_acct_access function for each profile.
@@ -5139,7 +5146,6 @@ def get_org_accounts_from_profiles(fProfileList):
 			while True:
 				# Get the work from the queue and expand the tuple
 				profile = self.queue.get()
-				pbar.update()
 				Account = {'ErrorFlag'   : False,
 				           'Success'     : False,
 				           'RootAcct'    : False,
@@ -5214,6 +5220,7 @@ def get_org_accounts_from_profiles(fProfileList):
 						logging.error(my_Error)
 				finally:
 					self.queue.task_done()
+					pbar.update()
 				AllAccounts.append(Account)
 
 	AllAccounts = []
@@ -5228,12 +5235,15 @@ def get_org_accounts_from_profiles(fProfileList):
 		worker.daemon = True
 		worker.start()
 
-	pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
-	            total=len(fProfileList)
-	            )
-
-	for profile_item in fProfileList:
-		logging.info(f"Queuing profile {profile_item} / {len(fProfileList)} profiles")
-		profilequeue.put(profile_item)
+	if fProfileList is None:
+		logging.info("No profiles were found, using environment variables")
+		pbar = tqdm(desc=f'Getting accounts', total=1)
+		profilequeue.put(fProfileList)
+	else:
+		for profile_item in fProfileList:
+			# logging.info(f"Queuing profile {profile_item} / {len(fProfileList)} profiles")
+			pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
+			            total=len(fProfileList) if fProfileList is not None else 1)
+			profilequeue.put(profile_item)
 	profilequeue.join()
 	return AllAccounts

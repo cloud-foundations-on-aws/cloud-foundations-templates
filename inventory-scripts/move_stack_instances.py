@@ -16,7 +16,7 @@ from ArgumentsClass import CommonArguments
 from account_class import aws_acct_access
 
 init()
-__version__ = "2024.02.16"
+__version__ = "2025.04.14"
 
 """
 This script attempts to move stack-instances from one stack-set to another without any impact to the ultimate resources.
@@ -520,7 +520,7 @@ def write_info_to_file(faws_acct: aws_acct_access, fstack_ids) -> dict:
 		logging.info(f"Writing data to the file {InfoFilename}")
 		logging.debug(f"Here's the data we're writing: {StackSetsInfo}")
 		file_data = json.dumps(StackSetsInfo, sort_keys=True, indent=4 * ' ', default=str)
-		with open(InfoFilename, 'w') as out:
+		with open(InfoFilename, 'w', encoding="utf-8") as out:
 			print(file_data, file=out)
 		return_response = {'Success': True}
 		return return_response
@@ -539,7 +539,7 @@ def read_stack_info_from_file() -> dict:
 	import simplejson as json
 
 	try:
-		with open(InfoFilename) as input_file:
+		with open(InfoFilename, 'r', encoding="utf-8") as input_file:
 			my_input_file = json.load(input_file)
 		return_response = {'Success': True, 'Payload': my_input_file}
 		return return_response

@@ -35,11 +35,12 @@ def test_get_all_credentials(parameters, test_value_dict, mocker):
 	pTiming = parameters['pTiming']
 	pRootOnly = parameters['pRootOnly']
 	pRoleList = parameters['pRoleList']
+	verbose = parameters['pverbose']
 	test_data = {'FunctionName'   : 'get_all_credentials',
 	             'AccountSpecific': True,
 	             'RegionSpecific' : True
 	             }
-	_amend_make_api_call(test_data, test_value_dict, mocker)
+	_amend_make_api_call(test_data, test_value_dict, verbose, mocker)
 
 	# if isinstance(test_value, Exception):
 	# 	print("Expected Error...")
