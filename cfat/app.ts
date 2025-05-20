@@ -260,7 +260,9 @@ const main = async (): Promise<void> => {
 		if(report.orgServices.find(param=> param.service === 'backup.amazonaws.com')){
 			cfatOrgServiceBackupEnabledPass = true;
 		}
-
+		if(report.orgCloudFormationStatus === 'ENABLED'){
+			cfatOrgCloudFormationEnabledPass = true;
+		}
 
 	} else if (accountType.isInOrganization && !accountType.isManagementAccount) {
 		const message:string = '\nWARNING: You are running CFAT from an account that is a member of your AWS Organization. Please run the solution from your AWS Management account.'
