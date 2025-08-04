@@ -8,10 +8,28 @@ CFAT is an open-source solution designed to provide automated discovery of an AW
 
 1. Go into an AWS account which is a `Management Account` and open CloudShell terminal.
 ![Find CloudShell](./docs/open-cloudshell.png)
-2. Ensure you have right now admin permissions or the proper *READONLY* permissions that include ability to use AWS CloudShell
+2. Ensure you have the admin permissions or the proper *READONLY* permissions that include ability to use AWS CloudShell
     * For least privilege readonly, leverage the IAM Managed Policies:
         - `arn:aws:iam::aws:policy/ReadOnlyAccess`
         - `arn:aws:iam::aws:policy/AWSCloudShellFullAccess`
+    * Create new policy and add the below JSON to policy.
+        ```
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "Statement1",
+                    "Effect": "Allow",
+                    "Action": [
+                        "controltower:ListLandingZones",
+                        "controltower:GetLandingZone",
+                        "cur:DescribeReportDefinitions"
+                    ],
+                    "Resource": ["*"]
+                }
+            ]
+        }
+        ```
 3. Within AWS CloudShell the following command: `curl -sSL https://raw.githubusercontent.com/cloud-foundations-on-aws/cloud-foundations-templates/main/cfat/run-assessment.sh | sh`
 ![Run CloudShell](./docs/cloudshell-console-run.png)
 4. Watch screen scroll through output looking for any errors.
