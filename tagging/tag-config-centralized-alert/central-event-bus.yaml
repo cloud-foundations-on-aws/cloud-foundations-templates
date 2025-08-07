@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Centralized Event Bus for Tag Config Rule Alerts'
+
+Parameters:
+  NotificationEmail:
+    Type: String
+    Description: Email address for Tag Config Rule alerts
+    Default: admin@example.com
+
+  OrganizationId:
+    Type: String
+    Description: Org ID (example o-cr1234abc)
+    Default: ""
+
+Resources:
+  TagConfigAlertEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: tag-config-alerts-bus
+
+  TagConfigAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: tag-config-alerts
+      DisplayName: Tag Config Rule Compliance Alerts
+
+  TagConfigAlertSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      TopicArn: !Ref TagConfigAlertTopic
+      Endpoint: !Ref NotificationEmail
+
+  TagConfigAlertRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref TagConfigAlertEventBus
+      EventPattern:
+        source:
+          - aws.config
+        detail-type:
+          - Config Rules Compliance Change
+        detail:
+          newEvaluationResult:
+            complianceType:
+              - NON_COMPLIANT
+      State: ENABLED
+      Targets:
+        - Arn: !Ref TagConfigAlertTopic
+          Id: TagConfigAlertTarget
+
+  TagEventBusPolicy:
+    Type: AWS::Events::EventBusPolicy
+    Properties:
+      EventBusName: !Ref TagConfigAlertEventBus
+      StatementId: AllowCrossAccountAccess
+      Statement:
+        Effect: Allow
+        Principal: '*'
+        Action: events:PutEvents
+        Resource: !GetAtt TagConfigAlertEventBus.Arn
+        Condition:
+          StringEquals:
+            'aws:PrincipalOrgID': !Ref OrganizationId
+
+Outputs:
+  EventBusArn:
+    Description: ARN of the centralized tag event bus
+    Value: !GetAtt TagConfigAlertEventBus.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-EventBusArn'
+  
+  EventBusName:
+    Description: Name of the centralized tag event bus
+    Value: !Ref TagConfigAlertEventBus
+    Export:
+      Name: !Sub '${AWS::StackName}-EventBusName'

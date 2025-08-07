@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Required Tags Config Rule with EventBridge integration'
+
+Parameters:
+  CentralEventBusArn:
+    Type: String
+    Description: ARN of the central event bus for Tag Config alerts
+  
+  RequiredTagKey1:
+    Type: String
+    Description: Tag key 1
+    Default: 'Environment'
+
+  RequiredTagValues1:
+      Type: CommaDelimitedList
+      Description: List of required tag values for tag key 1
+      Default: 'Prod,Dev'
+
+  RequiredTagKey2:
+    Type: String
+    Description: Tag key 2
+    Default: 'Owner'
+
+
+Resources:
+  RequiredTagsRule:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: required-tags-config-rule-1
+      Source:
+        Owner: AWS
+        SourceIdentifier: REQUIRED_TAGS
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Instance
+          - AWS::RDS::DBInstance
+      Source:
+        Owner: AWS
+        SourceIdentifier: REQUIRED_TAGS
+      InputParameters: 
+        tag1Key: !Ref RequiredTagKey1
+        tag1Value: !Join [",", !Ref RequiredTagValues1]
+        tag2Key: !Ref RequiredTagKey2
+
+
+  EventRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: TagEventBusAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: events:PutEvents
+                Resource: !Ref CentralEventBusArn
+
+  TagComplianceRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.config
+        detail-type:
+          - Config Rules Compliance Change
+        detail:
+          configRuleName:
+            - !Ref RequiredTagsRule
+      State: ENABLED
+      Targets:
+        - Arn: !Ref CentralEventBusArn
+          Id: TagEventBusTarget
+          RoleArn: !GetAtt EventRole.Arn
+
+Outputs:
+  ConfigRuleName:
+    Description: Name of the required tags Config rule
+    Value: !Ref RequiredTagsRule
