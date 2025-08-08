@@ -34,9 +34,6 @@ Resources:
         ComplianceResourceTypes:
           - AWS::EC2::Instance
           - AWS::RDS::DBInstance
-      Source:
-        Owner: AWS
-        SourceIdentifier: REQUIRED_TAGS
       InputParameters: 
         tag1Key: !Ref RequiredTagKey1
         tag1Value: !Join [",", !Ref RequiredTagValues1]
