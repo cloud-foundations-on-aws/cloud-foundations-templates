@@ -21,6 +21,7 @@ import createJiraImport from './src/actions/create-jiraimport.js'
 import createAsanaImport from './src/actions/create-asanaimport.js';
 import { CfatCheck, CloudFoundationAssessment, Task } from './src/types/index.js';
 import zipAssessmentFiles from './src/actions/zip-assessment.js'
+import getPartitionInfo from './src/actions/get-partition-info.js';
 import * as fs from 'fs';
 
 
@@ -41,8 +42,9 @@ function objectToCSV(data: Record<string, any> | Record<string, any>[]): string 
 const main = async (): Promise<void> => {
 	let report:CloudFoundationAssessment = {};
   let cfatChecks:CfatCheck[] = [];
-	const region =  process.env.AWS_REGION || 'us-east-1';
-	const allRegions = await getAllRegions();
+	const partitionInfo = await getPartitionInfo();
+	const region = process.env.AWS_REGION || partitionInfo.defaultRegion;
+	const allRegions = await getAllRegions(region);
 	console.log("discovering your AWS environment...")
 	const accountType = await defineAccountType(region);
 	let transitionalFound,suspendedFound,infrastructureFound:boolean = false;
@@ -87,7 +89,7 @@ const main = async (): Promise<void> => {
 	}
 
 	console.log("discovering IAM Users...")
-	const iamUserResult = await checkIamUsers();
+	const iamUserResult = await checkIamUsers(region);
 
 	if (iamUserResult && iamUserResult.length > 0) {
 		console.log("IAM Users discovered.")
@@ -127,22 +129,22 @@ const main = async (): Promise<void> => {
 	// all the following calls require an AWS Organization to exist and the account be a management account
 	if (accountType.isInOrganization && accountType.isManagementAccount) {
 		console.log("collecting general AWS Organization details...")
-		const orgDetails = await getOrgDetails('us-east-1');
+		const orgDetails = await getOrgDetails(region);
 		console.log("collecting CUR details...")
-		const legacyCurCheck = await checkLegacyCur('us-east-1');
+		const legacyCurCheck = await checkLegacyCur(region);
 		console.log("collecting AWS Organization Policy details...")
-		const enableOrgPoliciesCheck = await getEnabledOrgPolicyTypes('us-east-1');
+		const enableOrgPoliciesCheck = await getEnabledOrgPolicyTypes(region);
 		console.log("collecting AWS Organization service trusted access details...")
-		report.orgServices = await getEnabledOrgServices('us-east-1');
+		report.orgServices = await getEnabledOrgServices(region);
 		console.log("collecting AWS Organization CloudFormation status details...")
 		const cfnOrgStatus = await getOrgCloudFormation(region);
 		console.log("collecting AWS Control Tower details...")
 		const controlTowerDetails = await getControlTower(region);
 		report.idcInfo= await getIdcInfo(allRegions);
 		console.log("collecting AWS Organization service delegated admin details...")
-		report.orgDelegatedAdminAccounts = await getOrgDaAccounts();
+		report.orgDelegatedAdminAccounts = await getOrgDaAccounts(region);
 		console.log("collecting AWS Organization member account details...")
-		report.orgMemberAccounts = await getOrgMemberAccounts();
+		report.orgMemberAccounts = await getOrgMemberAccounts(region);
 		report.isLegacyCurSetup = legacyCurCheck.isLegacyCurSetup
 		report.orgArn = orgDetails.arn
 		report.orgId = orgDetails.id
@@ -184,7 +186,7 @@ const main = async (): Promise<void> => {
 		}
 		if(orgDetails.rootOuId){
 			console.log("collecting OU and member account details...")
-			report.orgOuInfo = await getOrgTopLevelOus('us-east-1', orgDetails.rootOuId);
+			report.orgOuInfo = await getOrgTopLevelOus(region, orgDetails.rootOuId);
 			if(report.orgOuInfo && report.orgOuInfo.length > 0){
 				for (const ou of report.orgOuInfo){
 					if(ou.name?.toLowerCase() === 'suspended'){suspendedFound = true}

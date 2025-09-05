@@ -2,6 +2,8 @@
 
 CFAT is an open-source solution designed to provide automated discovery of an AWS environment and its multi-account architecture. Additionally, CFAT will review the environment, checking for common configurations and best practices for your AWS Organization. The tool will produce a backlog of tasks to complete, along with remediation guidance. CFAT is simple to execute, requiring only that it be executed within the AWS Management Account in the AWS CloudShell.
 
+**Multi-Partition Support:** CFAT now automatically detects and works across all AWS partitions including `aws`, `aws-us-gov`, and `aws-cn`, using the appropriate default regions and endpoints for each partition.
+
 >**Note:** CFAT can operate with `READONLY` permissions **plus CloudShell permissions** to the AWS account, and does not make any changes to the AWS environment. All information generated from the tool is outputted to your local AWS CloudShell environment.
 
 ## How to Use
@@ -58,6 +60,7 @@ Running the CFAT produces an archive assessments folder `./cfat/assessment.zip` 
 
 * **Automated Discovery:** CFAT automates the discovery process, minimizing the need for manual checks and providing a quick overview of the environment.
 * **READONLY Access:** The tool operates with READONLY access (**plus CloudShell permissions**) to the AWS account, ensuring that it does not make any modifications or interfere with the existing setup.
+* **Multi-Partition Support:** Automatically detects and works across all AWS partitions (aws, aws-us-gov, aws-cn) with appropriate regional endpoints.
 * **Importable Backlog:** The tool creates common project management software importable file allowing you to import CFAT findings into services like Jira and Asana.
 * **AWS CloudShell Compatibility:** CFAT is designed to be executed within AWS CloudShell, providing a convenient and secure environment for running discovery.
 * **Developed in JavaScript and AWS-SDK v3:** CFAT is implemented using JavaScript and relies on the latest AWS-SDK v3 for seamless interaction with AWS services.

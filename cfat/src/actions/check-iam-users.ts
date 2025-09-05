@@ -2,9 +2,9 @@ import { IamUserInfo } from '../types';
 import { IAMClient, ListUsersCommand, ListAccessKeysCommand, GetAccessKeyLastUsedCommand } from "@aws-sdk/client-iam";
 
 // function list all IAM users and if they have keys in the management account
-const checkIamUsers = async (): Promise<IamUserInfo[]> => {
-  // Set to us-east-1 as IAM is global and region isn't a concern
-  const iamClient = new IAMClient({ region: 'us-east-1' });
+const checkIamUsers = async (region: string = 'us-east-1'): Promise<IamUserInfo[]> => {
+  // IAM is global but we use the provided region for consistency
+  const iamClient = new IAMClient({ region });
   const iamUserInfo: IamUserInfo[] = [];
   try {
     const listUsersCommand = new ListUsersCommand({});
