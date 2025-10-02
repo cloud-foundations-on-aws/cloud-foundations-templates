@@ -1,9 +1,9 @@
 import { OrganizationsClient, ListAccountsCommand, ListAccountsCommandOutput } from '@aws-sdk/client-organizations';
 import { OrgMemberAccount } from '../types';
 
-async function getOrgMemberAccounts(): Promise<OrgMemberAccount[]> {
+async function getOrgMemberAccounts(region: string = 'us-east-1'): Promise<OrgMemberAccount[]> {
   let orgMemberAccountInfo: OrgMemberAccount[] = []
-  const orgsClient = new OrganizationsClient({ region: 'us-east-1' });
+  const orgsClient = new OrganizationsClient({ region });
   const input = {
     MaxResults: Number("200"),
   };
