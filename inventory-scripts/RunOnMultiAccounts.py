@@ -151,6 +151,17 @@ def participant_user(faws_acct, create=None, username=None):
 			return_response['ErrorMessage'] = ErrorMessage
 	return return_response
 
+
+def display_firewall_manager(ocredentials):
+	"""
+	Description: Determine if firewall manager is running in this account
+	@param ocredentials: Credentials
+	@return:
+	"""
+	child_acct = aws_acct_access(ocredentials=ocredentials)
+	fw_mgr_client = child_acct.session.client('fms')
+	# response = fw_mgr_client.
+	# response =
 #####################
 
 
@@ -173,6 +184,7 @@ for account_num in Accounts:
 		Put more commands here... Or you can write functions that represent your commands and call them from here.
 		"""
 		credentials = Inventory_Modules.get_child_access3(aws_acct, account_num, 'us-east-1', ['reinvent-Admin'])
+		display_firewall_manager(credentials)
 		tgt_aws_access = aws_acct_access(ocredentials=credentials)
 		username = 'Paul'
 		user_response = participant_user(tgt_aws_access, username=username)

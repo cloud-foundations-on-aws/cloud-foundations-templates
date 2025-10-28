@@ -28,7 +28,7 @@ begin_time = time()
 ##################
 # Functions
 ##################
-def parse_args(args):
+def parse_args(fargs):
 	script_path, script_name = split(sys.argv[0])
 	parser = CommonArguments()
 	parser.multiprofile()  # Allows for a single profile to be specified
@@ -57,7 +57,7 @@ def parse_args(args):
 		metavar="language and version",
 		default=None,
 		help="Language runtime(s) you will replace what you've found with... ")
-	return parser.my_parser.parse_args(args)
+	return parser.my_parser.parse_args(fargs)
 
 
 def left(s, amount):
@@ -72,7 +72,7 @@ def mid(s, offset, amount):
 	return s[offset - 1:offset + amount - 1]
 
 
-def fix_runtime(CredentialList, new_runtime):
+def fix_runtime(fCredentialList, new_runtime):
 	from time import sleep
 
 	class UpdateRuntime(Thread):
@@ -129,8 +129,7 @@ def fix_runtime(CredentialList, new_runtime):
 
 	FixedFuncs = []
 	PlaceCount = 0
-	PlacesToLook = len(CredentialList)
-	WorkerThreads = min(len(CredentialList), 25)
+	WorkerThreads = min(len(fCredentialList), 25)
 
 	checkqueue = Queue()
 
@@ -140,7 +139,7 @@ def fix_runtime(CredentialList, new_runtime):
 		worker.daemon = True
 		worker.start()
 
-	for credential in CredentialList:
+	for credential in fCredentialList:
 		logging.info(f"Connecting to account {credential['AccountId']}")
 		try:
 			print(f"{ERASE_LINE}Queuing function {credential['FunctionName']} in account {credential['AccountId']} in region {credential['Region']}", end='\r')
@@ -155,7 +154,7 @@ def fix_runtime(CredentialList, new_runtime):
 	return FixedFuncs
 
 
-def check_accounts_for_functions(CredentialList, fFragments=None):
+def check_accounts_for_functions(fCredentialList, fFragments=None):
 	"""
 	Note that this function takes a list of Credentials and checks for functions in every account it has creds for
 	"""
@@ -188,7 +187,7 @@ def check_accounts_for_functions(CredentialList, fFragments=None):
 					logging.info(f"Actual Error: {my_Error}")
 					continue
 				finally:
-					if len(Functions) > 0:
+					if Functions:
 						for _ in range(len(Functions)):
 							Functions[_]['MgmtAccount'] = c_account_credentials['MgmtAccount']
 							Functions[_]['AccountId'] = c_account_credentials['AccountId']
@@ -202,12 +201,12 @@ def check_accounts_for_functions(CredentialList, fFragments=None):
 					self.queue.task_done()
 
 	AllFuncs = []
-	WorkerThreads = min(len(CredentialList), 25)
+	WorkerThreads = min(len(fCredentialList), 25)
 
 	checkqueue = Queue()
 
-	pbar = tqdm(desc=f'Finding instances from {len(CredentialList)} accounts / regions',
-	            total=len(CredentialList), unit=' locations'
+	pbar = tqdm(desc=f'Finding functions from {len(fCredentialList)} accounts / regions',
+	            total=len(fCredentialList), unit=' locations'
 	            )
 
 	for x in range(WorkerThreads):
@@ -216,10 +215,10 @@ def check_accounts_for_functions(CredentialList, fFragments=None):
 		worker.daemon = True
 		worker.start()
 
-	for credential in CredentialList:
+	for credential in fCredentialList:
 		logging.info(f"Connecting to account {credential['AccountId']}")
 		try:
-			logging.info(f"{ERASE_LINE}Queuing account {credential['AccountId']} in region {credential['Region']}", end='\r')
+			logging.info(f"{ERASE_LINE}Queuing account {credential['AccountId']} in region {credential['Region']}")
 			checkqueue.put((credential, fFragments))
 		except ClientError as my_Error:
 			if "AuthFailure" in str(my_Error):
@@ -230,21 +229,29 @@ def check_accounts_for_functions(CredentialList, fFragments=None):
 	return AllFuncs
 
 
-def collect_all_my_functions(AllCredentials, fFragments, fverbose=50):
-	# Generate parameter descriptions
+def collect_all_my_functions(fAllCredentials, fFragments, fverbose=50):
 	"""
 	@AllCredentials - This is a list of all the credentials we have to check
 	@fFragments - This is a list of fragments we want to search for
 	@fverbose - This is a level of verbosity
 	"""
-	AllFunctions = check_accounts_for_functions(AllCredentials, fFragments)
-	sorted_AllFunctions = sorted(AllFunctions, key=lambda k: (k['MgmtAccount'], k['AccountId'], k['Region'], k['FunctionName']))
+	response = check_accounts_for_functions(fAllCredentials, fFragments)
+	sorted_AllFunctions = sorted(response, key=lambda k: (k['MgmtAccount'], k['AccountId'], k['Region'], k['FunctionName']))
 	if fverbose < 50:
-		print(f"We found {len(AllFunctions)} functions in {len(AllCredentials)} places")
+		print(f"We found {len(response)} functions in {len(fAllCredentials)} places")
 	return sorted_AllFunctions
 
 
 def fix_my_functions(fAllFunctions, fRuntime, fNewRuntime, fForceDelete, fTiming):
+	"""
+	Description: Fix the Lambda functions found, with a new runtime
+	@param fAllFunctions: List of all the functions to fix
+	@param fRuntime: runtime we filtered on
+	@param fNewRuntime: new runtime to replace with
+	@param fForceDelete: Forces the change (maybe change the parameter to ForceChange?)
+	@param fTiming: To show the timing during the run
+	@return: Returns the updated list of functions
+	"""
 	begin_fix_time = time()
 
 	if fNewRuntime is None:
@@ -275,11 +282,6 @@ def fix_my_functions(fAllFunctions, fRuntime, fNewRuntime, fForceDelete, fTiming
 ##################
 # Main
 ##################
-display_dict = {'MgmtAccount' : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
-                'AccountId'   : {'DisplayOrder': 2, 'Heading': 'Acct Number'},
-                'Region'      : {'DisplayOrder': 3, 'Heading': 'Region'},
-                'FunctionName': {'DisplayOrder': 4, 'Heading': 'Function Name'},
-                'Role'        : {'DisplayOrder': 6, 'Heading': 'Role'}}
 
 if __name__ == '__main__':
 	args = parse_args(sys.argv[1:])
@@ -303,6 +305,12 @@ if __name__ == '__main__':
 	pverbose = args.loglevel
 	logging.basicConfig(level=pverbose, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
 
+	display_dict = {'MgmtAccount' : {'DisplayOrder': 1, 'Heading': 'Mgmt Acct'},
+	                'AccountId'   : {'DisplayOrder': 2, 'Heading': 'Acct Number'},
+	                'Region'      : {'DisplayOrder': 3, 'Heading': 'Region'},
+	                'FunctionName': {'DisplayOrder': 4, 'Heading': 'Function Name'},
+	                'Role'        : {'DisplayOrder': 6, 'Heading': 'Role'}}
+
 	if pRuntime is None and pFragments is None:
 		display_dict.update({'Runtime': {'DisplayOrder': 5, 'Heading': 'Runtime'}})
 	elif pRuntime is not None and pFragments is None:
@@ -318,7 +326,7 @@ if __name__ == '__main__':
 	AccountNum = len(set([acct['AccountId'] for acct in CredentialList]))
 	RegionNum = len(set([acct['Region'] for acct in CredentialList]))
 	print()
-	print(f"Looking through {AccountNum} accounts and {RegionNum} regions ")
+	print(f"Looking through {AccountNum} account{'' if AccountNum == 1 else 's'} and {RegionNum} region{'' if RegionNum == 1 else 's'} ")
 	print()
 
 	# Note that 'pFragments' is by default ['all'], so even if pRuntime is provided, we still look for everything
@@ -342,7 +350,7 @@ if __name__ == '__main__':
 		print(ERASE_LINE)
 		print(f"{Fore.GREEN}This script took {time() - begin_time:.3f} seconds{Fore.RESET}")
 	print(ERASE_LINE)
-	print(f"Found {len(AllFunctions)} functions across {AccountNum} accounts, across {RegionNum} regions")
+	print(f"Found {len(AllFunctions)} functions across {AccountNum} account{'' if AccountNum == 1 else 's'}, across {RegionNum} region{'' if RegionNum == 1 else 's'}")
 	print()
 	print("Thank you for using this script")
 	print()

@@ -5146,6 +5146,8 @@ def get_org_accounts_from_profiles(fProfileList=None):
 			while True:
 				# Get the work from the queue and expand the tuple
 				profile = self.queue.get()
+				if profile is None:
+					break
 				Account = {'ErrorFlag'   : False,
 				           'Success'     : False,
 				           'RootAcct'    : False,
@@ -5219,14 +5221,20 @@ def get_org_accounts_from_profiles(fProfileList=None):
 						logging.error("Credentials Error")
 						logging.error(my_Error)
 				finally:
+					# logging.info(f"Account: {Account}") ## Remove
+					# print(f"Account: {Account}")  ## Remove
 					self.queue.task_done()
 					pbar.update()
 				AllAccounts.append(Account)
 
+	# print(f"ProfileList from within the mt function: {fProfileList}")  ## Remove
 	AllAccounts = []
 	profilequeue = Queue()
-	# WorkerThreads = len(fProfileList)
-	WorkerThreads = 2
+	if fProfileList:
+		WorkerThreads = min(len(fProfileList), 2)
+	else:
+		WorkerThreads = 1
+	threads = []
 
 	# Create x worker threads
 	for x in range(WorkerThreads):
@@ -5234,16 +5242,28 @@ def get_org_accounts_from_profiles(fProfileList=None):
 		# Setting daemon to True will let the main thread exit even though the workers are blocking
 		worker.daemon = True
 		worker.start()
+		threads.append(worker)
 
 	if fProfileList is None:
 		logging.info("No profiles were found, using environment variables")
-		pbar = tqdm(desc=f'Getting accounts', total=1)
-		profilequeue.put(fProfileList)
+		logging.error("No profiles were found, using environment variables")
+		pbar = tqdm(desc=f'Getting account from EnvVar', total=1)
+		profilequeue.put('EnvVar')
 	else:
+		logging.info(f"List of profiles being looked at is: {fProfileList}")
+		logging.error(f"List of profiles being looked at is: {fProfileList}")
+		pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
+		            total=len(fProfileList))
 		for profile_item in fProfileList:
-			# logging.info(f"Queuing profile {profile_item} / {len(fProfileList)} profiles")
-			pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
-			            total=len(fProfileList) if fProfileList is not None else 1)
 			profilequeue.put(profile_item)
 	profilequeue.join()
+	# Sends 'sentinel value' to threads to tell them we're done
+	for _ in threads:
+		logging.debug(f"Sending 'None' to queue, to ensure all threads finish")
+		profilequeue.put(None)
+	# Waits for all threads to be finished
+	for t in threads:
+		logging.debug(f"Waiting for thread {t.name} to finish")
+		t.join()
+	# print(f"AllAccounts - from within the multi-threaded function, just before return: {AllAccounts}")  ## Remove
 	return AllAccounts

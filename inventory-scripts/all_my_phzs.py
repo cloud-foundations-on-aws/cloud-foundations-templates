@@ -69,13 +69,13 @@ def find_all_hosted_zones(fAllCredentials):
 					if "AuthFailure" in str(my_Error):
 						logging.error(f"Authorization Failure accessing account {c_account_credentials['AccountId']} in {c_account_credentials['Region']} region")
 						logging.warning(f"It's possible that the region {c_account_credentials['Region']} hasn't been opted-into")
+						logging.warning(my_Error)
 						continue
 					else:
 						logging.error("Error: Likely throttling errors from too much activity")
 						logging.warning(my_Error)
 						continue
 				finally:
-					print(".", end='')
 					self.queue.task_done()
 
 	checkqueue = Queue()
