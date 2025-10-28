@@ -114,14 +114,18 @@ def setup_auth_and_regions(fProfile: str) -> (aws_acct_access, list):
 		- a list of regions valid for this particular profile/ account.
 	"""
 	try:
+		logging.info(f"Running for profile: {fProfile}")
 		aws_acct = aws_acct_access(fProfile)
-	except ConnectionError as my_Error:
+	except Exception as my_Error:
 		logging.error(f"Exiting due to error: {my_Error}")
 		sys.exit(8)
 
 	AllRegions = get_ec2_regions3(aws_acct)
 
-	if pRegion.lower() not in AllRegions:
+	if not aws_acct.Success:
+		print(f"\n{Fore.RED}Profile '{fProfile}' didn't work properly. Please provide a valid profile{Fore.RESET}\n")
+		sys.exit(9)
+	elif pRegion.lower() not in AllRegions:
 		print()
 		print(f"{Fore.RED}You specified '{pRegion}' as the region, but this script only works with a single region.\n"
 		      f"Please run the command again and specify only a single, valid region{Fore.RESET}")

@@ -148,31 +148,44 @@ class aws_acct_access:
 			raise CredentialRetrievalError('Credentials supplied were not valid')
 		# If they didn't provide a profile, which generally means they want to use environment variables,
 		# but it can also mean that they want to use their default profile
-		elif fProfile is None:
+		elif fProfile is None or fProfile == 'EnvVar':
 			access_key = os.environ.get('AWS_ACCESS_KEY_ID', None)
 			secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
 			session_token = os.environ.get('AWS_SESSION_TOKEN', None)
 			region = os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')
 			env_var_profile = os.environ.get('AWS_PROFILE', None)
-			logging.info(f"access key: {access_key}\n"
+			logging.debug(f"access key: {access_key}\n"
 			             f"secret_access_key: {secret_access_key}\n"
 			             f"session_token: {session_token}\n"
 			             f"region: {region}\n"
 			             f"profile referenced in env vars: {env_var_profile}")
 			if env_var_profile is None:
 				UsingEnvVars = True
+				logging.debug(f"Using environment variables with no profile specified")
 				if fRegion is None and region is not None:
 					prelim_session = boto3.Session(region_name=region)
+					logging.debug(f"Using region: {region}")
 				elif fRegion is not None:
 					prelim_session = boto3.Session(region_name=fRegion)
+					logging.debug(f"Using region: {fRegion}")
+			# elif env_var_profile is not None:
+			# 	logging.info(f"Using profile {env_var_profile} from environment variables")
+			# 	UsingEnvVars = True
+			# 	fProfile = env_var_profile
 			else:
-				UsingEnvVars = False
+				UsingEnvVars = True
+				logging.debug(f"Using profile specified from environment variables")
 				if fRegion is None and region is None:
 					prelim_session = boto3.Session(profile_name=env_var_profile)
+					logging.debug(f"Using profile: {env_var_profile} and no region specified")
 				elif fRegion is None and region is not None:
 					prelim_session = boto3.Session(profile_name=env_var_profile, region_name=region)
+					logging.debug(f"Using profile: {env_var_profile} and region: {region}")
 				elif fRegion is not None:
 					prelim_session = boto3.Session(profile_name=env_var_profile, region_name=fRegion)
+					logging.debug(f"Using profile: {env_var_profile} and region: {fRegion}")
+				fProfile = env_var_profile
+				self.profile = fProfile
 			account_access_successful = True
 		else:
 			# Not trying to use account_key_credentials
@@ -262,6 +275,7 @@ class aws_acct_access:
 			self.ErrorType = None
 			self.creds = self.session._session._credentials.get_frozen_credentials()
 			self.credentials = dict()
+			self.Profile = fProfile if fProfile is not None else (self.session.profile_name if hasattr(self, 'session') else 'Default')
 			self.credentials.update({'AccessKeyId'    : self.creds[0],
 			                         'SecretAccessKey': self.creds[1],
 			                         'SessionToken'   : self.creds[2],
@@ -269,7 +283,7 @@ class aws_acct_access:
 			                         'AccountId'      : self.acct_number,
 			                         'MgmtAccount'    : self.MgmtAccount,
 			                         'Region'         : fRegion,
-			                         'Profile'        : fProfile if fProfile is not None else None})
+			                         'Profile'        : self.Profile})
 			if self.AccountType.lower() == 'root':
 				logging.info("Enumerating all of the child accounts")
 				self.ChildAccounts = self.find_child_accounts()
@@ -289,12 +303,12 @@ class aws_acct_access:
 			                       'AccountId'    : '012345678912',
 			                       'AccountStatus': None,
 			                       'MgmtAccount'  : '012345678912'}]
-			self.Profile = fProfile if fProfile is not None else None
+			self.Profile = fProfile if fProfile is not None else (self.session.profile_name if 'session' in self else 'None')
 			self.creds = 'Unknown'
 			self.credentials = 'Unknown'
 			self.ErrorType = 'Invalid profile'
 			self.Success = False
-			logging.error(f"Profile {fProfile} doesn't seem to work...")
+			logging.critical(f"Profile {fProfile} doesn't seem to work...")
 		# raise NoCredentialsError
 		elif fProfile is not None and account_access_successful:  # Likely the problem was the region passed in
 			logging.error(f"Region '{fRegion}' wasn't valid. Please specify a valid region.")
@@ -309,7 +323,7 @@ class aws_acct_access:
 			self.Success = False
 		# raise UnknownRegionError(region_name=fRegion)
 		elif ocredentials is not None:
-			logging.error(f"Credentials for access_key {ocredentials['AccountNum']} failed to successfully access an account")
+			logging.critical(f"Credentials for account {ocredentials['AccountNum']} failed to successfully access an account")
 			self.AccountType = 'Unknown'
 			self.MgmtAccount = 'Unknown'
 			self.OrgID = 'Unknown'
@@ -471,7 +485,7 @@ class aws_acct_access:
 				sorted_child_accounts = sorted(child_accounts, key=lambda d: d['AccountId'])
 				return sorted_child_accounts
 			except ClientError as my_Error:
-				logging.warning(f"Account {self.acct_num()} doesn't represent an Org Root account")
+				logging.warning(f"Account {self.acct_number} doesn't represent an Org Root account")
 				logging.debug(my_Error)
 				return ()
 		elif self.find_account_attr()['AccountType'].lower() in ['standalone', 'child']:
@@ -492,7 +506,12 @@ class aws_acct_access:
 		return f"Account #{self.acct_number} is a {self.AccountType} account with {len(self.ChildAccounts) - 1} child accounts"
 
 	def __repr__(self):
-		return f"Account #{self.acct_number} is a {self.AccountType} account with {len(self.ChildAccounts) - 1} child accounts"
+		try:
+			return f"Account #{self.acct_number} is a {self.AccountType} account with {len(self.ChildAccounts) - 1} child accounts"
+		except AttributeError as my_Error:
+			logging.error (f"Profile #{self.Profile} had a failure of some kind")
+			logging.info(f"Error Message: {my_Error}")
+			return ("This should be an error message")
 
 
 class Aws_Acct_Credentials:
