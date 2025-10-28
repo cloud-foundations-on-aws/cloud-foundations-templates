@@ -23,6 +23,9 @@ Parameters:
     Description: The IAM Identity Center managed IAM Role you use to access the AWS Control Tower dashboard
     Type: String
 
+Conditions:
+  cIsUsEast1: !Equals [!Ref 'AWS::Region', 'us-east-1']
+
 Resources:
   rAWSControlTowerBlueprintAccess:
     Type: AWS::IAM::Role
@@ -35,7 +38,10 @@ Resources:
             Principal:
               AWS:
                 - !Sub 'arn:aws:iam::${pManagementAccountId}:role/service-role/AWSControlTowerAdmin'
-                - !Sub 'arn:aws:iam::${pManagementAccountId}:role/aws-reserved/sso.amazonaws.com/${pAWSAdministratorAccessRole}'
+                - !If
+                  - cIsUsEast1
+                  - !Sub 'arn:aws:iam::${pManagementAccountId}:role/aws-reserved/sso.amazonaws.com/${pAWSAdministratorAccessRole}'
+                  - !Sub 'arn:aws:iam::${pManagementAccountId}:role/aws-reserved/sso.amazonaws.com/${AWS::Region}/${pAWSAdministratorAccessRole}'
             Action:
               - 'sts:AssumeRole'
       Path: /

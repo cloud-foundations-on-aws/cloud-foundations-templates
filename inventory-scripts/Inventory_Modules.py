@@ -1783,10 +1783,10 @@ def find_global_accelerators2(ocredentials=None):
 			accelerator['Listeners'] = []
 			try:
 				for listener in listeners['Listeners']:
-					# accelerator['ListenerArns'] = []
-					# try:
+				# accelerator['ListenerArns'] = []
+				# try:
 					# for listener in accelerator['Listeners']:
-					# accelerator['ListenerArns'].append(listener['ListenerArn'])
+						# accelerator['ListenerArns'].append(listener['ListenerArn'])
 					endpoints = accelerator_client.list_endpoint_groups(ListenerArn=listener['ListenerArn'])
 					listener['EndpointGroups'] = []
 					for endpoint in endpoints['EndpointGroups']:
