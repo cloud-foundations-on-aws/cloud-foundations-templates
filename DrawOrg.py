@@ -8,7 +8,7 @@ from time import time
 from colorama import init, Fore
 from ArgumentsClass import CommonArguments
 
-__version__ = '2025.04.04'
+__version__ = '2025.09.26'
 
 init()
 
@@ -21,7 +21,8 @@ policy_shape = 'hexagon'
 ou_fillcolor = 'burlywood'
 ou_shape = 'box'
 # aws_policy_type_list = ['SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY',
-#                         'AISERVICES_OPT_OUT_POLICY', 'CHATBOT_POLICY', 'RESOURCE_CONTROL_POLICY', 'DECLARATIVE_POLICY_EC2']
+#                         'AISERVICES_OPT_OUT_POLICY', 'CHATBOT_POLICY', 'RESOURCE_CONTROL_POLICY', 
+# 							'DECLARATIVE_POLICY_EC2', 'SECURITYHUB_POLICY']
 
 
 #####################
@@ -182,6 +183,8 @@ def draw_org(froot, filename):
 				policy_type = 'chatbot'
 			elif policy['Type'] == 'DECLARATIVE_POLICY_EC2':
 				policy_type = 'dcp'
+			elif policy['Type'] == 'SECURITYHUB_POLICY':
+				policy_type = 'sec'
 			else:
 				policy_type = policy['Type']
 

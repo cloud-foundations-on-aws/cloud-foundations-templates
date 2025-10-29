@@ -52,13 +52,13 @@ def parse_args(f_arguments):
 
 def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_Timing: bool, f_RootOnly: bool, f_SaveFilename: str, f_Shortform: bool, f_verbose):
 	ProfileList = get_profiles(fSkipProfiles=f_SkipProfiles, fprofiles=f_Profiles)
-	# print("Capturing info for supplied profiles")
-	logging.info(f"These profiles were requested {f_Profiles}.")
-	logging.warning(f"These profiles are being checked {ProfileList}.")
-	print(f"Please bear with us as we run through {len(ProfileList)} profiles")
+	logging.info(f"These profiles were requested: {f_Profiles}.")
+	logging.warning(f"These profiles are being checked: {ProfileList}.")
+	print(f"Please bear with us as we run through {len(ProfileList)} profile{'s' if len(ProfileList) == 1 else ''}")
 	AllProfileAccounts = get_org_accounts_from_profiles(ProfileList)
 	if not AllProfileAccounts:
 		logging.info(f"No profiles were found, hence we're going to look at the environment variables")
+		print(f"No profiles were found, hence we're going to look at the environment variables")
 		AllProfileAccounts = get_org_accounts_from_profiles()
 	AccountList = []
 	FailedProfiles = []
@@ -67,14 +67,15 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 	# Print out the results
 	if f_Timing:
 		print()
-		print(f"It's taken {Fore.GREEN}{time() - begin_time:.2f}{Fore.RESET} seconds to find profile accounts...")
+		print(f"It's taken {Fore.GREEN}{time() - begin_time:.2f}{Fore.RESET} seconds to find {len(ProfileList)} profile accounts...")
 		print()
-	fmt = '%-23s %-15s %-15s %-12s %-10s'
+	fmt = '%-36s %-15s %-15s %-12s %-10s'
 	print("<------------------------------------>")
 	print(fmt % ("Profile Name", "Account Number", "Payer Org Acct", "Org ID", "Root Acct?"))
 	print(fmt % ("------------", "--------------", "--------------", "------", "----------"))
 
 	for item in AllProfileAccounts:
+		logging.error(item)
 		if not item['Success']:
 			# If the profile failed, don't print anything and continue on.
 			FailedProfiles.append(item['profile'])
@@ -93,7 +94,7 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 					continue
 				else:
 					logging.info(f"{item['profile']} was successful.")
-					print(f"{Fore.RED if item['RootAcct'] else ''}{item['profile']:23s} {item['aws_acct'].acct_number:15s} {item['MgmtAccount']:15s} {str(item['OrgId']):12s} {item['RootAcct']}{Fore.RESET}")
+					print(f"{Fore.RED if item['RootAcct'] else ''}{item['profile']:36s} {item['aws_acct'].acct_number:15s} {item['MgmtAccount']:15s} {str(item['OrgId']):12s} {item['RootAcct']}{Fore.RESET}")
 			except TypeError as my_Error:
 				logging.error(f"Error - {my_Error} on {item}")
 				pass
@@ -112,9 +113,17 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 
 	if f_Shortform:
 		# The user specified "short-form" which means they don't want any information on child accounts.
-		return_response = {'OrgsFound'         : OrgsFound,
-		                   'FailedProfiles'    : FailedProfiles,
-		                   'AllProfileAccounts': AllProfileAccounts}
+		orgs = ClassOrgsFound()
+		orgs.orgs_found = OrgsFound.copy()
+		# orgs.num_of_org_accounts = NumOfOrgAccounts
+		# orgs.closed_accounts = ClosedAccounts.copy()
+		orgs.failed_profiles = FailedProfiles.copy()
+		# orgs.stand_alone_accounts = StandAloneAccounts.copy()
+		orgs.all_profile_accounts = AllProfileAccounts.copy()
+		# return_response = {'OrgsFound'         : OrgsFound,
+		#                    'FailedProfiles'    : FailedProfiles,
+		#                    'AllProfileAccounts': AllProfileAccounts}
+		return orgs
 	else:
 		NumOfOrgAccounts = 0
 		ClosedAccounts = []
@@ -162,7 +171,7 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 			                'AccountId'    : {'DisplayOrder': 2, 'Heading': 'Account Number'},
 			                'AccountStatus': {'DisplayOrder': 3, 'Heading': 'Account Status', 'Condition': ['SUSPENDED', 'CLOSED']},
 			                'AccountEmail' : {'DisplayOrder': 4, 'Heading': 'Email'}}
-			if pRootOnly:
+			if f_RootOnly:
 				sorted_Results = sorted(AllProfileAccounts, key=lambda d: (d['MgmtAccount'], d['AccountId']))
 			else:
 				sorted_Results = sorted(AccountList, key=lambda d: (d['MgmtAccount'], d['AccountId']))
@@ -176,38 +185,37 @@ def all_my_orgs(f_Profiles: list, f_SkipProfiles: list, f_AccountList: list, f_T
 		OrgsFound.sort()
 		ClosedAccounts.sort()
 
-		print()
-		print(f"Number of Organizations: {len(OrgsFound)}")
-		print(f"Number of Organization Accounts: {NumOfOrgAccounts}")
-		print(f"Number of Standalone Accounts: {len(StandAloneAccounts)}")
-		print(f"Number of suspended or closed accounts: {len(ClosedAccounts)}")
-		print(f"Number of profiles that failed: {len(FailedProfiles)}")
-		if f_verbose < 50:
-			print("----------------------")
-			print(f"The following accounts are the Org Accounts: {OrgsFound}")
-			print(f"The following accounts are Standalone: {StandAloneAccounts}") if len(StandAloneAccounts) > 0 else None
-			print(f"The following accounts are closed or suspended: {ClosedAccounts}") if len(ClosedAccounts) > 0 else None
-			print(f"The following profiles failed: {FailedProfiles}") if len(FailedProfiles) > 0 else None
-			print("----------------------")
-		print()
-		return_response = {'OrgsFound'         : OrgsFound,
-		                   'StandAloneAccounts': StandAloneAccounts,
-		                   'ClosedAccounts'    : ClosedAccounts,
-		                   'FailedProfiles'    : FailedProfiles,
-		                   'AccountList'       : AccountList}
+		orgs = ClassOrgsFound()
+		orgs.orgs_found = OrgsFound.copy()
+		orgs.num_of_org_accounts = NumOfOrgAccounts
+		orgs.closed_accounts = ClosedAccounts.copy()
+		orgs.failed_profiles = FailedProfiles.copy()
+		orgs.stand_alone_accounts = StandAloneAccounts.copy()
+		orgs.account_list = AccountList.copy()
 
-	if f_AccountList is not None:
-		print(f"Found the requested account number{'' if len(AccountList) == 1 else 's'}:")
-		for acct in AccountList:
-			if acct['AccountId'] in f_AccountList:
-				print(f"Profile: {acct['Profile']} | Org: {acct['MgmtAccount']} | Account: {acct['AccountId']} | Status: {acct['AccountStatus']} | Email: {acct['AccountEmail']}")
+		# return_response = {'OrgsFound'         : OrgsFound,
+		#                    'NumOfOrgAccounts'  : NumOfOrgAccounts,
+		#                    'StandAloneAccounts': StandAloneAccounts,
+		#                    'ClosedAccounts'    : ClosedAccounts,
+		#                    'FailedProfiles'    : FailedProfiles,
+		#                    'AccountList'       : AccountList}
 
-	return return_response
+	return orgs
 
 
 ##################
 # Main
 ##################
+
+class ClassOrgsFound:
+	def __init__(self):
+		self.orgs_found = []
+		self.num_of_org_accounts = 0
+		self.stand_alone_accounts = []
+		self.closed_accounts = []
+		self.failed_profiles = []
+		self.account_list = []
+
 
 if __name__ == '__main__':
 	args = parse_args(sys.argv[1:])
@@ -227,7 +235,30 @@ if __name__ == '__main__':
 	logging.getLogger("s3transfer").setLevel(logging.CRITICAL)
 	logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 
-	all_my_orgs(pProfiles, pSkipProfiles, pAccountList, pTiming, pRootOnly, pSaveFilename, pShortform, verbose)
+	response = all_my_orgs(pProfiles, pSkipProfiles, pAccountList, pTiming, pRootOnly, pSaveFilename, pShortform, verbose)
+
+	print()
+	print(f"Number of Organizations: {len(response.orgs_found)}")
+	print(f"Number of Organization Accounts: {response.num_of_org_accounts}")
+
+	print(f"Number of Standalone Accounts: {len(response.stand_alone_accounts)}")
+	print(f"Number of suspended or closed accounts: {len(response.closed_accounts)}")
+	print(f"Number of profiles that failed: {len(response.failed_profiles)}")
+	if verbose < 50:
+		print("----------------------")
+		print(f"The following accounts are the Org Accounts: {response.orgs_found}")
+		print(f"The following accounts are Standalone: {response.stand_alone_accounts}") if len(response.stand_alone_accounts) > 0 else None
+		print(f"The following accounts are closed or suspended: {response.closed_accounts}") if len(response.closed_accounts) > 0 else None
+		print(f"The following profiles failed: {response.failed_profiles}") if len(response.failed_profiles) > 0 else None
+		print("----------------------")
+	print()
+
+	if pAccountList is not None:
+		print(f"Found the requested account number{'' if len(response.account_list) == 1 else 's'}:")
+		for acct in response.account_list:
+			if acct['AccountId'] in pAccountList:
+				print(f"Profile: {acct['Profile']} | Org: {acct['MgmtAccount']} | Account: {acct['AccountId']} | Status: {acct['AccountStatus']} | Email: {acct['AccountEmail']}")
+
 
 	print()
 	if pTiming:

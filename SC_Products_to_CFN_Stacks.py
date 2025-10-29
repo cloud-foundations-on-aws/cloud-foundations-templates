@@ -92,7 +92,9 @@ def find_account_stacksets(faws_acct, f_SCProducts, fRegion=None, fstacksetname=
 						)
 						# The above command fails if the stack found (by the find_stacks3 function) has been deleted
 						# The following section determines the NEW Account's AccountEmail and AccountID
-						AccountEmail = AccountID = AccountStatus = None
+						AccountEmail = None
+						AccountID = None
+						AccountStatus = None
 						if 'Parameters' in stack_info['Stacks'][0].keys() and len(stack_info['Stacks'][0]['Parameters']) > 0:
 							for y in range(len(stack_info['Stacks'][0]['Parameters'])):
 								if stack_info['Stacks'][0]['Parameters'][y]['ParameterKey'] == 'AccountEmail':
@@ -273,7 +275,7 @@ def main():
 		# 		print(f"{ERASE_LINE}Found {len(result['ProductViewDetails'])} products | Total found: {len(prod_ids)}", end='\r')
 		# print()
 		for product in prod_ids:
-			if product['ProductViewSummary']['Name'].find('Account-Vending-Machine') > 0:
+			if product['ProductViewSummary']['Name'].find('Account-Vending-Machine') > 0 or product['ProductViewSummary']['Name'].find('AWS Control Tower Account Factory') > 0:
 				AVM_prod_id = product['ProductViewSummary']['ProductId']
 	elif pFragment is not None and not pExact:
 		result = client_sc.search_products_as_admin()

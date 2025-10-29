@@ -17,8 +17,8 @@ from common_test_functions import _amend_make_api_call, _amend_make_api_call_ori
 		# json.dumps([2, 3, 5, 7, 11, 13, 17, 19]),
 		# KeyError("How dare you touch my secret!"),
 		# ValueError("Oh my goodness you even have the guts to repeat it!!!"),
-	],
-)
+		],
+	)
 def test_get_account_data(parameters, test_value_dict, mocker):
 	pProfiles = parameters['pProfiles']
 	pSkipProfiles = parameters['pSkipProfiles']

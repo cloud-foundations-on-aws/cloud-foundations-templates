@@ -506,7 +506,7 @@ def get_regions(Resources: list):
 	return regions
 
 
-def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: list, RouteTableList: list, filename: str = 'aws_network_diagram'):
+def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: list, RouteTableList: list, f_filename: str = None):
 	"""
 	Description: Draws out the network from the VPCs, TGWs, and TGW Attachments
 	:@param VPCList: List of VPCs
@@ -599,8 +599,8 @@ def draw_network(Regions: list, VPCList: list, TGWList: list, AttachmentList: li
 		         )
 	# Render the graph
 	try:
-		dot.render(filename, format='png', cleanup=True)
-		print("Network diagram has been saved as 'aws_network_diagram.png'")
+		dot.render(f_filename, format='png', view=False)
+		print(f"Network diagram has been saved as {Fore.RED}{f_filename}.png{Fore.RESET}")
 	except Exception as e:
 		print(f"Error generating diagram: {str(e)}")
 		print("Make sure graphviz is installed on your system")
@@ -623,7 +623,7 @@ if __name__ == '__main__':
 	pSkipAccounts = args.SkipAccounts
 	pSkipProfiles = args.SkipProfiles
 	pRootOnly = args.RootOnly
-	pFilename = args.Filename
+	pFilename = args.Filename or 'aws_network_diagram'
 	pTiming = args.Time
 	verbose = args.loglevel
 	pDrawNetwork = args.DrawNetworkDiagram
@@ -692,7 +692,6 @@ if __name__ == '__main__':
 
 	if pDrawNetwork:
 		draw_network(ResourcedRegions, VPCsFound, TGWsFound, DeDupedAttachments, RouteTablesFound, pFilename)
-		print(f"Diagram saved to '{Fore.RED}{pFilename}.png{Fore.RESET}'")
 	if pTiming:
 		print()
 		print(f"{Fore.GREEN}This script completed in {time() - begin_time:.2f} seconds{Fore.RESET}")
