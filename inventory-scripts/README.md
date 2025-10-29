@@ -189,6 +189,22 @@ Find all of the Private Hosted Zones using cross-account functionality.
 
 Find all the RDS instances within a profile, or an Org.
 
+### [all_my_ram_shares.py](./all_my_ram_shares.py)
+
+This script inventories all AWS Resource Access Manager (RAM) shares across your organization. It provides comprehensive information about both owned shares (resources you've shared with others) and received shares (resources shared with you).
+
+The script displays detailed information including:
+- Share ARN and name
+- Share status and type (OWNED/RECEIVED)
+- Resources being shared (with their types and ARNs)
+- Who the resources are shared with (principals)
+- Owner account information
+- Creation and last updated timestamps
+- Whether external principals are allowed
+- Associated tags
+
+You can filter results by share status (`-s` parameter: ACTIVE, DELETING, FAILED, PENDING) and share type (`-t` parameter: OWNED, RECEIVED). The script uses multi-threading for efficient processing across multiple accounts and regions.
+
 ### [all_my_rds_instances.py](./all_my_rds_instances.py)
 
 Find all the RDS instances within a profile, or an Org.

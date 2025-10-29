@@ -16,7 +16,7 @@ import logging
 
 init()
 
-__version__ = '2024.10.24'
+__version__ = '2025.09.26'
 
 
 ##################
@@ -49,6 +49,13 @@ def parse_args(f_args):
 		default=None,
 		help="IP address(es) you're looking for within your accounts")
 	local.add_argument(
+		"--fqdn", "--name",
+		dest="pDNSNames",
+		nargs="*",
+		metavar="Fully Qualified Domain Name",
+		default=None,
+		help="DNS Name(s) you're looking to find within your accounts")
+	local.add_argument(
 		"--public-only", "--po",
 		action="store_true",
 		dest="ppublic",
@@ -56,11 +63,11 @@ def parse_args(f_args):
 	return parser.my_parser.parse_args(f_args)
 
 
-def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False):
+def check_accounts_for_enis(fCredentialList, fips: list = None, fPublicOnly: bool = False):
 	"""
 	@Description: Note that this function takes a list of Credentials and checks for ENIs in every account and region it has creds for
 	@param fCredentialList: The list of credentials to check
-	@param fip: The IP address to look for
+	@param fips: The IP address to look for
 	@param fPublicOnly: Whether to look for only public IPs
 	@return: LIst of ENIs from the list of credentials
 	"""
@@ -74,12 +81,11 @@ def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False
 		def run(self):
 			while True:
 				# Get the work from the queue and expand the tuple
-				c_account_credentials, c_region, c_fip, c_PlacesToLook, c_PlaceCount = self.queue.get()
-				pbar.update()
+				c_account_credentials, c_region, c_fips = self.queue.get()
 				logging.info(f"De-queued info for account {c_account_credentials['AccountId']}")
 				try:
 					logging.info(f"Attempting to connect to {c_account_credentials['AccountId']}")
-					account_enis = find_account_enis2(c_account_credentials, c_region, c_fip)
+					account_enis = find_account_enis2(c_account_credentials, c_region, c_fips)
 					logging.info(f"Successfully connected to account {c_account_credentials['AccountId']} in region {c_region}")
 					for eni in account_enis:
 						eni['MgmtAccount'] = c_account_credentials['MgmtAccount']
@@ -87,7 +93,7 @@ def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False
 							pass
 						else:
 							Results.append(eni)
-					# Results.extend(account_enis)
+				# Results.extend(account_enis)
 				except KeyError as my_Error:
 					logging.error(f"Account Access failed - trying to access {c_account_credentials['AccountId']}")
 					logging.info(f"Actual Error: {my_Error}")
@@ -98,6 +104,7 @@ def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False
 					continue
 				finally:
 					# print(f"{ERASE_LINE}Finished finding ENIs in account {c_account_credentials['AccountId']} in region {c_region} - {c_PlaceCount} / {c_PlacesToLook}", end='\r')
+					pbar.update()
 					self.queue.task_done()
 
 	checkqueue = Queue()
@@ -107,8 +114,6 @@ def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False
 	            )
 
 	Results = []
-	PlaceCount = 0
-	PlacesToLook = fCredentialList.__len__()
 	WorkerThreads = min(len(fCredentialList), 50)
 
 	for x in range(WorkerThreads):
@@ -121,15 +126,41 @@ def check_accounts_for_enis(fCredentialList, fip=None, fPublicOnly: bool = False
 		logging.info(f"Connecting to account {credential['AccountId']} in region {credential['Region']}")
 		try:
 			# print(f"{ERASE_LINE}Queuing account {credential['AccountId']} in region {region}", end='\r')
-			checkqueue.put((credential, credential['Region'], fip, PlacesToLook, PlaceCount))
-			PlaceCount += 1
+			checkqueue.put((credential, credential['Region'], fips))
 		except ClientError as my_Error:
 			if "AuthFailure" in str(my_Error):
 				logging.error(f"Authorization Failure accessing account {credential['AccountId']} in {credential['Region']} region")
 				logging.warning(f"It's possible that the region {credential['Region']} hasn't been opted-into")
 				pass
 	checkqueue.join()
+	pbar.close()
 	return Results
+
+
+def resolve_names_to_ips(f_fqdns: list = None):
+	"""
+	@Description: Resolves names to IPs before we begin to search
+	@f_fqdns: A list of names that need to be resolved to external IP addresses, to search on
+	@return: A list - containing the IP addresses for the names passed in
+	"""
+	import socket
+
+	# Resolve FQDNs to IP addresses using DNS lookup
+	resolved_ips = []
+	for fqdn in f_fqdns:
+		try:
+			# Get all IP addresses for the FQDN
+			result = socket.getaddrinfo(fqdn, None)
+			# Extract unique IP addresses from the result
+			ips = {'fqdn': fqdn, 'IPs': list(set([addr[4][0] for addr in result]))}
+			resolved_ips.append(ips)
+			logging.info(f"Resolved {fqdn} to IPs: {ips}")
+		except socket.gaierror as e:
+			logging.warning(f"Failed to resolve {fqdn}: {e}")
+
+	# Remove duplicates
+	# logging.info(f"Resolved IP list to search for: {ips}")
+	return resolved_ips
 
 
 def present_results(f_ENIsFound: list):
@@ -146,7 +177,7 @@ def present_results(f_ENIsFound: list):
 	                'ENIId'           : {'DisplayOrder': 7, 'Heading': 'ENI Id'},
 	                'PrivateIpAddress': {'DisplayOrder': 8, 'Heading': 'Assoc. IP'}}
 
-	sorted_ENIs_Found = sorted(f_ENIsFound, key=lambda d: (d['MgmtAccount'], d['AccountId'], d['Region'], d['VpcId']))
+	sorted_ENIs_Found = sorted(f_ENIsFound, key=lambda d: (d['MgmtAccount'], d['AccountId'], d['Region'], d['ENIId']))
 	display_results(sorted_ENIs_Found, display_dict, 'None', pFilename)
 
 	DetachedENIs = [x for x in sorted_ENIs_Found if x['Status'] in ['available', 'attaching', 'detaching']]
@@ -158,7 +189,7 @@ def present_results(f_ENIsFound: list):
 	print(f"These profiles were skipped - as requested: {pSkipProfiles}") if pSkipProfiles is not None else ""
 	print()
 	print(f"The output has also been written to a file beginning with '{pFilename}' + the date and time") if pFilename is not None else ""
-	print(f"Found {len(f_ENIsFound)} ENIs {'with public IPs' if pPublicOnly else ''} across {len(AccountList)} accounts across {len(RegionList)} regions")
+	print(f"Found {len(f_ENIsFound)} ENIs{' with public IPs' if pPublicOnly else ''} across {len(AccountList)} accounts across {len(RegionList)} regions")
 	print(f"{Fore.RED}Found {len(DetachedENIs)} ENIs that are not listed as 'in-use' and may therefore be costing you additional money while they're unused.{Fore.RESET}") if DetachedENIs else ""
 	print()
 	if verbose < 40:
@@ -181,6 +212,7 @@ if __name__ == '__main__':
 	pAccounts = args.Accounts
 	pRootOnly = args.RootOnly
 	pIPaddressList = args.pipaddresses
+	pDNSNames = args.pDNSNames
 	pPublicOnly = args.ppublic
 	pFilename = args.Filename
 	pTiming = args.Time
@@ -200,12 +232,27 @@ if __name__ == '__main__':
 	logging.info(f"Profiles: {pProfiles}")
 
 	# Get credentials for all relevant children accounts
+	logging.debug(f"pProfiles: {pProfiles}")
 	CredentialList = get_all_credentials(pProfiles, pTiming, pSkipProfiles, pSkipAccounts, pRootOnly, pAccounts, pRegionList)
+
+	# Add into the IP list, any IPs that come from the names of the fqdns passed in
+	if pDNSNames is not None:
+		fqdn_resolutions = resolve_names_to_ips(pDNSNames)
+		fqdn_ips = [ip for x in fqdn_resolutions for ip in x['IPs']]
+	if pIPaddressList is None and pDNSNames is not None:
+		pIPaddressList = fqdn_ips
+	elif pIPaddressList is not None and pDNSNames is not None:
+		pIPaddressList.extend(fqdn_ips)
 
 	# Find ENIs across all children accounts
 	ENIsFound = check_accounts_for_enis(CredentialList, pIPaddressList, pPublicOnly)
 	# Display results
 	present_results(ENIsFound)
+
+	if verbose < 50:
+		print(f"You asked me to resolve {len(pDNSNames)} DNS Names")
+		for fqdn in fqdn_resolutions:
+			print(f"    DNS Name: {Fore.RED}{fqdn['fqdn']}{Fore.RESET} resolved to {Fore.RED}{fqdn['IPs']}{Fore.RESET}")
 
 	if pTiming:
 		print(f"{Fore.GREEN}This script took {time() - begin_time:.2f} seconds{Fore.RESET}")
