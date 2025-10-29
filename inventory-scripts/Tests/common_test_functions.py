@@ -1,6 +1,6 @@
 from botocore import client
 from botocore import session
-import pytest
+# import pytest
 
 ERASE_LINE = '\x1b[2K'
 
@@ -28,7 +28,10 @@ def AWSKeyID_from_AWSAccount(AWSAccountNumber):
 	return AWSKey
 
 
-def _amend_create_boto3_session(test_data, mocker):
+def _amend_create_boto3_session(test_data, verbosity, mocker):
+	import logging
+	logging.basicConfig(level=verbosity, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+
 	orig = session.Session.create_client
 
 	def amend_create_client(
@@ -46,12 +49,12 @@ def _amend_create_boto3_session(test_data, mocker):
 			):
 		# Intercept boto3 Session, in hopes of sending back a client that includes the Account Number
 		# if aws_access_key_id == '*****AccessKeyHere*****':
-		print(test_data['FunctionName'])
+		logging.info(test_data['FunctionName'])
 		if aws_access_key_id == 'MeantToFail':
-			print(f"Failed Access Key: {aws_access_key_id}")
+			logging.info(f"Failed Access Key: {aws_access_key_id}")
 			return ()
 		else:
-			print(f"Not Failed Access Key: {aws_access_key_id}")
+			logging.info(f"Not Failed Access Key: {aws_access_key_id}")
 			return_response = orig(self,
 			                       service_name,
 			                       region_name,
@@ -69,7 +72,10 @@ def _amend_create_boto3_session(test_data, mocker):
 	print()
 
 
-def _amend_make_api_call_orig(test_key, test_value, mocker):
+def _amend_make_api_call_orig(test_key, test_value, verbosity, mocker):
+	import logging
+	logging.basicConfig(level=verbosity, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+
 	orig = client.BaseClient._make_api_call
 
 	def amend_make_api_call(self, operation_name, kwargs):
@@ -81,23 +87,26 @@ def _amend_make_api_call_orig(test_key, test_value, mocker):
 			if isinstance(test_value, Exception):
 				raise test_value
 			# Implied break and exit of the function here...
-			print(f"Operation Name mocked: {operation_name}\n"
-			      f"Key Name: {test_key}\n"
-			      f"kwargs: {kwargs}\n"
-			      f"mocked return_response: {test_value}")
+			logging.info(f"Operation Name mocked: {operation_name}\n"
+			             f"Key Name: {test_key}\n"
+			             f"kwargs: {kwargs}\n"
+			             f"mocked return_response: {test_value}")
 			return test_value
 
 		return_response = orig(self, operation_name, kwargs)
-		print(f"Operation Name passed through: {operation_name}\n"
-		      f"Key name: {test_key}\n"
-		      f"kwargs: {kwargs}\n"
-		      f"Actual return response: {return_response}")
+		logging.info(f"Operation Name passed through: {operation_name}\n"
+		             f"Key name: {test_key}\n"
+		             f"kwargs: {kwargs}\n"
+		             f"Actual return response: {return_response}")
 		return return_response
 
 	mocker.patch('botocore.client.BaseClient._make_api_call', new=amend_make_api_call)
 
 
-def _amend_make_api_call(meta_key_dict, test_dict, mocker):
+def _amend_make_api_call(meta_key_dict, test_dict, verbosity, mocker):
+	import logging
+	logging.basicConfig(level=verbosity, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+
 	orig = client.BaseClient._make_api_call
 
 	def amend_make_api_call(self, operation_name, kwargs):
@@ -112,17 +121,17 @@ def _amend_make_api_call(meta_key_dict, test_dict, mocker):
 				if isinstance(test_value, Exception):
 					# Implied break and exit of the function here...
 					raise test_value
-				print(f"Operation Name mocked: {operation_name}\n"
-				      f"Function Name: {meta_key_dict['FunctionName']}\n"
-				      f"kwargs: {kwargs}\n"
-				      f"mocked return_response: {op_name['test_result']}")
+				logging.info(f"Operation Name mocked: {operation_name}\n"
+				             f"Function Name: {meta_key_dict['FunctionName']}\n"
+				             f"kwargs: {kwargs}\n"
+				             f"mocked return_response: {op_name['test_result']}")
 				return op_name['test_result']
 		try:
-			print(f"Trying: Operation Name passed through: {operation_name}\n"
-			      f"Key Name: {meta_key_dict['FunctionName']}\n"
-			      f"kwargs: {kwargs}\n")
+			logging.info(f"Trying: Operation Name passed through: {operation_name}\n"
+			             f"Key Name: {meta_key_dict['FunctionName']}\n"
+			             f"kwargs: {kwargs}\n")
 			return_response = orig(self, operation_name, kwargs)
-			print(f"Actual return_response: {return_response}")
+			logging.info(f"Actual return_response: {return_response}")
 		except Exception as my_Error:
 			raise ConnectionError("Operation Failed")
 		return return_response
@@ -130,7 +139,10 @@ def _amend_make_api_call(meta_key_dict, test_dict, mocker):
 	mocker.patch('botocore.client.BaseClient._make_api_call', new=amend_make_api_call)
 
 
-def _amend_make_api_call_specific(meta_key_dict, test_dict, mocker):
+def _amend_make_api_call_specific(meta_key_dict, test_dict, verbosity, mocker):
+	import logging
+	logging.basicConfig(level=verbosity, format="[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s")
+
 	orig = client.BaseClient._make_api_call
 
 	def amend_make_api_call(self, operation_name, kwargs):
@@ -152,30 +164,31 @@ def _amend_make_api_call_specific(meta_key_dict, test_dict, mocker):
 						break
 				if test_value is not None and isinstance(test_value, Exception):
 					# Implied break and exit of the function here...
-					print("Expected Error...")
+					logging.info("Expected Error...")
 					raise test_value
 				elif test_value is None:
-					print(f"No test data offered for this credentials in region {region}")
+					logging.info(f"No test data offered for this credentials in region {region}")
 					continue
-				print(f"Operation Name mocked: {operation_name}\n"
-				      f"Function Name: {meta_key_dict['FunctionName']}\n"
-				      f"kwargs: {kwargs}\n"
-				      f"mocked return_response: {test_value}")
+				logging.info(f"Operation Name mocked: {operation_name}\n"
+				             f"Function Name: {meta_key_dict['FunctionName']}\n"
+				             f"kwargs: {kwargs}\n"
+				             f"mocked return_response: {test_value}")
 				return test_value
 
-		print(f"Operation Name passed through: {operation_name}\n"
-		      f"Function Name: {meta_key_dict['FunctionName']}\n"
-		      f"kwargs: {kwargs}\n")
+		logging.info(f"Operation Name passed through: {operation_name}\n"
+		             f"Function Name: {meta_key_dict['FunctionName']}\n"
+		             f"kwargs: {kwargs}\n")
 		return_response = orig(self, operation_name, kwargs)
-		print(f"Actual return_response: {return_response}")
+		logging.info(f"Actual return_response: {return_response}")
 		return return_response
 
 	mocker.patch('botocore.client.BaseClient._make_api_call', new=amend_make_api_call)
+
+
 # mocker.patch('botocore.session', new=amend_make_api_call)
 
 
-
-def mock_find_all_instances2(creds:dict, region:str):
+def mock_find_all_instances2(creds: dict, region: str):
 	"""
 	This is a mock function that will return a list of all the instances in the region that we're looking for.
 	:param creds: Credentials object, where 'AccountNumber' is the account number of the account that we're looking for.

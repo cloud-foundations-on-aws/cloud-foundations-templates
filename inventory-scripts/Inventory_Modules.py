@@ -4579,7 +4579,9 @@ def display_results(results_list, fdisplay_dict: dict, defaultAction=None, file_
 
 		Enhancements:
 			- How to create a break between rows, like after every account, or Management Org, or region, or whatever...
-			- How to do sub-sections, where there is more data to show per row...  
+
+		TODO: Documentation on how to do the sub-sections - which has been written, but not explained. 
+		- How to do sub-sections, where there is more data to show per row...  
 	"""
 
 	def handle_list():
@@ -4912,6 +4914,7 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 	import logging
 	from account_class import aws_acct_access
 	# from time import time
+	from botocore.exceptions import NoCredentialsError
 	from colorama import init, Fore
 
 	init()
@@ -4930,11 +4933,15 @@ def get_all_credentials(fProfiles: list = None, fTiming: bool = False, fSkipProf
 		fRegionList = ['us-east-1']
 	if fProfiles is None:  # Default use case from the classes
 		print("Getting Accounts to check: ", end='')
-		aws_acct = aws_acct_access()
-		# This doesn't mean the profile "default", this is just what the label for the Org Name will be, since there's no other text
-		profile = '-default-'
+		try:
+			aws_acct = aws_acct_access()
+		except NoCredentialsError as my_Error:
+			logging.error(f"Credentials error: {my_Error}")
+			raise Exception(f"Credential Error")
+		# This doesn't mean the profile "default" or 'None', this is just what the label for the Org Name will be, since there's no other text
+		profile = 'None'
 		RegionList = get_regions3(aws_acct, fRegionList)
-		logging.info(f"No profile string passed in. Using string '-default-'")
+		logging.info(f"No profile string passed in. Using string 'None'")
 		# This should populate the list "AllCreds" with the credentials for the relevant accounts.
 		AllCredentials.extend(get_credentials_for_accounts_in_org(aws_acct, fSkipAccounts, fRootOnly, fAccounts, profile, RegionList, RoleList, fTiming))
 	else:
@@ -5115,7 +5122,7 @@ def get_credentials_for_accounts_in_org(faws_acct, fSkipAccounts=None, fRootOnly
 	return AllCreds
 
 
-def get_org_accounts_from_profiles(fProfileList):
+def get_org_accounts_from_profiles(fProfileList=None):
 	"""
 	Note that this function returns account_class objects based on the list of profiles passed to it
 	This function is fairly slow since it needs to call the aws_acct_access function for each profile.
@@ -5139,7 +5146,8 @@ def get_org_accounts_from_profiles(fProfileList):
 			while True:
 				# Get the work from the queue and expand the tuple
 				profile = self.queue.get()
-				pbar.update()
+				if profile is None:
+					break
 				Account = {'ErrorFlag'   : False,
 				           'Success'     : False,
 				           'RootAcct'    : False,
@@ -5213,13 +5221,20 @@ def get_org_accounts_from_profiles(fProfileList):
 						logging.error("Credentials Error")
 						logging.error(my_Error)
 				finally:
+					# logging.info(f"Account: {Account}") ## Remove
+					# print(f"Account: {Account}")  ## Remove
 					self.queue.task_done()
+					pbar.update()
 				AllAccounts.append(Account)
 
+	# print(f"ProfileList from within the mt function: {fProfileList}")  ## Remove
 	AllAccounts = []
 	profilequeue = Queue()
-	# WorkerThreads = len(fProfileList)
-	WorkerThreads = 2
+	if fProfileList:
+		WorkerThreads = min(len(fProfileList), 2)
+	else:
+		WorkerThreads = 1
+	threads = []
 
 	# Create x worker threads
 	for x in range(WorkerThreads):
@@ -5227,13 +5242,28 @@ def get_org_accounts_from_profiles(fProfileList):
 		# Setting daemon to True will let the main thread exit even though the workers are blocking
 		worker.daemon = True
 		worker.start()
+		threads.append(worker)
 
-	pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
-	            total=len(fProfileList)
-	            )
-
-	for profile_item in fProfileList:
-		logging.info(f"Queuing profile {profile_item} / {len(fProfileList)} profiles")
-		profilequeue.put(profile_item)
+	if fProfileList is None:
+		logging.info("No profiles were found, using environment variables")
+		logging.error("No profiles were found, using environment variables")
+		pbar = tqdm(desc=f'Getting account from EnvVar', total=1)
+		profilequeue.put('EnvVar')
+	else:
+		logging.info(f"List of profiles being looked at is: {fProfileList}")
+		logging.error(f"List of profiles being looked at is: {fProfileList}")
+		pbar = tqdm(desc=f'Getting accounts from {len(fProfileList)} profiles',
+		            total=len(fProfileList))
+		for profile_item in fProfileList:
+			profilequeue.put(profile_item)
 	profilequeue.join()
+	# Sends 'sentinel value' to threads to tell them we're done
+	for _ in threads:
+		logging.debug(f"Sending 'None' to queue, to ensure all threads finish")
+		profilequeue.put(None)
+	# Waits for all threads to be finished
+	for t in threads:
+		logging.debug(f"Waiting for thread {t.name} to finish")
+		t.join()
+	# print(f"AllAccounts - from within the multi-threaded function, just before return: {AllAccounts}")  ## Remove
 	return AllAccounts
