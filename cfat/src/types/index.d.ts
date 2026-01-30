@@ -79,6 +79,7 @@ export interface PolicyTypesEnabled {
   scpEnabled: boolean;
   tagPolicyEnabled: boolean;
   backupPolicyEnabled: boolean;
+  rcpEnabled: boolean;
 };
 
 export interface OrgDelegatedAdminAccount {

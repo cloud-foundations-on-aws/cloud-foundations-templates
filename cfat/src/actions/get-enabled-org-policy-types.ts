@@ -6,7 +6,8 @@ async function getEnabledOrgPolicyTypes(region: string ): Promise<PolicyTypesEna
   let policyTypesEnabled:PolicyTypesEnabled = {
     scpEnabled: false,
     tagPolicyEnabled: false,
-    backupPolicyEnabled : false
+    backupPolicyEnabled : false,
+    rcpEnabled: false    
   };
   try {
     const input: ListRootsCommandInput = {};
@@ -23,6 +24,9 @@ async function getEnabledOrgPolicyTypes(region: string ): Promise<PolicyTypesEna
                 }
                 if (enabledPolicy.Type == 'BACKUP_POLICY' && enabledPolicy.Status == 'ENABLED') {
                   policyTypesEnabled.backupPolicyEnabled = true;
+                }
+                if (enabledPolicy.Type == 'RESOURCE_CONTROL_POLICY' && enabledPolicy.Status == 'ENABLED') {
+                  policyTypesEnabled.rcpEnabled = true;
                 }
             }// end for
         }// end if

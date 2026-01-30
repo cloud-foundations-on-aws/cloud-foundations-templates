@@ -76,7 +76,11 @@ const main = async (): Promise<void> => {
 	let cfatLogArchiveAccountPass:boolean = false;
 	let cfatAuditAccountPass:boolean = false;
 	let cfatManagementAccountPass:boolean = true;
-	let cfatOrgServiceBackupEnabledPass = false
+	let cfatOrgServiceBackupEnabledPass = false;
+	let cfatMinAWSAccountsPass:boolean = false;
+	let cfatRcpEnabledPass:boolean = false;
+	let cfatOrgServiceCostOptimizationHubEnabledPass:boolean = false
+
 
 	if (accountType) {
 		report.organizationDeploy = accountType.isInOrganization
@@ -145,6 +149,9 @@ const main = async (): Promise<void> => {
 		report.orgDelegatedAdminAccounts = await getOrgDaAccounts(region);
 		console.log("collecting AWS Organization member account details...")
 		report.orgMemberAccounts = await getOrgMemberAccounts(region);
+		if(report.orgMemberAccounts && report.orgMemberAccounts.length >= 4){
+			cfatMinAWSAccountsPass = true;
+		}
 		report.isLegacyCurSetup = legacyCurCheck.isLegacyCurSetup
 		report.orgArn = orgDetails.arn
 		report.orgId = orgDetails.id
@@ -183,6 +190,9 @@ const main = async (): Promise<void> => {
 		}
 		if(enableOrgPoliciesCheck.backupPolicyEnabled) {
 			cfatBackupPoliciesEnabledPass = true;
+		}
+		if(enableOrgPoliciesCheck.rcpEnabled) {
+			cfatRcpEnabledPass = true;
 		}
 		if(orgDetails.rootOuId){
 			console.log("collecting OU and member account details...")
@@ -262,6 +272,9 @@ const main = async (): Promise<void> => {
 		if(report.orgServices.find(param=> param.service === 'backup.amazonaws.com')){
 			cfatOrgServiceBackupEnabledPass = true;
 		}
+		if(report.orgServices.find(param=> param.service === 'cost-optimization-hub.bcm.amazonaws.com')){
+			cfatOrgServiceCostOptimizationHubEnabledPass = true;
+		}
 		if(report.orgCloudFormationStatus === 'ENABLED'){
 			cfatOrgCloudFormationEnabledPass = true;
 		}
@@ -295,6 +308,17 @@ const main = async (): Promise<void> => {
 		remediationLink: "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-creating.html"
 	}
 	cfatChecks.push(MACheck);
+
+	const cfatMinAccountsCheck:CfatCheck = {
+		check: "Minimum 4 AWS accounts deployed",
+		description: "Organization should have at least 4 accounts (Management, Log Archive, Audit, and workload account) following AWS multi-account best practices.",
+		status: cfatMinAWSAccountsPass ? "complete": "incomplete",
+		required: true,
+		weight: 6,
+		loe: 2,
+		remediationLink: "https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-your-aws-environment.html"
+	}
+	cfatChecks.push(cfatMinAccountsCheck);
 
 	const cfatIamUserCheck:CfatCheck = {
 		check: "Management Account IAM users removed",
@@ -481,6 +505,17 @@ const main = async (): Promise<void> => {
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/services-that-can-integrate-backup.html#integrate-enable-ta-backup"
 	}
 
+	const cfatOrgServiceCostOptimizationHubEnabledCheck:CfatCheck = {
+		check: "Cost Optimization Hub Organization service enabled",
+		description: "Cost Optimization Hub trusted access should be enabled in the AWS Organization to centralize cost optimization recommendations.",
+		status: cfatOrgServiceCostOptimizationHubEnabledPass ? "complete": "incomplete",
+		required: false,
+		weight: 4,
+		loe: 1,
+		remediationLink: "https://docs.aws.amazon.com/cost-management/latest/userguide/coh-trusted-access.html"
+	}
+	cfatChecks.push(cfatOrgServiceCostOptimizationHubEnabledCheck);
+
 	const cfatInfraOuCheck:CfatCheck = {
 		check: "Top-level Infrastructure OU deployed",
 		description: "Top-level Infrastructure OU should exist.",
@@ -568,6 +603,17 @@ const main = async (): Promise<void> => {
 		remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_enable-disable.html"
 	}
 	cfatChecks.push(cfatBackupPoliciesEnabledCheck);
+
+	const cfatRcpEnabledCheck:CfatCheck = {
+    check: "Resource Control Policies enabled",
+    description: "Resource Control Policy should be enabled within the AWS Organization.",
+    status: cfatRcpEnabledPass ? "complete": "incomplete",
+    required: false,
+    weight: 4,
+    loe: 1,
+    remediationLink: "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_rcps.html"
+	}
+	cfatChecks.push(cfatRcpEnabledCheck);
 
 	const cfatControlTowerDeployedCheck:CfatCheck= {
 		check: "Control Tower deployed",
